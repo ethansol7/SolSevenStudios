@@ -190,19 +190,24 @@ export const solXComponents = [
     note: 'Primary SOL X foundation component.',
   },
   {
-    label: 'SOL X S02 Shade',
+    label: 'SOL X S02',
     path: assetUrl('models/solx/s02.glb'),
-    note: 'Component shade file for the SOL X preview system.',
+    note: 'Shade module for calm, vertical SOL X stack compositions.',
   },
   {
-    label: 'SOL X S03 Shade',
+    label: 'SOL X S03',
     path: assetUrl('models/solx/s03.glb'),
-    note: 'Tall shade component for SOL X system previews.',
+    note: 'Tall shade module for a softer, more architectural profile.',
+  },
+  {
+    label: 'SOL X S04',
+    path: assetUrl('models/solx/s04.glb'),
+    note: 'New shade module for extended, more expressive stack builds.',
   },
   {
     label: 'SOL X Divider',
     path: assetUrl('models/solx/divider.glb'),
-    note: 'Divider component for spacing and modular assembly studies.',
+    note: 'Slim connector layer that separates two shade modules.',
   },
 ];
 

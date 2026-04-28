@@ -95,10 +95,3 @@ export const capabilities = [
   'Circular design',
   'Storytelling',
 ];
-
-export const assetNotes = [
-  'Hero model: lightweight SOL lamp GLB from local Capstone Electric Lamp Renders.',
-  'Product visuals: Sol lamp, SOL X, PlastiVista, Revo Chair, and Sol Wheel assets from local D: drive and Google Drive discovery.',
-  'Motion media: real shredder process video, muted by design.',
-  'Music: editable local stem engine with prompt-based section transitions.',
-];

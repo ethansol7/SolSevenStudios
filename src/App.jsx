@@ -13,7 +13,7 @@ import {
   SolXConfiguratorPage,
   SolXPage,
 } from './components/StorePages.jsx';
-import { assetNotes, assetUrl, capabilities, featuredWork, heroLines, navItems, systemTabs } from './content.js';
+import { assetUrl, capabilities, featuredWork, heroLines, navItems, systemTabs } from './content.js';
 import { findProductBySlug } from './data/products.js';
 import { requestMusicSection, useActiveMusicSection } from './music/useActiveMusicSection.js';
 import { currentRoutePath, useClientNavigation } from './routing.js';
@@ -262,11 +262,6 @@ function Capabilities() {
             <span>{String(index + 1).padStart(2, '0')}</span>
             <p>{capability}</p>
           </motion.div>
-        ))}
-      </div>
-      <div className="asset-note-strip" aria-label="Asset sourcing notes">
-        {assetNotes.map((note) => (
-          <p key={note}>{note}</p>
         ))}
       </div>
     </section>

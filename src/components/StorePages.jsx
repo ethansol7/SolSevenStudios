@@ -218,8 +218,8 @@ export function SolXPage({ onNavigate }) {
 
       <section className="store-section section-pad" data-music-section="solX">
         <div className="section-heading">
-          <p className="section-kicker">Provided GLB files</p>
-          <h2>Loaded as SOL X components, not Original SOL product imagery.</h2>
+          <p className="section-kicker">SOL X components</p>
+          <h2>Preview the base, shades, and divider as a modular lighting language.</h2>
         </div>
         <div className="component-list">
           {solXComponents.map((component) => (

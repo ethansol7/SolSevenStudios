@@ -4,7 +4,7 @@ import { Suspense, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { solXComponents } from '../data/products.js';
 
-function ComponentModel({ component, index, isolated }) {
+function ComponentModel({ component, index, isolated, count }) {
   const { scene } = useGLTF(component.path);
   const clone = useMemo(() => {
     const next = scene.clone(true);
@@ -24,7 +24,8 @@ function ComponentModel({ component, index, isolated }) {
     return next;
   }, [scene]);
 
-  const x = isolated ? 0 : (index - 1.5) * 2.05;
+  const spacing = count > 4 ? 1.72 : 2.05;
+  const x = isolated ? 0 : (index - (count - 1) / 2) * spacing;
 
   return (
     <group position={[x, 0, 0]} scale={isolated ? 13.5 : 10.5}>
@@ -39,6 +40,7 @@ function ViewerRig({ activeIndex }) {
   const group = useRef();
   const isolated = activeIndex !== 'all';
   const components = isolated ? [solXComponents[activeIndex]] : solXComponents;
+  const count = components.length;
 
   useFrame((state) => {
     if (!group.current) return;
@@ -54,6 +56,7 @@ function ViewerRig({ activeIndex }) {
             component={component}
             index={isolated ? 1.5 : index}
             isolated={isolated}
+            count={count}
           />
         ))}
       </group>

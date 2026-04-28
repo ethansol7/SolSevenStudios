@@ -147,7 +147,7 @@ export default function MusicPlayer({ activeSectionKey }) {
               </label>
               <button type="button" className="music-edit-button" onClick={() => setEditorOpen(true)}>
                 <SlidersHorizontal size={16} />
-                <span>Edit Music Prompts</span>
+                <span>Edit Music</span>
               </button>
               <button type="button" className="music-icon-button music-collapse-button" onClick={() => setIsCollapsed(true)} aria-label="Collapse music dashboard">
                 <Sprout size={17} />
@@ -168,10 +168,10 @@ export default function MusicPlayer({ activeSectionKey }) {
           >
             <div className="music-editor__header">
               <div>
-                <p className="section-kicker">Local prompt lab</p>
-                <h3>Section music prompts</h3>
+                <p className="section-kicker">Sound editor</p>
+                <h3>Music scenes</h3>
               </div>
-              <button type="button" className="music-icon-button" onClick={() => setEditorOpen(false)} aria-label="Close music prompt editor">
+              <button type="button" className="music-icon-button" onClick={() => setEditorOpen(false)} aria-label="Close music editor">
                 <X size={18} />
               </button>
             </div>
@@ -194,7 +194,7 @@ export default function MusicPlayer({ activeSectionKey }) {
               </label>
 
               <label className="music-field music-field--wide">
-                <span>Prompt</span>
+                <span>Scene direction</span>
                 <textarea value={selectedPrompt.prompt} onChange={(event) => updatePrompt('prompt', event.target.value)} rows={5} />
               </label>
 
@@ -224,7 +224,7 @@ export default function MusicPlayer({ activeSectionKey }) {
                   <span>{copied ? 'Copied config' : 'Copy config'}</span>
                 </button>
                 <button type="button" onClick={resetLocalEdits}>
-                  Reset local edits
+                  Reset edits
                 </button>
               </div>
             </div>
