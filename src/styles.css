@@ -121,7 +121,9 @@ canvas {
   justify-self: center;
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.6vw, 38px);
+  gap: clamp(12px, 1.7vw, 26px);
+  max-width: min(980px, 100%);
+  overflow-x: auto;
   padding: 13px 18px;
   border: 1px solid rgba(25, 25, 24, 0.1);
   border-radius: 999px;
@@ -381,7 +383,9 @@ canvas {
 .work-image-wrap img {
   width: 100%;
   aspect-ratio: 1.22;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: linear-gradient(180deg, #f8f7f1, #ece7dc);
   transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -636,6 +640,386 @@ canvas {
   background: rgba(247, 245, 239, 0.86);
 }
 
+.route-page {
+  min-height: 100svh;
+  padding-top: clamp(92px, 10vh, 130px);
+}
+
+.store-hero {
+  width: min(var(--max), 100%);
+  min-height: min(880px, calc(100svh - 24px));
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.72fr);
+  gap: clamp(34px, 7vw, 108px);
+  align-items: center;
+  margin-inline: auto;
+  padding: clamp(54px, 8vw, 112px) clamp(20px, 5vw, 72px) clamp(72px, 9vw, 128px);
+}
+
+.store-hero__copy h1,
+.product-detail__copy h1,
+.solx-page__copy h1 {
+  margin: 0;
+  font-size: clamp(3.2rem, 8.7vw, 10.8rem);
+  font-weight: 480;
+  line-height: 0.88;
+  letter-spacing: 0;
+}
+
+.store-hero__copy > p:not(.section-kicker),
+.product-detail__copy > p,
+.solx-page__copy > p {
+  width: min(660px, 100%);
+  margin: 28px 0 0;
+  color: var(--ink-soft);
+  font-size: clamp(1.08rem, 1.5vw, 1.35rem);
+  line-height: 1.55;
+}
+
+.store-hero__media,
+.product-detail__gallery,
+.solx-viewer,
+.collection-tile,
+.store-card {
+  border-radius: 8px;
+}
+
+.store-hero__media {
+  overflow: hidden;
+  background: linear-gradient(180deg, #fbfaf6, #ebe6da);
+  box-shadow: inset 0 0 0 1px rgba(25, 25, 24, 0.08);
+}
+
+.store-hero__media img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  padding: clamp(18px, 4vw, 46px);
+}
+
+.route-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 34px;
+}
+
+.route-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(25, 25, 24, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--ink);
+  transition: transform 240ms ease, border-color 240ms ease, background 240ms ease;
+}
+
+.route-actions a:hover,
+.route-actions a:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(25, 25, 24, 0.36);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.store-section {
+  border-top: 1px solid var(--line);
+}
+
+.collection-grid,
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.5vw, 32px);
+}
+
+.store-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.collection-tile,
+.store-card {
+  overflow: hidden;
+  border: 1px solid rgba(25, 25, 24, 0.1);
+  background: rgba(255, 255, 255, 0.22);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 320ms ease, background 320ms ease;
+}
+
+.collection-tile:hover,
+.collection-tile:focus-visible,
+.store-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(25, 25, 24, 0.24);
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.collection-tile {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.48fr) minmax(0, 1fr);
+  min-height: 320px;
+}
+
+.collection-tile img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: contain;
+  object-position: center;
+  padding: 28px;
+  background: linear-gradient(180deg, #fbfaf6, #ebe6da);
+}
+
+.collection-tile div,
+.store-card__body {
+  padding: clamp(18px, 2.6vw, 34px);
+}
+
+.collection-tile p,
+.store-card__body p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.collection-tile h3,
+.store-card__body h3 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.6vw, 3.9rem);
+  font-weight: 460;
+  line-height: 0.95;
+}
+
+.collection-tile span,
+.store-card__body span {
+  display: block;
+  margin-top: 18px;
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.store-card {
+  display: grid;
+  min-height: 100%;
+}
+
+.store-card__image {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  background: linear-gradient(180deg, #fbfaf6, #ebe6da);
+}
+
+.store-card__image img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  padding: 22px;
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.store-card:hover .store-card__image img {
+  transform: scale(1.035);
+}
+
+.store-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.store-card__footer small {
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.store-card__footer a {
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.product-detail {
+  width: min(var(--max), 100%);
+  min-height: min(880px, calc(100svh - 24px));
+  display: grid;
+  grid-template-columns: minmax(320px, 0.82fr) minmax(0, 0.78fr);
+  gap: clamp(36px, 7vw, 112px);
+  align-items: center;
+  margin-inline: auto;
+  padding: clamp(54px, 8vw, 112px) clamp(20px, 5vw, 72px) clamp(72px, 9vw, 128px);
+}
+
+.product-detail__gallery {
+  overflow: hidden;
+  background: linear-gradient(180deg, #fbfaf6, #ebe6da);
+  box-shadow: inset 0 0 0 1px rgba(25, 25, 24, 0.08);
+}
+
+.product-detail__gallery img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  padding: clamp(24px, 5vw, 70px);
+}
+
+.product-price {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.product-price span {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.product-price strong {
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  font-weight: 500;
+}
+
+.product-story {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(280px, 0.48fr);
+  gap: clamp(30px, 7vw, 106px);
+  border-top: 1px solid var(--line);
+}
+
+.product-story h2 {
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 7.4rem);
+  font-weight: 460;
+  line-height: 0.94;
+}
+
+.product-story > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(1.08rem, 1.55vw, 1.35rem);
+  line-height: 1.58;
+}
+
+.product-notes {
+  border-top: 1px solid var(--line);
+}
+
+.product-notes__grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.product-notes__grid .capability-item p {
+  font-size: clamp(1.02rem, 1.65vw, 1.55rem);
+  line-height: 1.22;
+}
+
+.solx-page {
+  width: min(var(--max), 100%);
+  min-height: min(900px, calc(100svh - 24px));
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(460px, 0.9fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+  margin-inline: auto;
+  padding: clamp(54px, 8vw, 112px) clamp(20px, 5vw, 72px) clamp(72px, 9vw, 128px);
+}
+
+.solx-page__copy {
+  min-width: 0;
+}
+
+.solx-page__copy h1 {
+  max-width: 8.6ch;
+  font-size: clamp(3.2rem, 6.8vw, 8.4rem);
+}
+
+.solx-viewer {
+  overflow: hidden;
+  border: 1px solid rgba(25, 25, 24, 0.1);
+  background:
+    linear-gradient(135deg, rgba(128, 155, 139, 0.11), transparent 38%),
+    linear-gradient(250deg, rgba(206, 150, 68, 0.11), transparent 42%),
+    #f4f1e8;
+}
+
+.solx-viewer--loading {
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+.solx-viewer__canvas {
+  height: clamp(430px, 55vh, 620px);
+}
+
+.solx-viewer__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(25, 25, 24, 0.1);
+}
+
+.solx-viewer__controls button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(25, 25, 24, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.solx-viewer__controls button.active,
+.solx-viewer__controls button:hover,
+.solx-viewer__controls button:focus-visible {
+  border-color: rgba(25, 25, 24, 0.34);
+  background: rgba(255, 255, 255, 0.66);
+  color: var(--ink);
+}
+
+.component-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.component-list article {
+  min-height: 180px;
+  padding: clamp(18px, 2.4vw, 30px);
+  background: rgba(247, 245, 239, 0.9);
+}
+
+.component-list p {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.08;
+}
+
+.component-list span {
+  display: block;
+  margin-top: 16px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.contact-section--route {
+  min-height: 70svh;
+}
+
 .music-player {
   position: fixed;
   left: clamp(14px, 2.5vw, 36px);
@@ -650,7 +1034,7 @@ canvas {
   grid-template-columns: 46px minmax(0, 1fr) auto;
   gap: 15px;
   align-items: center;
-  width: min(980px, 100%);
+  width: min(660px, 100%);
   padding: 12px;
   border: 1px solid rgba(25, 25, 24, 0.13);
   border-radius: 8px;
@@ -890,7 +1274,11 @@ canvas {
   }
 
   .intro-section,
-  .systems-section {
+  .systems-section,
+  .store-hero,
+  .product-detail,
+  .product-story,
+  .solx-page {
     grid-template-columns: 1fr;
   }
 
@@ -911,6 +1299,20 @@ canvas {
   .asset-note-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .store-grid,
+  .product-notes__grid,
+  .component-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .collection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .solx-page__copy {
+    order: 2;
+  }
 }
 
 @media (max-width: 760px) {
@@ -923,11 +1325,17 @@ canvas {
   .site-nav nav {
     order: 3;
     grid-column: 1 / -1;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     width: 100%;
     gap: 12px;
     padding: 12px 14px;
-    overflow-x: auto;
+    overflow: visible;
+    border-radius: 22px;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
   }
 
   .hero {
@@ -984,7 +1392,10 @@ canvas {
   }
 
   .capability-grid,
-  .asset-note-strip {
+  .asset-note-strip,
+  .store-grid,
+  .product-notes__grid,
+  .component-list {
     grid-template-columns: 1fr;
   }
 
@@ -1035,6 +1446,32 @@ canvas {
 
   .music-editor__body {
     grid-template-columns: 1fr;
+  }
+
+  .store-hero,
+  .product-detail,
+  .solx-page {
+    padding: 120px 18px 82px;
+  }
+
+  .store-hero__copy h1,
+  .product-detail__copy h1,
+  .solx-page__copy h1 {
+    font-size: clamp(3.1rem, 16vw, 5.4rem);
+  }
+
+  .collection-tile {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-tile img,
+  .store-card__image,
+  .product-detail__gallery img {
+    min-height: 240px;
+  }
+
+  .solx-viewer__canvas {
+    height: 440px;
   }
 }
 

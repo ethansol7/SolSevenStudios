@@ -1,9 +1,21 @@
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ArrowDown, ExternalLink } from 'lucide-react';
-import { Suspense, lazy, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import AppLink from './components/AppLink.jsx';
 import MusicPlayer from './components/MusicPlayer.jsx';
+import {
+  AboutPage,
+  NotFoundPage,
+  OriginalSolCollectionPage,
+  PlastiVistaPage,
+  ProductPage,
+  ShopPage,
+  SolXPage,
+} from './components/StorePages.jsx';
 import { assetNotes, assetUrl, capabilities, featuredWork, heroLines, navItems, systemTabs } from './content.js';
+import { findProductBySlug } from './data/products.js';
 import { requestMusicSection, useActiveMusicSection } from './music/useActiveMusicSection.js';
+import { currentRoutePath, useClientNavigation } from './routing.js';
 
 const HeroScene = lazy(() => import('./components/HeroScene.jsx'));
 
@@ -26,17 +38,17 @@ const cascade = {
   },
 };
 
-function Navigation() {
+function Navigation({ onNavigate }) {
   return (
     <header className="site-nav">
-      <a className="brand-mark" href="#home" aria-label="Sol Seven Studios home">
+      <AppLink className="brand-mark" to="/" onNavigate={onNavigate} aria-label="Sol Seven Studios home">
         <span>S7</span>
-      </a>
+      </AppLink>
       <nav aria-label="Primary navigation">
         {navItems.map((item) => (
-          <a key={item.href} className="nav-link" href={item.href}>
+          <AppLink key={item.href} className="nav-link" to={item.href} onNavigate={onNavigate}>
             <span data-label={item.label}>{item.label}</span>
-          </a>
+          </AppLink>
         ))}
       </nav>
     </header>
@@ -280,6 +292,44 @@ function Contact() {
   );
 }
 
+function HomePage() {
+  return (
+    <main>
+      <Hero />
+      <StudioIntro />
+      <FeaturedWork />
+      <CinematicSection />
+      <Systems />
+      <Capabilities />
+      <Contact />
+    </main>
+  );
+}
+
+function RouteSwitch({ onNavigate, routePath }) {
+  if (routePath === '/' || routePath === '') return <HomePage />;
+  if (routePath === '/shop') return <ShopPage onNavigate={onNavigate} />;
+  if (routePath === '/shop/original-sol') return <OriginalSolCollectionPage onNavigate={onNavigate} />;
+  if (routePath === '/sol-x') return <SolXPage onNavigate={onNavigate} />;
+  if (routePath === '/plastivista') return <PlastiVistaPage />;
+  if (routePath === '/about') return <AboutPage />;
+  if (routePath.startsWith('/product/')) return <ProductPage slug={routePath.replace('/product/', '')} onNavigate={onNavigate} />;
+  return <NotFoundPage onNavigate={onNavigate} />;
+}
+
+function musicSectionForRoute(routePath) {
+  if (routePath === '/shop' || routePath === '/shop/original-sol') return 'solLamp';
+  if (routePath === '/sol-x') return 'solX';
+  if (routePath === '/plastivista') return 'plastivista';
+  if (routePath === '/about') return 'contact';
+  if (routePath.startsWith('/product/')) {
+    const product = findProductBySlug(routePath.replace('/product/', ''));
+    return product?.category === 'add-ons' ? 'process' : 'solLamp';
+  }
+
+  return 'home';
+}
+
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 110, damping: 28, restDelta: 0.001 });
@@ -288,24 +338,28 @@ function ScrollProgress() {
 }
 
 export default function App() {
+  const [routePath, setRoutePath] = useState(currentRoutePath);
+  const onNavigate = useClientNavigation(setRoutePath);
   const activeMusicSection = useActiveMusicSection('home');
   const { scrollYProgress } = useScroll();
   const backgroundShift = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+
+  useEffect(() => {
+    const handlePopState = () => setRoutePath(currentRoutePath());
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    requestMusicSection(musicSectionForRoute(routePath));
+  }, [routePath]);
 
   return (
     <>
       <ScrollProgress />
       <motion.div className="ambient-wash" style={{ '--scroll-shift': backgroundShift }} aria-hidden="true" />
-      <Navigation />
-      <main>
-        <Hero />
-        <StudioIntro />
-        <FeaturedWork />
-        <CinematicSection />
-        <Systems />
-        <Capabilities />
-        <Contact />
-      </main>
+      <Navigation onNavigate={onNavigate} />
+      <RouteSwitch routePath={routePath} onNavigate={onNavigate} />
       <MusicPlayer activeSectionKey={activeMusicSection} />
     </>
   );

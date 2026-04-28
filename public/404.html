@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sol Seven Studios</title>
+    <script>
+      (function () {
+        var base = '/SolSevenStudios';
+        var target = window.location.pathname + window.location.search + window.location.hash;
+        if (window.location.pathname.indexOf(base) === 0) {
+          sessionStorage.setItem('solseven.redirect', target);
+          window.location.replace(base + '/');
+        } else {
+          window.location.replace(base + '/');
+        }
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

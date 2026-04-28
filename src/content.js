@@ -1,10 +1,13 @@
 export const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 
 export const navItems = [
-  { label: 'Work', href: '#work' },
-  { label: 'Systems', href: '#systems' },
-  { label: 'Capabilities', href: '#capabilities' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/' },
+  { label: 'Work', href: '/#work' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Original SOL', href: '/shop/original-sol' },
+  { label: 'SOL X', href: '/sol-x' },
+  { label: 'PlastiVista', href: '/plastivista' },
+  { label: 'About / Contact', href: '/about' },
 ];
 
 export const heroLines = [
