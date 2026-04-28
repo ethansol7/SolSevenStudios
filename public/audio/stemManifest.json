@@ -1,0 +1,14 @@
+{
+  "audio/home": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/studio": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/sol-lamp": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/sol-x": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/plastivista": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/revo-chair": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/sol-wheel": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/process": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/dram": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/capabilities": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/icff": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"],
+  "audio/contact": ["pad.wav", "texture.wav", "rhythm.wav", "sparkle.wav"]
+}

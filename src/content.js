@@ -17,6 +17,7 @@ export const featuredWork = [
   {
     title: 'SOL Lamp System',
     eyebrow: 'Modular lighting',
+    musicSection: 'solLamp',
     image: assetUrl('assets/lamps/homepage-sol-feature.png'),
     description:
       'A lighting platform designed around swappable forms, repairable assemblies, and expressive spatial presence.',
@@ -24,6 +25,7 @@ export const featuredWork = [
   {
     title: 'SOL X Lamp',
     eyebrow: 'Additive workflow',
+    musicSection: 'solX',
     image: assetUrl('assets/lamps/solx-one-lamp.png'),
     description:
       'A refined lamp study that connects printed parts, connector logic, and premium domestic lighting.',
@@ -31,6 +33,7 @@ export const featuredWork = [
   {
     title: 'PlastiVista',
     eyebrow: 'Circular manufacturing',
+    musicSection: 'plastivista',
     image: assetUrl('assets/plastivista/homepage-process-sequence.png'),
     description:
       'A compact material system for shredding, extruding, printing, and returning plastic waste to product form.',
@@ -38,6 +41,7 @@ export const featuredWork = [
   {
     title: 'Revo Chair',
     eyebrow: 'Furniture system',
+    musicSection: 'revoChair',
     image: assetUrl('assets/chairs/revo-tall-test.png'),
     description:
       'Furniture development focused on rotational form, digital fabrication, and quiet structural clarity.',
@@ -45,6 +49,7 @@ export const featuredWork = [
   {
     title: 'Sol Wheel',
     eyebrow: 'Object research',
+    musicSection: 'solWheel',
     image: assetUrl('assets/process/sol-wheel-render.png'),
     description:
       'A product exploration linking playful interaction, fabrication research, and physical prototyping.',
@@ -91,5 +96,5 @@ export const assetNotes = [
   'Hero model: lightweight SOL lamp GLB from local Capstone Electric Lamp Renders.',
   'Product visuals: Sol lamp, SOL X, PlastiVista, Revo Chair, and Sol Wheel assets from local D: drive and Google Drive discovery.',
   'Motion media: real shredder process video, muted by design.',
-  'Sound: procedural Web Audio, off until the visitor enables it.',
+  'Music: editable local stem engine with prompt-based section transitions.',
 ];
