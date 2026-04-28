@@ -186,22 +186,22 @@ export const featuredOriginalSolProducts = originalSolProducts.filter((product) 
 export const solXComponents = [
   {
     label: 'SOL X Base',
-    path: assetUrl('assets/3d/solx/base.glb'),
+    path: assetUrl('models/solx/base.glb'),
     note: 'Primary SOL X foundation component.',
   },
   {
     label: 'SOL X S02 Shade',
-    path: assetUrl('assets/3d/solx/shade_s02.glb'),
+    path: assetUrl('models/solx/s02.glb'),
     note: 'Component shade file for the SOL X preview system.',
   },
   {
     label: 'SOL X S03 Shade',
-    path: assetUrl('assets/3d/solx/shade_s03.glb'),
+    path: assetUrl('models/solx/s03.glb'),
     note: 'Tall shade component for SOL X system previews.',
   },
   {
     label: 'SOL X Divider',
-    path: assetUrl('assets/3d/solx/divider.glb'),
+    path: assetUrl('models/solx/divider.glb'),
     note: 'Divider component for spacing and modular assembly studies.',
   },
 ];

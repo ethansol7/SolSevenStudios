@@ -10,6 +10,7 @@ import {
   PlastiVistaPage,
   ProductPage,
   ShopPage,
+  SolXConfiguratorPage,
   SolXPage,
 } from './components/StorePages.jsx';
 import { assetNotes, assetUrl, capabilities, featuredWork, heroLines, navItems, systemTabs } from './content.js';
@@ -311,6 +312,7 @@ function RouteSwitch({ onNavigate, routePath }) {
   if (routePath === '/shop') return <ShopPage onNavigate={onNavigate} />;
   if (routePath === '/shop/original-sol') return <OriginalSolCollectionPage onNavigate={onNavigate} />;
   if (routePath === '/sol-x') return <SolXPage onNavigate={onNavigate} />;
+  if (routePath === '/solx-configurator') return <SolXConfiguratorPage onNavigate={onNavigate} />;
   if (routePath === '/plastivista') return <PlastiVistaPage />;
   if (routePath === '/about') return <AboutPage />;
   if (routePath.startsWith('/product/')) return <ProductPage slug={routePath.replace('/product/', '')} onNavigate={onNavigate} />;
@@ -319,7 +321,7 @@ function RouteSwitch({ onNavigate, routePath }) {
 
 function musicSectionForRoute(routePath) {
   if (routePath === '/shop' || routePath === '/shop/original-sol') return 'solLamp';
-  if (routePath === '/sol-x') return 'solX';
+  if (routePath === '/sol-x' || routePath === '/solx-configurator') return 'solX';
   if (routePath === '/plastivista') return 'plastivista';
   if (routePath === '/about') return 'contact';
   if (routePath.startsWith('/product/')) {

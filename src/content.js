@@ -6,6 +6,7 @@ export const navItems = [
   { label: 'Shop', href: '/shop' },
   { label: 'Original SOL', href: '/shop/original-sol' },
   { label: 'SOL X', href: '/sol-x' },
+  { label: 'Configurator', href: '/solx-configurator' },
   { label: 'PlastiVista', href: '/plastivista' },
   { label: 'About / Contact', href: '/about' },
 ];

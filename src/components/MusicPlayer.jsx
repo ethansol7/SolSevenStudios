@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Copy, Pause, Play, SlidersHorizontal, Volume2, VolumeX, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Check, Copy, Pause, Play, SlidersHorizontal, Sprout, Volume2, VolumeX, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { sectionMusicPrompts } from '../music/sectionMusicPrompts.js';
 import { MUSIC_PROMPT_STORAGE_KEY, formatPromptsAsConfig, loadPromptOverrides, savePromptOverrides } from '../music/promptStorage.js';
 import { useAmbientMusicEngine } from '../music/useAmbientMusicEngine.js';
 
 const promptKeys = Object.keys(sectionMusicPrompts);
+const MUSIC_DASHBOARD_COLLAPSED_KEY = 'solseven.musicDashboardCollapsed';
 
 const normalizeKeywords = (value) =>
   value
@@ -16,12 +17,32 @@ const normalizeKeywords = (value) =>
 export default function MusicPlayer({ activeSectionKey }) {
   const [prompts, setPrompts] = useState(loadPromptOverrides);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      const stored = localStorage.getItem(MUSIC_DASHBOARD_COLLAPSED_KEY);
+      return stored === null ? true : stored === 'true';
+    } catch {
+      return true;
+    }
+  });
   const [selectedKey, setSelectedKey] = useState(activeSectionKey in prompts ? activeSectionKey : promptKeys[0]);
   const [copied, setCopied] = useState(false);
   const activeKey = activeSectionKey in prompts ? activeSectionKey : 'home';
   const selectedPrompt = prompts[selectedKey] ?? prompts.home;
 
   const engine = useAmbientMusicEngine({ prompts, activeSectionKey: activeKey });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MUSIC_DASHBOARD_COLLAPSED_KEY, String(isCollapsed));
+    } catch {
+      // Ignore storage failures; the music engine should keep running.
+    }
+
+    if (isCollapsed) {
+      setEditorOpen(false);
+    }
+  }, [isCollapsed]);
 
   const promptPreview = useMemo(() => {
     const text = engine.activePrompt?.prompt ?? '';
@@ -64,50 +85,80 @@ export default function MusicPlayer({ activeSectionKey }) {
   };
 
   return (
-    <aside className="music-player" aria-label="Ambient music system">
-      <div className="music-player__main">
-        <button className="music-orb" type="button" onClick={engine.togglePlay} aria-label={engine.isPlaying ? 'Pause ambient music' : 'Play ambient music'}>
-          {engine.isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
-        </button>
+    <aside className={`music-player${isCollapsed ? ' music-player--collapsed' : ''}`} aria-label="Ambient music system">
+      <AnimatePresence mode="wait">
+        {isCollapsed ? (
+          <motion.button
+            key="plant"
+            type="button"
+            className={`music-plant-toggle${engine.isPlaying ? ' is-playing' : ''}`}
+            initial={{ opacity: 0, y: 14, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => setIsCollapsed(false)}
+            aria-label="Open music dashboard"
+            aria-expanded="false"
+          >
+            <Sprout size={25} />
+            <span className="visually-hidden">Open music dashboard</span>
+          </motion.button>
+        ) : (
+          <motion.div
+            key="dashboard"
+            className="music-player__main"
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 14, scale: 0.98 }}
+            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <button className="music-orb" type="button" onClick={engine.togglePlay} aria-label={engine.isPlaying ? 'Pause ambient music' : 'Play ambient music'}>
+              {engine.isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
+            </button>
 
-        <div className="music-player__text">
-          <div className="music-player__eyebrow">
-            <span>{engine.loading ? 'Loading stems' : engine.status}</span>
-          </div>
-          <h2>{engine.activePrompt.label}</h2>
-          <p>{promptPreview}</p>
-          <div className="music-meta-row">
-            <span>{engine.activePrompt.texture}</span>
-            <span>{engine.activePrompt.tempo} BPM</span>
-            <span>{Math.round(engine.activePrompt.intensity * 100)}% intensity</span>
-            <span>{engine.loadedStemCount ? `${engine.loadedStemCount} stems` : 'No stems loaded for this section'}</span>
-          </div>
-        </div>
+            <div className="music-player__text">
+              <div className="music-player__eyebrow">
+                <span>{engine.loading ? 'Loading stems' : engine.status}</span>
+              </div>
+              <h2>{engine.activePrompt.label}</h2>
+              <p>{promptPreview}</p>
+              <div className="music-meta-row">
+                <span>{engine.activePrompt.texture}</span>
+                <span>{engine.activePrompt.tempo} BPM</span>
+                <span>{Math.round(engine.activePrompt.intensity * 100)}% intensity</span>
+                <span>{engine.loadedStemCount ? `${engine.loadedStemCount} stems` : 'No stems loaded for this section'}</span>
+              </div>
+            </div>
 
-        <div className="music-player__controls">
-          <button type="button" className="music-icon-button" onClick={() => engine.setMuted(!engine.muted)} aria-label={engine.muted ? 'Unmute music' : 'Mute music'}>
-            {engine.muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
-          </button>
-          <label className="volume-control">
-            <span>Volume</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={engine.volume}
-              onChange={(event) => engine.setVolume(Number(event.target.value))}
-            />
-          </label>
-          <button type="button" className="music-edit-button" onClick={() => setEditorOpen(true)}>
-            <SlidersHorizontal size={16} />
-            <span>Edit Music Prompts</span>
-          </button>
-        </div>
-      </div>
+            <div className="music-player__controls">
+              <button type="button" className="music-icon-button" onClick={() => engine.setMuted(!engine.muted)} aria-label={engine.muted ? 'Unmute music' : 'Mute music'}>
+                {engine.muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+              </button>
+              <label className="volume-control">
+                <span>Volume</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={engine.volume}
+                  onChange={(event) => engine.setVolume(Number(event.target.value))}
+                />
+              </label>
+              <button type="button" className="music-edit-button" onClick={() => setEditorOpen(true)}>
+                <SlidersHorizontal size={16} />
+                <span>Edit Music Prompts</span>
+              </button>
+              <button type="button" className="music-icon-button music-collapse-button" onClick={() => setIsCollapsed(true)} aria-label="Collapse music dashboard">
+                <Sprout size={17} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
-        {editorOpen && (
+        {editorOpen && !isCollapsed && (
           <motion.div
             className="music-editor"
             initial={{ opacity: 0, y: 24, scale: 0.98 }}

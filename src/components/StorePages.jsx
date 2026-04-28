@@ -10,6 +10,7 @@ import {
 import { assetUrl } from '../content.js';
 
 const SolXViewer = lazy(() => import('./SolXViewer.jsx'));
+const SolXConfigurator = lazy(() => import('./SolXConfigurator.jsx'));
 
 function PageHero({ kicker, title, body, media, musicSection = 'solLamp', children }) {
   return (
@@ -205,6 +206,7 @@ export function SolXPage({ onNavigate }) {
           <h1>Component intelligence for the next modular lamp system.</h1>
           <p>{collectionNotes.solX}</p>
           <div className="route-actions">
+            <AppLink to="/solx-configurator" onNavigate={onNavigate}>Open Configurator</AppLink>
             <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Original SOL Collection</AppLink>
             <AppLink to="/about" onNavigate={onNavigate}>Join Waitlist</AppLink>
           </div>
@@ -229,6 +231,14 @@ export function SolXPage({ onNavigate }) {
         </div>
       </section>
     </main>
+  );
+}
+
+export function SolXConfiguratorPage({ onNavigate }) {
+  return (
+    <Suspense fallback={<main className="route-page"><div className="solx-viewer solx-viewer--loading">Loading SOL X configurator...</div></main>}>
+      <SolXConfigurator onNavigate={onNavigate} />
+    </Suspense>
   );
 }
 
