@@ -7,17 +7,19 @@ import AppLink from './AppLink.jsx';
 import { defaultSolXStack, shadeColorOptions, solxPartOrder, solxParts } from '../data/solxParts.js';
 
 const MODEL_SCALE = 8.5;
-const STACK_GAP = 0.035;
+const CONNECTOR_GAP = 0.004;
 const FEEDBACK_TIMEOUT = 2600;
+const LOCAL_UP = new THREE.Vector3(0, 1, 0);
+const LAYOUT_PADDING = 0.095;
 
 const isShade = (partKey) => solxParts[partKey]?.type === 'shade';
 
-function validateStack(stack) {
+function validateStack(stack, { allowTrailingDivider = false } = {}) {
   if (!stack.length || stack[0] !== 'base') {
     return { valid: false, message: 'Start with the base.' };
   }
 
-  if (solxParts[stack.at(-1)]?.type === 'divider') {
+  if (!allowTrailingDivider && solxParts[stack.at(-1)]?.type === 'divider') {
     return { valid: false, message: 'Dividers only go between shades.' };
   }
 
@@ -73,12 +75,28 @@ function nextPartMessage(partKey, stack, pendingDivider) {
 }
 
 const isMoveValid = (stack, index, direction) => {
-  const target = index + direction;
-  if (index === 0 || target < 1 || target >= stack.length) return false;
-  const next = [...stack];
-  [next[index], next[target]] = [next[target], next[index]];
-  return validateStack(next).valid;
+  return Boolean(findClosestValidMove(stack, index, direction));
 };
+
+function moveItem(stack, fromIndex, toIndex) {
+  const next = [...stack];
+  const [part] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, part);
+  return next;
+}
+
+function findClosestValidMove(stack, index, direction) {
+  if (index === 0) return null;
+
+  for (let target = index + direction; target > 0 && target < stack.length; target += direction) {
+    const next = moveItem(stack, index, target);
+    if (validateStack(next).valid) {
+      return next;
+    }
+  }
+
+  return null;
+}
 
 class ConfiguratorErrorBoundary extends Component {
   constructor(props) {
@@ -126,17 +144,66 @@ function findMaterialByName(scene, namePart) {
   return material;
 }
 
-function StackModel({ partKey, shadeColor, y }) {
+function vectorFromArray(value, fallback = [0, 0, 0]) {
+  return new THREE.Vector3(...(value ?? fallback));
+}
+
+function quaternionFromDirection(direction) {
+  return new THREE.Quaternion().setFromUnitVectors(LOCAL_UP, direction.clone().normalize());
+}
+
+function buildConnectorLayout(stack) {
+  let connectorPosition = new THREE.Vector3(0, 0, 0);
+  let connectorDirection = LOCAL_UP.clone();
+  const points = [connectorPosition.clone()];
+  const placements = stack.map((partKey, index) => {
+    const part = solxParts[partKey];
+    const quaternion = quaternionFromDirection(connectorDirection);
+    const placement = {
+      id: `${partKey}-${index}`,
+      partKey,
+      position: connectorPosition.clone(),
+      quaternion,
+    };
+
+    const outputOffset = vectorFromArray(part.outputOffset, [0, part.height / MODEL_SCALE, 0]).applyQuaternion(quaternion);
+    connectorDirection = vectorFromArray(part.outputDirection, [0, 1, 0]).applyQuaternion(quaternion).normalize();
+    connectorPosition = connectorPosition
+      .clone()
+      .add(outputOffset)
+      .add(connectorDirection.clone().multiplyScalar(CONNECTOR_GAP));
+    points.push(connectorPosition.clone());
+
+    return placement;
+  });
+
+  const box = new THREE.Box3().setFromPoints(points);
+  box.expandByScalar(LAYOUT_PADDING);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+
+  return {
+    frameSize: [
+      Math.max(0.34, size.x),
+      Math.max(0.34, size.y),
+      Math.max(0.34, size.z),
+    ],
+    placements: placements.map((placement) => ({
+      ...placement,
+      position: placement.position.sub(center).toArray(),
+      quaternion: placement.quaternion.toArray(),
+    })),
+  };
+}
+
+function StackModel({ partKey, shadeColor }) {
   const part = solxParts[partKey];
   const { scene } = useGLTF(part.file);
 
   const clone = useMemo(() => {
     const next = scene.clone(true);
-    const box = new THREE.Box3().setFromObject(next);
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-
-    next.position.set(-center.x, -box.min.y, -center.z);
+    const inputAnchor = vectorFromArray(part.inputAnchor);
+    next.position.copy(inputAnchor.multiplyScalar(-1));
     const shadeColorMaterial = part.type === 'shade' ? findMaterialByName(scene, shadeColorOptions[shadeColor].materialName) : null;
 
     next.traverse((child) => {
@@ -160,39 +227,27 @@ function StackModel({ partKey, shadeColor, y }) {
     });
 
     return next;
-  }, [part.tint, part.type, scene, shadeColor]);
+  }, [part.inputAnchor, part.tint, part.type, scene, shadeColor]);
 
   return (
-    <group position={[0, y, 0]} scale={MODEL_SCALE}>
-      <primitive object={clone} />
-    </group>
+    <primitive object={clone} />
   );
 }
 
 function StackAssembly({ shadeColor, stack }) {
-  const { frameHeight, placements, totalHeight } = useMemo(() => {
-    let y = 0;
-    const nextPlacements = stack.map((partKey, index) => {
-      const placement = { id: `${partKey}-${index}`, partKey, y };
-      y += solxParts[partKey].height + STACK_GAP;
-      return placement;
-    });
-    return {
-      frameHeight: Math.max(3.2, y),
-      placements: nextPlacements,
-      totalHeight: y,
-    };
-  }, [stack]);
+  const { frameSize, placements } = useMemo(() => buildConnectorLayout(stack), [stack]);
 
   return (
-    <Bounds fit clip observe margin={1.45}>
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[2.75, frameHeight, 2.75]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-      </mesh>
-      <group position={[0, -totalHeight / 2, 0]}>
+    <Bounds fit clip observe margin={1.28}>
+      <group scale={MODEL_SCALE}>
+        <mesh>
+          <boxGeometry args={frameSize} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
         {placements.map((placement) => (
-          <StackModel key={placement.id} partKey={placement.partKey} shadeColor={shadeColor} y={placement.y} />
+          <group key={placement.id} position={placement.position} quaternion={placement.quaternion}>
+            <StackModel partKey={placement.partKey} shadeColor={shadeColor} />
+          </group>
         ))}
       </group>
     </Bounds>
@@ -205,7 +260,7 @@ function ConfiguratorViewer({ autoRotate, shadeColor, stack }) {
   return (
     <div className="configurator-viewer" aria-label="Interactive SOL X configurator viewer">
       <Canvas
-        camera={{ position: [5.2, 3.2, 7.2], fov: 34 }}
+        camera={{ position: [5.8, 3.8, 8.4], fov: 34 }}
         dpr={[1, 1.65]}
         shadows
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
@@ -233,7 +288,7 @@ function ConfiguratorViewer({ autoRotate, shadeColor, stack }) {
           autoRotateSpeed={0.5}
           enablePan={false}
           minDistance={3}
-          maxDistance={13}
+          maxDistance={16}
           minPolarAngle={Math.PI * 0.18}
           maxPolarAngle={Math.PI * 0.78}
         />
@@ -244,7 +299,6 @@ function ConfiguratorViewer({ autoRotate, shadeColor, stack }) {
 
 export default function SolXConfigurator({ onNavigate }) {
   const [stack, setStack] = useState(defaultSolXStack);
-  const [pendingDivider, setPendingDivider] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [shadeColor, setShadeColor] = useState('white');
   const [autoRotate, setAutoRotate] = useState(true);
@@ -262,38 +316,21 @@ export default function SolXConfigurator({ onNavigate }) {
       return;
     }
 
-    if (!pendingDivider && partKey === 'divider') {
-      setPendingDivider(true);
-      showFeedback('Choose a shade to place above the divider.');
-      return;
-    }
-
     setStack((current) => {
-      const next = pendingDivider && isShade(partKey) ? [...current, 'divider', partKey] : [...current, partKey];
-      const result = validateStack(next);
+      const next = [...current, partKey];
+      const result = validateStack(next, { allowTrailingDivider: partKey === 'divider' });
       if (!result.valid) {
         showFeedback(result.message);
         return current;
       }
-      setPendingDivider(false);
-      setFeedback('');
+      showFeedback(partKey === 'divider' ? 'Choose a shade to finish the divider connection.' : '');
       return next;
     });
   };
 
   const removeTop = () => {
-    if (pendingDivider) {
-      setPendingDivider(false);
-      setFeedback('');
-      return;
-    }
-
     setStack((current) => {
       if (current.length <= 1) return current;
-      if (current.at(-2) === 'divider') {
-        setFeedback('');
-        return current.slice(0, -2);
-      }
       setFeedback('');
       return current.slice(0, -1);
     });
@@ -301,19 +338,14 @@ export default function SolXConfigurator({ onNavigate }) {
 
   const resetStack = () => {
     setStack(defaultSolXStack);
-    setPendingDivider(false);
     setFeedback('');
   };
 
   const movePart = (index, direction) => {
     setStack((current) => {
-      const target = index + direction;
-      if (index === 0 || target < 1 || target >= current.length) return current;
-      const next = [...current];
-      [next[index], next[target]] = [next[target], next[index]];
-      const result = validateStack(next);
-      if (!result.valid) {
-        showFeedback(result.message);
+      const next = findClosestValidMove(current, index, direction);
+      if (!next) {
+        showFeedback("This part can't move any further with the current stack.");
         return current;
       }
       setFeedback('');
@@ -322,6 +354,7 @@ export default function SolXConfigurator({ onNavigate }) {
   };
 
   const validation = validateStack(stack);
+  const isTrailingDivider = solxParts[stack.at(-1)]?.type === 'divider';
 
   return (
     <main className="route-page configurator-page" data-music-section="solX">
@@ -340,14 +373,14 @@ export default function SolXConfigurator({ onNavigate }) {
                 className="configurator-action-wrap"
                 key={partKey}
                 onClick={() => {
-                  const message = nextPartMessage(partKey, stack, pendingDivider);
+                  const message = nextPartMessage(partKey, stack, isTrailingDivider);
                   if (message) showFeedback(message);
                 }}
               >
                 <button
                   type="button"
-                  disabled={Boolean(nextPartMessage(partKey, stack, pendingDivider))}
-                  onClick={() => addPart(partKey, nextPartMessage(partKey, stack, pendingDivider))}
+                  disabled={Boolean(nextPartMessage(partKey, stack, isTrailingDivider))}
+                  onClick={() => addPart(partKey, nextPartMessage(partKey, stack, isTrailingDivider))}
                 >
                   <Plus size={15} />
                   <span>{solxParts[partKey].label}</span>
@@ -375,9 +408,9 @@ export default function SolXConfigurator({ onNavigate }) {
           </div>
 
           <div className="configurator-secondary-actions">
-            <button type="button" onClick={removeTop} disabled={stack.length <= 1 && !pendingDivider}>
+            <button type="button" onClick={removeTop} disabled={stack.length <= 1}>
               <Trash2 size={15} />
-              <span>{pendingDivider ? 'Cancel Divider' : 'Remove Top'}</span>
+              <span>Remove Top</span>
             </button>
             <button type="button" onClick={resetStack}>
               <RotateCcw size={15} />
@@ -389,36 +422,41 @@ export default function SolXConfigurator({ onNavigate }) {
           </div>
 
           <div className={`configurator-feedback${feedback || !validation.valid ? ' is-visible' : ''}`} role="status" aria-live="polite">
-            {feedback || (!validation.valid ? validation.message : 'Only compatible parts are available for the next layer.')}
+            {feedback || (!validation.valid ? (isTrailingDivider ? 'Choose a shade to finish the divider connection.' : validation.message) : 'Only compatible parts are available for the next layer.')}
           </div>
 
           <div className="configurator-stack-card">
             <div className="configurator-stack-card__header">
               <span>Current stack</span>
-              <strong>{stack.length + (pendingDivider ? 1 : 0)} part{stack.length + (pendingDivider ? 1 : 0) === 1 ? '' : 's'}</strong>
+              <strong>{stack.length} part{stack.length === 1 ? '' : 's'}</strong>
             </div>
             <ol>
-              {pendingDivider && (
-                <li className="pending">
-                  <span>Divider</span>
-                  <small>Choose shade above</small>
-                  <div />
-                </li>
-              )}
               {[...stack].reverse().map((partKey, reversedIndex) => {
                 const index = stack.length - 1 - reversedIndex;
                 const locked = index === 0;
                 const canMoveUp = isMoveValid(stack, index, 1);
                 const canMoveDown = isMoveValid(stack, index, -1);
                 return (
-                  <li key={`${partKey}-${index}`}>
+                  <li key={`${partKey}-${index}`} className={partKey === 'divider' && index === stack.length - 1 ? 'pending' : undefined}>
                     <span>{solxParts[partKey].label}</span>
-                    <small>{locked ? 'Locked base' : `Layer ${index + 1}`}</small>
+                    <small>{locked ? 'Locked base' : partKey === 'divider' && index === stack.length - 1 ? 'Needs shade' : `Layer ${index + 1}`}</small>
                     <div>
-                      <button type="button" onClick={() => movePart(index, 1)} disabled={!canMoveUp} aria-label={`Move ${solxParts[partKey].label} up`}>
+                      <button
+                        type="button"
+                        onClick={() => movePart(index, 1)}
+                        disabled={locked}
+                        className={!locked && !canMoveUp ? 'soft-disabled' : undefined}
+                        aria-label={`Move ${solxParts[partKey].label} up`}
+                      >
                         <ArrowUp size={14} />
                       </button>
-                      <button type="button" onClick={() => movePart(index, -1)} disabled={!canMoveDown} aria-label={`Move ${solxParts[partKey].label} down`}>
+                      <button
+                        type="button"
+                        onClick={() => movePart(index, -1)}
+                        disabled={locked}
+                        className={!locked && !canMoveDown ? 'soft-disabled' : undefined}
+                        aria-label={`Move ${solxParts[partKey].label} down`}
+                      >
                         <ArrowDown size={14} />
                       </button>
                     </div>

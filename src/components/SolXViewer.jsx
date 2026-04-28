@@ -1,13 +1,18 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Bounds, Center, OrbitControls, useGLTF } from '@react-three/drei';
+import { Bounds, OrbitControls, useGLTF } from '@react-three/drei';
 import { Suspense, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { solXComponents } from '../data/products.js';
+import { solxParts } from '../data/solxParts.js';
 
 function ComponentModel({ component, index, isolated, count }) {
+  const part = solxParts[component.partKey];
   const { scene } = useGLTF(component.path);
   const clone = useMemo(() => {
     const next = scene.clone(true);
+    if (part?.inputAnchor) {
+      next.position.set(-part.inputAnchor[0], -part.inputAnchor[1], -part.inputAnchor[2]);
+    }
     next.traverse((child) => {
       if (!child.isMesh) return;
       child.castShadow = true;
@@ -22,16 +27,15 @@ function ComponentModel({ component, index, isolated, count }) {
       }
     });
     return next;
-  }, [scene]);
+  }, [part, scene]);
 
-  const spacing = count > 4 ? 1.72 : 2.05;
+  const spacing = count > 4 ? 2.25 : 2.28;
   const x = isolated ? 0 : (index - (count - 1) / 2) * spacing;
+  const scale = isolated ? 12.5 : 8.6;
 
   return (
-    <group position={[x, 0, 0]} scale={isolated ? 13.5 : 10.5}>
-      <Center>
-        <primitive object={clone} />
-      </Center>
+    <group position={[x, 0, 0]} scale={scale}>
+      <primitive object={clone} />
     </group>
   );
 }
@@ -48,7 +52,7 @@ function ViewerRig({ activeIndex }) {
   });
 
   return (
-    <Bounds fit clip observe margin={1.45}>
+    <Bounds fit clip observe margin={1.55}>
       <group ref={group}>
         {components.map((component, index) => (
           <ComponentModel
@@ -96,8 +100,8 @@ export default function SolXViewer() {
             autoRotate
             autoRotateSpeed={0.42}
             enablePan={false}
-            minDistance={2.4}
-            maxDistance={12}
+            minDistance={3.2}
+            maxDistance={15}
             maxPolarAngle={Math.PI * 0.72}
             minPolarAngle={Math.PI * 0.2}
           />

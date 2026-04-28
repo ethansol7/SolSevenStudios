@@ -9,6 +9,9 @@ export const solxParts = {
     file: modelFile('base.glb'),
     expectedPath: '/models/solx/base.glb',
     height: 0.23,
+    inputAnchor: [0, 0.3735, 0],
+    outputOffset: [0, 0.027, 0],
+    outputDirection: [0, 1, 0],
     tint: '#f4eee8',
   },
   s02: {
@@ -17,6 +20,9 @@ export const solxParts = {
     file: modelFile('s02.glb'),
     expectedPath: '/models/solx/s02.glb',
     height: 2.14,
+    inputAnchor: [0, 0.089, 0],
+    outputOffset: [0, 0.246, 0],
+    outputDirection: [0, 1, 0],
   },
   s03: {
     label: 'S03',
@@ -24,6 +30,9 @@ export const solxParts = {
     file: modelFile('s03.glb'),
     expectedPath: '/models/solx/s03.glb',
     height: 1.52,
+    inputAnchor: [0, -0.196, 0],
+    outputOffset: [0, 0.174, 0],
+    outputDirection: [0, 1, 0],
   },
   s04: {
     label: 'S04',
@@ -31,6 +40,9 @@ export const solxParts = {
     file: modelFile('s04.glb'),
     expectedPath: '/models/solx/s04.glb',
     height: 1.64,
+    inputAnchor: [0, 0.5427, 0],
+    outputOffset: [0, 0.1136, 0.1136],
+    outputDirection: [0, 0, 1],
   },
   divider: {
     label: 'Divider',
@@ -38,6 +50,9 @@ export const solxParts = {
     file: modelFile('divider.glb'),
     expectedPath: '/models/solx/divider.glb',
     height: 0.12,
+    inputAnchor: [0, 0.5011, 0],
+    outputOffset: [0, 0.012, 0],
+    outputDirection: [0, 1, 0],
     tint: '#ece7dc',
   },
 };

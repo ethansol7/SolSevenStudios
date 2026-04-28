@@ -186,26 +186,31 @@ export const featuredOriginalSolProducts = originalSolProducts.filter((product) 
 export const solXComponents = [
   {
     label: 'SOL X Base',
+    partKey: 'base',
     path: assetUrl('models/solx/base.glb'),
     note: 'Primary SOL X foundation component.',
   },
   {
     label: 'SOL X S02',
+    partKey: 's02',
     path: assetUrl('models/solx/s02.glb'),
     note: 'Shade module for calm, vertical SOL X stack compositions.',
   },
   {
     label: 'SOL X S03',
+    partKey: 's03',
     path: assetUrl('models/solx/s03.glb'),
     note: 'Tall shade module for a softer, more architectural profile.',
   },
   {
     label: 'SOL X S04',
+    partKey: 's04',
     path: assetUrl('models/solx/s04.glb'),
     note: 'New shade module for extended, more expressive stack builds.',
   },
   {
     label: 'SOL X Divider',
+    partKey: 'divider',
     path: assetUrl('models/solx/divider.glb'),
     note: 'Slim connector layer that separates two shade modules.',
   },
