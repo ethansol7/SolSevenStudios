@@ -4,6 +4,7 @@ import {
   Camera,
   Copy,
   Download,
+  DollarSign,
   FolderOpen,
   MousePointer2,
   RotateCcw,
@@ -16,6 +17,7 @@ import {
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import AppLink from './AppLink.jsx';
+import { estimateSolXBuild, formatPricingValue, solxPricing } from '../data/pricing.js';
 import { shadeColorOptions, solxBuilderConfig, solxPartOrder, solxParts } from '../data/solxParts.js';
 
 const MODEL_SCALE = 8.5;
@@ -33,6 +35,21 @@ const DEFAULT_CAMERA = {
   target: [0, 0.46, 0],
   fov: 40,
 };
+
+function useMobileBuilderMode() {
+  const [isMobileBuilder, setIsMobileBuilder] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 760px), (pointer: coarse)');
+    const syncMode = () => setIsMobileBuilder(media.matches);
+
+    syncMode();
+    media.addEventListener('change', syncMode);
+    return () => media.removeEventListener('change', syncMode);
+  }, []);
+
+  return isMobileBuilder;
+}
 
 const vectorFromArray = (value, fallback = [0, 0, 0]) => new THREE.Vector3(...(value ?? fallback));
 
@@ -508,21 +525,23 @@ function BuilderScene({
   layout,
   lightingMode,
   onBeginSceneDrag,
+  onCanvasTap,
   onClearSelection,
   onSelect,
   parts,
+  placementIntent,
   resetCameraToken,
   screenToFloorRef,
   selectedId,
 }) {
   const controlsRef = useRef(null);
   const eligibleConnectorIds = useMemo(() => {
-    if (!activeDrag) return new Set();
-    return new Set(eligibleConnectorsForDrag(activeDrag, connectors, parts).map((connector) => connector.id));
-  }, [activeDrag, connectors, parts]);
+    if (!placementIntent) return new Set();
+    return new Set(eligibleConnectorsForDrag(placementIntent, connectors, parts).map((connector) => connector.id));
+  }, [connectors, parts, placementIntent]);
   const expectedPaths = solxPartOrder.map((key) => solxParts[key].expectedPath);
   const resetKey = parts.map((part) => `${part.id}-${part.partKey}`).join('-');
-  const canDropOnFloor = canPlaceOnFloor(activeDrag, freePlacement);
+  const canDropOnFloor = canPlaceOnFloor(placementIntent, freePlacement);
 
   return (
     <Canvas
@@ -530,7 +549,16 @@ function BuilderScene({
       dpr={[1, 1.65]}
       shadows
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
-      onPointerMissed={onClearSelection}
+      onPointerDown={(event) => {
+        if (!activeDrag && placementIntent) onCanvasTap(event.nativeEvent);
+      }}
+      onPointerMissed={(event) => {
+        if (!activeDrag && placementIntent) {
+          onCanvasTap(event.nativeEvent);
+          return;
+        }
+        onClearSelection();
+      }}
     >
       <color attach="background" args={['#ede6d9']} />
       <fog attach="fog" args={['#ede6d9', 12, 30]} />
@@ -590,7 +618,7 @@ function BuilderScene({
       </ConfiguratorErrorBoundary>
       <OrbitControls
         ref={controlsRef}
-        enabled={!activeDrag}
+        enabled={!activeDrag && !placementIntent}
         makeDefault
         enableDamping
         dampingFactor={0.075}
@@ -639,14 +667,197 @@ function SolLampGlyph() {
   );
 }
 
+function PriceSummary({ estimate }) {
+  return (
+    <div className="price-summary">
+      <div className="price-summary__heading">
+        <span>Estimated price</span>
+        <strong>{formatPricingValue(estimate.total, estimate.currency)}</strong>
+      </div>
+      <p>{estimate.note}</p>
+      <ul>
+        {estimate.lineItems.map((item) => {
+          const colorSummary = item.colors.map((color) => `${color.count} ${color.label.replace('Translucent ', '')}`).join(', ');
+          return (
+            <li key={item.partKey}>
+              <div>
+                <span>{item.label}</span>
+                <small>{item.quantity} x {formatPricingValue(item.unitPrice, estimate.currency)}</small>
+                {colorSummary && <em>{colorSummary}</em>}
+              </div>
+              <strong>{formatPricingValue(item.subtotal, estimate.currency)}</strong>
+            </li>
+          );
+        })}
+      </ul>
+      {estimate.hasTemporaryPricing && (
+        <small className="price-summary__temporary">
+          Base and divider estimates live in the pricing config so they can be updated when standalone module pricing is final.
+        </small>
+      )}
+      <small className="price-summary__source">Pricing checked {solxPricing.lastChecked}</small>
+    </div>
+  );
+}
+
+function MobileBuilderDrawer({
+  activeTab,
+  estimate,
+  feedback,
+  mobileDrawerOpen,
+  onChoosePart,
+  onClearSavedBuild,
+  onDeleteSelectedPart,
+  onDuplicateSelectedPart,
+  onLoadSavedBuild,
+  onResetCamera,
+  onResetScene,
+  onSaveBuild,
+  onSetActiveTab,
+  onTakeScreenshot,
+  onToggleDrawer,
+  onUpdateSelectedColor,
+  pendingPartKey,
+  selectedPart,
+  selectedPartLabel,
+}) {
+  return (
+    <div className={`builder-glass mobile-builder-drawer${mobileDrawerOpen ? ' is-open' : ' is-collapsed'}`}>
+      <button type="button" className="mobile-builder-drawer__summary" onClick={onToggleDrawer} aria-expanded={mobileDrawerOpen}>
+        <span>Build controls</span>
+        <small>{pendingPartKey ? `Placing ${solxParts[pendingPartKey].shortLabel}` : selectedPartLabel}</small>
+        <b>{mobileDrawerOpen ? 'Close' : 'Open'}</b>
+      </button>
+      {mobileDrawerOpen && (
+        <div className="mobile-builder-drawer__body">
+          <div className="mobile-builder-tabs" role="tablist" aria-label="SOL X mobile builder controls">
+            {['parts', 'color', 'build', 'price'].map((tab) => (
+              <button
+                type="button"
+                key={tab}
+                className={activeTab === tab ? 'active' : ''}
+                onClick={() => onSetActiveTab(tab)}
+                role="tab"
+                aria-selected={activeTab === tab}
+              >
+                {tab === 'price' ? 'Price' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === 'parts' && (
+            <div className="mobile-builder-pane">
+              <div className="mobile-part-strip" aria-label="SOL X parts">
+                {solxPartOrder.map((partKey) => (
+                  <button
+                    type="button"
+                    key={partKey}
+                    className={pendingPartKey === partKey ? 'active' : ''}
+                    onClick={() => onChoosePart(partKey)}
+                  >
+                    <PartPreviewIcon partKey={partKey} />
+                    <span>{solxParts[partKey].shortLabel ?? solxParts[partKey].label}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="mobile-builder-help">{feedback}</p>
+            </div>
+          )}
+
+          {activeTab === 'color' && (
+            <div className="mobile-builder-pane mobile-builder-pane--color">
+              {selectedPart ? (
+                <>
+                  <p>Selected {selectedPartLabel}</p>
+                  <div className="mobile-color-grid">
+                    {Object.entries(shadeColorOptions).map(([key, option]) => (
+                      <button
+                        type="button"
+                        key={key}
+                        className={selectedPart.color === key ? 'active' : ''}
+                        onClick={() => onUpdateSelectedColor(key)}
+                      >
+                        <span style={{ '--swatch': option.swatch }} />
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mobile-action-grid">
+                    <button type="button" onClick={onDeleteSelectedPart}>
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                    <button type="button" onClick={onDuplicateSelectedPart}>
+                      <Copy size={16} />
+                      Duplicate
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p>Select a part in the scene to change color.</p>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'build' && (
+            <div className="mobile-builder-pane">
+              <div className="mobile-action-grid mobile-action-grid--build">
+                <button type="button" onClick={onSaveBuild}>
+                  <Save size={16} />
+                  Save build
+                </button>
+                <button type="button" onClick={onLoadSavedBuild}>
+                  <FolderOpen size={16} />
+                  Load build
+                </button>
+                <button type="button" onClick={onClearSavedBuild}>
+                  <X size={16} />
+                  Clear saved
+                </button>
+                <button type="button" onClick={onResetScene}>
+                  <RotateCcw size={16} />
+                  Reset scene
+                </button>
+                <button type="button" onClick={onResetCamera}>
+                  <Camera size={16} />
+                  Reset camera
+                </button>
+                <button type="button" onClick={onTakeScreenshot}>
+                  <Download size={16} />
+                  Screenshot
+                </button>
+                <button type="button" className="mobile-action-grid__wide" onClick={() => onSetActiveTab('price')}>
+                  <DollarSign size={16} />
+                  Get price
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'price' && (
+            <div className="mobile-builder-pane">
+              <PriceSummary estimate={estimate} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SolXConfigurator({ onNavigate }) {
+  const isMobileBuilder = useMobileBuilderMode();
   const [parts, setParts] = useState(createStarterScene);
   const [selectedId, setSelectedId] = useState('base-1');
   const [feedback, setFeedback] = useState('Drop bases onto the floor, then snap modules onto glowing connectors.');
   const [activeDrag, setActiveDrag] = useState(null);
+  const [pendingTapPartKey, setPendingTapPartKey] = useState(null);
   const [hoverConnectorId, setHoverConnectorId] = useState(null);
   const [floorHover, setFloorHover] = useState(null);
   const [resetCameraToken, setResetCameraToken] = useState(0);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
+  const [mobileTab, setMobileTab] = useState('parts');
+  const [pricePanelOpen, setPricePanelOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [showAdvancedDisclaimer, setShowAdvancedDisclaimer] = useState(false);
   const [freePlacement, setFreePlacement] = useState(false);
@@ -666,6 +877,8 @@ export default function SolXConfigurator({ onNavigate }) {
   const selectedPart = parts.find((part) => part.id === selectedId) ?? null;
   const selectedPartLabel = selectedPart ? solxParts[selectedPart.partKey].label : 'None';
   const rootBaseCount = parts.filter((part) => !part.parentId && part.partKey === 'base').length;
+  const priceEstimate = useMemo(() => estimateSolXBuild(parts), [parts]);
+  const placementIntent = activeDrag ?? (pendingTapPartKey ? { kind: 'new', partKey: pendingTapPartKey } : null);
 
   useEffect(() => {
     partsRef.current = parts;
@@ -676,6 +889,10 @@ export default function SolXConfigurator({ onNavigate }) {
   }, [activeDrag]);
 
   useEffect(() => () => window.clearTimeout(feedbackTimeout.current), []);
+
+  useEffect(() => {
+    if (!isMobileBuilder) setPendingTapPartKey(null);
+  }, [isMobileBuilder]);
 
   const showFeedback = useCallback((message, persistent = false) => {
     setFeedback(message);
@@ -710,14 +927,16 @@ export default function SolXConfigurator({ onNavigate }) {
       y: event.clientY,
     };
     setActiveDrag(nextDrag);
+    setPendingTapPartKey(null);
     setHoverConnectorId(null);
     setFloorHover(null);
     showFeedback(drag.partKey === 'base' ? 'Drop it on the floor or snap it to a shade.' : 'Move it near a glowing connector.', true);
   }, [showFeedback]);
 
   const beginTrayDrag = useCallback((event, partKey) => {
+    if (isMobileBuilder) return;
     startDrag(event, { kind: 'new', partKey });
-  }, [startDrag]);
+  }, [isMobileBuilder, startDrag]);
 
   const beginSceneDrag = useCallback((event, id) => {
     const part = partsRef.current.find((nextPart) => nextPart.id === id);
@@ -725,18 +944,16 @@ export default function SolXConfigurator({ onNavigate }) {
     startDrag(event, { kind: 'existing', id, partKey: part.partKey });
   }, [startDrag]);
 
-  const finishDrop = useCallback((event) => {
-    const drag = activeDragRef.current;
+  const placeDragAtPoint = useCallback((drag, clientX, clientY, options = {}) => {
     if (!drag) return;
 
     const currentParts = partsRef.current;
-    const target = nearestConnectorForPoint(drag, connectorScreensRef.current, currentParts, event.clientX, event.clientY);
+    const target = nearestConnectorForPoint(drag, connectorScreensRef.current, currentParts, clientX, clientY);
     const viewerBounds = viewerRef.current?.getBoundingClientRect();
     const insideViewer = viewerBounds
-      ? event.clientX >= viewerBounds.left && event.clientX <= viewerBounds.right && event.clientY >= viewerBounds.top && event.clientY <= viewerBounds.bottom
+      ? clientX >= viewerBounds.left && clientX <= viewerBounds.right && clientY >= viewerBounds.top && clientY <= viewerBounds.bottom
       : false;
-    const moved = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 8;
-    const floorPosition = screenToFloorRef.current?.(event.clientX, event.clientY, fineSnap) ?? null;
+    const floorPosition = screenToFloorRef.current?.(clientX, clientY, fineSnap) ?? null;
 
     if (target) {
       if (drag.kind === 'new') {
@@ -749,6 +966,7 @@ export default function SolXConfigurator({ onNavigate }) {
       }
 
       showFeedback(solxParts[drag.partKey].type === 'divider' ? 'Add a shade to finish this connector.' : 'Snapped into place.');
+      return true;
     } else if (insideViewer && floorPosition && canPlaceOnFloor(drag, freePlacement)) {
       if (drag.kind === 'new') {
         const nextPart = createPart(drag.partKey, { position: floorPosition, parentId: null });
@@ -759,14 +977,25 @@ export default function SolXConfigurator({ onNavigate }) {
         setSelectedId(drag.id);
       }
       showFeedback(drag.partKey === 'base' ? 'Base placed on the floor.' : 'Placed in experimental free mode.');
-    } else if (insideViewer && moved) {
-      showFeedback('This part cannot connect there.');
+      return true;
+    } else if (insideViewer && (options.moved || options.showInvalid)) {
+      showFeedback("This part can't connect there.");
     }
+
+    return false;
+  }, [createPart, fineSnap, freePlacement, showFeedback]);
+
+  const finishDrop = useCallback((event) => {
+    const drag = activeDragRef.current;
+    if (!drag) return;
+
+    const moved = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 8;
+    placeDragAtPoint(drag, event.clientX, event.clientY, { moved });
 
     setActiveDrag(null);
     setHoverConnectorId(null);
     setFloorHover(null);
-  }, [createPart, fineSnap, freePlacement, showFeedback]);
+  }, [placeDragAtPoint]);
 
   useEffect(() => {
     if (!activeDrag) return undefined;
@@ -788,6 +1017,32 @@ export default function SolXConfigurator({ onNavigate }) {
       window.removeEventListener('pointerup', handlePointerUp);
     };
   }, [activeDrag, fineSnap, finishDrop, freePlacement]);
+
+  const chooseMobilePart = useCallback((partKey) => {
+    setPendingTapPartKey(partKey);
+    setActiveDrag(null);
+    setHoverConnectorId(null);
+    setFloorHover(null);
+    showFeedback(
+      partKey === 'base'
+        ? 'Tap the floor to place a base, or tap a glowing shade connector.'
+        : 'Tap a glowing connector to place this part.',
+      true,
+    );
+  }, [showFeedback]);
+
+  const handleCanvasTapPlacement = useCallback((event) => {
+    if (!pendingTapPartKey || activeDragRef.current) return;
+    const placed = placeDragAtPoint(
+      { kind: 'new', partKey: pendingTapPartKey },
+      event.clientX,
+      event.clientY,
+      { showInvalid: true },
+    );
+    if (placed) setPendingTapPartKey(null);
+    setHoverConnectorId(null);
+    setFloorHover(null);
+  }, [pendingTapPartKey, placeDragAtPoint]);
 
   const updateSelectedColor = (color) => {
     if (!selectedPart) return;
@@ -825,6 +1080,7 @@ export default function SolXConfigurator({ onNavigate }) {
     setParts(nextScene);
     setSelectedId(nextScene[0].id);
     setActiveDrag(null);
+    setPendingTapPartKey(null);
     setHoverConnectorId(null);
     setFloorHover(null);
     showFeedback('Scene reset to one starter base.');
@@ -1009,11 +1265,13 @@ export default function SolXConfigurator({ onNavigate }) {
             layout={layout}
             lightingMode={lightingMode}
             onBeginSceneDrag={beginSceneDrag}
+            onCanvasTap={handleCanvasTapPlacement}
             onClearSelection={() => {
-              if (!activeDragRef.current) setSelectedId(null);
+              if (!activeDragRef.current && !pendingTapPartKey) setSelectedId(null);
             }}
             onSelect={setSelectedId}
             parts={parts}
+            placementIntent={placementIntent}
             resetCameraToken={resetCameraToken}
             screenToFloorRef={screenToFloorRef}
             selectedId={selectedId}
@@ -1042,6 +1300,9 @@ export default function SolXConfigurator({ onNavigate }) {
                     key={partKey}
                     className="parts-tray__item parts-tray__item--icon"
                     onPointerDown={(event) => beginTrayDrag(event, partKey)}
+                    onClick={() => {
+                      if (isMobileBuilder) chooseMobilePart(partKey);
+                    }}
                   >
                     <PartPreviewIcon partKey={partKey} />
                     <span>{solxParts[partKey].shortLabel ?? solxParts[partKey].label}</span>
@@ -1116,7 +1377,47 @@ export default function SolXConfigurator({ onNavigate }) {
                 <Download size={15} />
                 <span>Screenshot</span>
               </button>
+              <button type="button" onClick={() => setPricePanelOpen((current) => !current)}>
+                <DollarSign size={15} />
+                <span>Get price</span>
+              </button>
             </div>
+
+            {pricePanelOpen && (
+              <div className="builder-glass builder-price-panel">
+                <div className="builder-panel__header">
+                  <span>Price</span>
+                  <button type="button" onClick={() => setPricePanelOpen(false)} aria-label="Close price estimate">
+                    <X size={14} />
+                  </button>
+                </div>
+                <PriceSummary estimate={priceEstimate} />
+              </div>
+            )}
+
+            {isMobileBuilder && (
+              <MobileBuilderDrawer
+                activeTab={mobileTab}
+                estimate={priceEstimate}
+                feedback={feedback}
+                mobileDrawerOpen={mobileDrawerOpen}
+                onChoosePart={chooseMobilePart}
+                onClearSavedBuild={clearSavedBuild}
+                onDeleteSelectedPart={deleteSelectedPart}
+                onDuplicateSelectedPart={duplicateSelectedPart}
+                onLoadSavedBuild={loadSavedBuild}
+                onResetCamera={() => setResetCameraToken((token) => token + 1)}
+                onResetScene={resetScene}
+                onSaveBuild={saveBuild}
+                onSetActiveTab={setMobileTab}
+                onTakeScreenshot={takeScreenshot}
+                onToggleDrawer={() => setMobileDrawerOpen((current) => !current)}
+                onUpdateSelectedColor={updateSelectedColor}
+                pendingPartKey={pendingTapPartKey}
+                selectedPart={selectedPart}
+                selectedPartLabel={selectedPartLabel}
+              />
+            )}
 
             <button type="button" className="advanced-lamp-button" onClick={toggleAdvanced} aria-expanded={advancedOpen}>
               <SolLampGlyph />
