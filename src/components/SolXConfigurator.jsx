@@ -317,17 +317,28 @@ function SolPartModel({ colorKey, partKey }) {
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       const nextMaterials = materials.map((material) => {
         const nextMaterial = material.clone();
-        nextMaterial.roughness = Math.min(nextMaterial.roughness ?? 0.58, 0.66);
+        nextMaterial.roughness = Math.min(nextMaterial.roughness ?? 0.58, 0.72);
         nextMaterial.metalness = Math.min(nextMaterial.metalness ?? 0, 0.05);
 
         if (isTintableMaterial(nextMaterial, part)) {
           nextMaterial.color.copy(targetColor);
           nextMaterial.transparent = true;
           nextMaterial.opacity = option.opacity ?? 0.78;
-          nextMaterial.depthWrite = (option.opacity ?? 0.78) >= 0.86;
+          nextMaterial.depthWrite = true;
+          nextMaterial.depthTest = true;
+          nextMaterial.alphaTest = 0.035;
+          nextMaterial.premultipliedAlpha = true;
+          nextMaterial.envMapIntensity = 0.34;
+          if (nextMaterial.emissive && option.emissive) {
+            nextMaterial.emissive.copy(new THREE.Color(option.emissive));
+            nextMaterial.emissiveIntensity = 0.08;
+          }
           if ('transmission' in nextMaterial) nextMaterial.transmission = option.transmission ?? nextMaterial.transmission ?? 0;
-          if ('thickness' in nextMaterial) nextMaterial.thickness = Math.max(nextMaterial.thickness ?? 0, 0.12);
+          if ('thickness' in nextMaterial) nextMaterial.thickness = Math.max(nextMaterial.thickness ?? 0, 0.18);
           if ('ior' in nextMaterial) nextMaterial.ior = 1.34;
+        } else if (nextMaterial.color) {
+          nextMaterial.color.multiplyScalar(0.86);
+          nextMaterial.roughness = Math.min(nextMaterial.roughness ?? 0.6, 0.7);
         }
 
         return nextMaterial;
@@ -345,12 +356,12 @@ function SelectionGlow() {
   return (
     <group>
       <mesh quaternion={connectorQuaternion(LOCAL_UP)}>
-        <torusGeometry args={[0.102, 0.0045, 16, 80]} />
-        <meshBasicMaterial color="#819d8b" transparent opacity={0.76} depthWrite={false} />
+        <torusGeometry args={[0.102, 0.0038, 16, 80]} />
+        <meshBasicMaterial color="#6f8978" transparent opacity={0.58} depthWrite={false} />
       </mesh>
       <mesh>
         <sphereGeometry args={[0.017, 18, 12]} />
-        <meshBasicMaterial color="#819d8b" transparent opacity={0.44} depthWrite={false} />
+        <meshBasicMaterial color="#6f8978" transparent opacity={0.28} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -402,6 +413,19 @@ function FloorGrid({ visible }) {
   if (!visible) return null;
 
   return <gridHelper ref={gridRef} args={[12, 24, '#9dad9f', '#ded8ca']} position={[0, FLOOR_Y + 0.006, 0]} />;
+}
+
+function PartContactShadow({ partKey, placement }) {
+  const partType = solxParts[partKey]?.type;
+  const radius = partKey === 's04' ? 0.2 : partType === 'shade' ? 0.155 : 0.118;
+  const opacity = partType === 'divider' ? 0.1 : 0.16;
+
+  return (
+    <mesh position={[placement.position.x, FLOOR_Y / MODEL_SCALE + 0.003, placement.position.z]} rotation={[-Math.PI / 2, 0, 0]}>
+      <circleGeometry args={[radius, 72]} />
+      <meshBasicMaterial color="#6f6659" transparent opacity={opacity} depthWrite={false} />
+    </mesh>
+  );
 }
 
 function PlacedPart({ dragActive, onBeginSceneDrag, onSelect, part, placement, selected }) {
@@ -508,20 +532,37 @@ function BuilderScene({
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
       onPointerMissed={onClearSelection}
     >
-      <color attach="background" args={['#f4f0e6']} />
-      <fog attach="fog" args={['#f4f0e6', 10, 26]} />
-      <ambientLight intensity={lightingMode === 'gallery' ? 1.08 : 0.92} />
-      <hemisphereLight args={['#fff6e5', '#aebcaf', lightingMode === 'gallery' ? 0.72 : 0.6]} />
-      <directionalLight position={[4.8, 8, 5.2]} intensity={lightingMode === 'gallery' ? 2.55 : 2.22} color="#fff2dc" castShadow />
+      <color attach="background" args={['#ede6d9']} />
+      <fog attach="fog" args={['#ede6d9', 12, 30]} />
+      <ambientLight intensity={lightingMode === 'gallery' ? 0.78 : 0.66} />
+      <hemisphereLight args={['#fff1d8', '#9aa99d', lightingMode === 'gallery' ? 0.58 : 0.48]} />
+      <directionalLight
+        position={[4.8, 8, 5.2]}
+        intensity={lightingMode === 'gallery' ? 2.25 : 2.05}
+        color="#fff0d4"
+        castShadow
+        shadow-bias={-0.00018}
+        shadow-normalBias={0.012}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+      >
+        <orthographicCamera attach="shadow-camera" args={[-7, 7, 7, -7, 0.2, 24]} />
+      </directionalLight>
+      <directionalLight position={[-5.5, 4.2, -4.5]} intensity={0.46} color="#aeb8b1" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y, 0]} receiveShadow>
         <circleGeometry args={[6.3, 128]} />
-        <meshStandardMaterial color="#f1ede2" roughness={0.9} metalness={0} />
+        <meshStandardMaterial color="#e8dfcf" roughness={0.94} metalness={0} />
       </mesh>
       <FloorGrid visible={gridVisible} />
       {floorHover && canDropOnFloor && <FloorPlacementTarget position={floorHover} />}
       <ConfiguratorErrorBoundary resetKey={resetKey} fallback={<CanvasMessage title="Could not load SOL X GLB files." paths={expectedPaths} />}>
         <Suspense fallback={<CanvasMessage title="Loading SOL X parts..." />}>
           <group scale={MODEL_SCALE}>
+            {parts.map((part) => {
+              const placement = layout.placements.get(part.id);
+              if (!placement) return null;
+              return <PartContactShadow key={`${part.id}-shadow`} partKey={part.partKey} placement={placement} />;
+            })}
             {parts.map((part) => {
               const placement = layout.placements.get(part.id);
               if (!placement) return null;
