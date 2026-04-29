@@ -1016,8 +1016,17 @@ canvas {
   padding: clamp(54px, 8vw, 112px) clamp(20px, 5vw, 72px) clamp(72px, 8vw, 118px);
 }
 
+.configurator-shell--builder {
+  grid-template-columns: minmax(360px, 0.58fr) minmax(500px, 1fr);
+  align-items: stretch;
+}
+
 .configurator-copy {
   min-width: 0;
+}
+
+.builder-copy {
+  align-self: center;
 }
 
 .configurator-copy h1 {
@@ -1042,6 +1051,133 @@ canvas {
   color: var(--ink);
   font-size: clamp(1.35rem, 2.2vw, 2.2rem);
   line-height: 1.05;
+}
+
+.builder-panel {
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(25, 25, 24, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(247, 245, 239, 0.72)),
+    radial-gradient(circle at 0% 0%, rgba(128, 155, 139, 0.09), transparent 32%);
+}
+
+.builder-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 15px;
+  border-bottom: 1px solid rgba(25, 25, 24, 0.1);
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.builder-panel__header small {
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.parts-tray {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  padding: 13px;
+}
+
+.parts-tray__item,
+.builder-tool-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid rgba(25, 25, 24, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.38);
+  color: var(--ink);
+  cursor: grab;
+  font-size: 0.84rem;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, opacity 220ms ease;
+}
+
+.builder-tool-row button {
+  cursor: pointer;
+  padding: 0 14px;
+}
+
+.parts-tray__item:active {
+  cursor: grabbing;
+}
+
+.parts-tray__item:hover,
+.parts-tray__item:focus-visible,
+.builder-tool-row button:hover,
+.builder-tool-row button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(25, 25, 24, 0.34);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.parts-tray__item:first-child {
+  grid-column: 1 / -1;
+}
+
+.builder-selection {
+  padding-bottom: 13px;
+}
+
+.builder-empty-selection {
+  margin: 0;
+  padding: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.builder-tool-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.builder-selection .builder-tool-row {
+  padding: 0 13px;
+}
+
+.builder-tool-row button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+  transform: none;
+}
+
+.builder-feedback {
+  margin-top: 15px;
+  color: var(--muted);
+}
+
+.builder-drag-ghost {
+  position: fixed;
+  z-index: 120;
+  transform: translate(-50%, -130%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(128, 155, 139, 0.38);
+  border-radius: 999px;
+  background: rgba(247, 245, 239, 0.86);
+  color: var(--ink);
+  font-size: 0.78rem;
+  box-shadow: 0 14px 38px rgba(38, 58, 45, 0.14);
+  pointer-events: none;
+  backdrop-filter: blur(18px);
 }
 
 .configurator-actions,
@@ -1110,6 +1246,11 @@ canvas {
   display: grid;
   gap: 10px;
   margin-top: 24px;
+}
+
+.shade-color-picker--builder {
+  margin-top: 0;
+  padding: 13px;
 }
 
 .shade-color-picker p {
@@ -1269,6 +1410,12 @@ canvas {
     linear-gradient(250deg, rgba(206, 150, 68, 0.1), transparent 42%),
     #f4f1e8;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.builder-viewer {
+  height: min(78vh, 820px);
+  min-height: 620px;
+  align-self: stretch;
 }
 
 .configurator-viewer canvas {
@@ -1642,6 +1789,14 @@ canvas {
   .configurator-viewer {
     order: -1;
   }
+
+  .builder-copy {
+    order: 2;
+  }
+
+  .builder-viewer {
+    min-height: 560px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1838,6 +1993,24 @@ canvas {
 
   .configurator-viewer {
     height: 520px;
+  }
+
+  .builder-viewer {
+    min-height: 500px;
+    height: 560px;
+  }
+
+  .parts-tray {
+    grid-template-columns: 1fr;
+  }
+
+  .parts-tray__item:first-child {
+    grid-column: auto;
+  }
+
+  .builder-tool-row button,
+  .parts-tray__item {
+    flex: 1 1 160px;
   }
 }
 
