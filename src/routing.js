@@ -3,6 +3,17 @@ export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 export const buildPath = (path = '/') => `${basePath}${path.startsWith('/') ? path : `/${path}`}`;
 
 export const currentRoutePath = () => {
+  const redirectedPath = window.sessionStorage.getItem('solseven.redirect');
+  if (redirectedPath) {
+    window.sessionStorage.removeItem('solseven.redirect');
+    const redirectUrl = new URL(redirectedPath, window.location.origin);
+    const redirectRoute = redirectUrl.pathname.startsWith(basePath)
+      ? redirectUrl.pathname.slice(basePath.length)
+      : redirectUrl.pathname;
+    window.history.replaceState({}, '', `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`);
+    return redirectRoute || '/';
+  }
+
   const pathname = window.location.pathname;
   const withoutBase = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname;
   return withoutBase || '/';
