@@ -2,29 +2,29 @@ import { shadeColorOptions, solxPartOrder, solxParts } from './solxParts.js';
 
 export const solxPricing = {
   currency: 'USD',
-  lastChecked: '2026-04-29',
+  lastChecked: '2026-04-30',
   sourceUrl: 'https://www.solsevenstudios.com/category/all-products',
   note: 'Estimated price is based on the modules in your current build. Final availability and pricing may change.',
   parts: {
     base: {
       label: 'Base',
-      unitPrice: 35,
-      sourceNote: 'Temporary module estimate from current public S01 sale price ($70) minus current S01 shade price ($35).',
+      unitPrice: 55,
+      sourceNote: 'Temporary module estimate from current public S0 lamp price ($70) minus current S02/S03/S04 shade price ($15).',
       temporary: true,
     },
     s02: {
       label: 'S02 Shade',
-      unitPrice: 35,
+      unitPrice: 15,
       sourceNote: 'Current public S02 Shade listing.',
     },
     s03: {
       label: 'S03 Shade',
-      unitPrice: 35,
+      unitPrice: 15,
       sourceNote: 'Current public S03 Shade listing.',
     },
     s04: {
       label: 'S04 Shade',
-      unitPrice: 40,
+      unitPrice: 15,
       sourceNote: 'Current public S04 Shade listing.',
     },
     divider: {

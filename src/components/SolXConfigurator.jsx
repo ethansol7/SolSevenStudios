@@ -28,6 +28,9 @@ const FLOOR_Y = -0.05;
 const FLOOR_LIMIT = 0.88;
 const FLOOR_SNAP = 0.045;
 const FLOOR_FINE_SNAP = 0.015;
+const DEFAULT_BUILD_NAME = 'Untitled SOL Build';
+const PENTAGON_POINTS = 5;
+const PENTAGON_STEP = (Math.PI * 2) / PENTAGON_POINTS;
 const LOCAL_UP = new THREE.Vector3(0, 1, 0);
 const TORUS_FORWARD = new THREE.Vector3(0, 0, 1);
 const DEFAULT_CAMERA = {
@@ -40,7 +43,7 @@ function useMobileBuilderMode() {
   const [isMobileBuilder, setIsMobileBuilder] = useState(false);
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 760px), (pointer: coarse)');
+    const media = window.matchMedia('(max-width: 820px), (pointer: coarse)');
     const syncMode = () => setIsMobileBuilder(media.matches);
 
     syncMode();
@@ -136,6 +139,28 @@ function normalizeFloorPosition(position, fineSnap = false) {
 function canPlaceOnFloor(drag, freePlacement) {
   if (!drag) return false;
   return drag.partKey === 'base' || freePlacement;
+}
+
+function getRootPart(parts, partId) {
+  const partsById = new Map(parts.map((part) => [part.id, part]));
+  let current = partsById.get(partId) ?? null;
+  const visited = new Set();
+
+  while (current?.parentId && partsById.has(current.parentId) && !visited.has(current.id)) {
+    visited.add(current.id);
+    current = partsById.get(current.parentId);
+  }
+
+  return current;
+}
+
+function normalizeAngle(angle) {
+  const fullTurn = Math.PI * 2;
+  return ((angle % fullTurn) + fullTurn) % fullTurn;
+}
+
+function nearestPentagonIndex(angle) {
+  return Math.round(normalizeAngle(angle) / PENTAGON_STEP) % PENTAGON_POINTS;
 }
 
 function buildBuilderLayout(parts) {
@@ -343,12 +368,12 @@ function SolPartModel({ colorKey, partKey }) {
           nextMaterial.opacity = option.opacity ?? 0.78;
           nextMaterial.depthWrite = true;
           nextMaterial.depthTest = true;
-          nextMaterial.alphaTest = 0.035;
+          nextMaterial.alphaTest = 0.02;
           nextMaterial.premultipliedAlpha = true;
-          nextMaterial.envMapIntensity = 0.34;
+          nextMaterial.envMapIntensity = 0.24;
           if (nextMaterial.emissive && option.emissive) {
             nextMaterial.emissive.copy(new THREE.Color(option.emissive));
-            nextMaterial.emissiveIntensity = 0.08;
+            nextMaterial.emissiveIntensity = 0.045;
           }
           if ('transmission' in nextMaterial) nextMaterial.transmission = option.transmission ?? nextMaterial.transmission ?? 0;
           if ('thickness' in nextMaterial) nextMaterial.thickness = Math.max(nextMaterial.thickness ?? 0, 0.18);
@@ -399,6 +424,49 @@ function ConnectorTarget({ active, connector }) {
   );
 }
 
+function PentagonalRotationGuide({ activeIndex, onRotateToSnap, target }) {
+  const radius = 0.255;
+  const points = useMemo(() => Array.from({ length: PENTAGON_POINTS }, (_, index) => {
+    const angle = -Math.PI / 2 + index * PENTAGON_STEP;
+    return new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+  }), []);
+  const pentagonGeometry = useMemo(() => new THREE.BufferGeometry().setFromPoints([...points, points[0]]), [points]);
+
+  useEffect(() => () => pentagonGeometry.dispose(), [pentagonGeometry]);
+
+  if (!target) return null;
+
+  return (
+    <group position={[target.position.x, FLOOR_Y / MODEL_SCALE + 0.03, target.position.z]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[radius - 0.004, radius + 0.004, 96]} />
+        <meshBasicMaterial color="#7e9888" transparent opacity={0.28} depthWrite={false} />
+      </mesh>
+      <line geometry={pentagonGeometry}>
+        <lineBasicMaterial color="#789181" transparent opacity={0.34} depthWrite={false} />
+      </line>
+      {points.map((point, index) => (
+        <mesh
+          key={`pentagon-point-${index}`}
+          position={[point.x, point.y + 0.006, point.z]}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onRotateToSnap(index);
+          }}
+        >
+          <sphereGeometry args={[activeIndex === index ? 0.019 : 0.014, 18, 12]} />
+          <meshBasicMaterial
+            color={activeIndex === index ? '#d69b42' : '#8aa493'}
+            transparent
+            opacity={activeIndex === index ? 0.9 : 0.62}
+            depthWrite={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function FloorPlacementTarget({ position }) {
   return (
     <group position={[position[0] * MODEL_SCALE, FLOOR_Y + 0.012, position[2] * MODEL_SCALE]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -435,7 +503,7 @@ function FloorGrid({ visible }) {
 function PartContactShadow({ partKey, placement }) {
   const partType = solxParts[partKey]?.type;
   const radius = partKey === 's04' ? 0.2 : partType === 'shade' ? 0.155 : 0.118;
-  const opacity = partType === 'divider' ? 0.1 : 0.16;
+  const opacity = partType === 'divider' ? 0.14 : 0.22;
 
   return (
     <mesh position={[placement.position.x, FLOOR_Y / MODEL_SCALE + 0.003, placement.position.z]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -527,10 +595,12 @@ function BuilderScene({
   onBeginSceneDrag,
   onCanvasTap,
   onClearSelection,
+  onRotateToSnap,
   onSelect,
   parts,
   placementIntent,
   resetCameraToken,
+  rotationTarget,
   screenToFloorRef,
   selectedId,
 }) {
@@ -560,13 +630,13 @@ function BuilderScene({
         onClearSelection();
       }}
     >
-      <color attach="background" args={['#ede6d9']} />
-      <fog attach="fog" args={['#ede6d9', 12, 30]} />
-      <ambientLight intensity={lightingMode === 'gallery' ? 0.78 : 0.66} />
-      <hemisphereLight args={['#fff1d8', '#9aa99d', lightingMode === 'gallery' ? 0.58 : 0.48]} />
+      <color attach="background" args={['#e8dfd0']} />
+      <fog attach="fog" args={['#e8dfd0', 12, 30]} />
+      <ambientLight intensity={lightingMode === 'gallery' ? 0.66 : 0.56} />
+      <hemisphereLight args={['#fff1d8', '#87968b', lightingMode === 'gallery' ? 0.5 : 0.42]} />
       <directionalLight
         position={[4.8, 8, 5.2]}
-        intensity={lightingMode === 'gallery' ? 2.25 : 2.05}
+        intensity={lightingMode === 'gallery' ? 2.1 : 1.92}
         color="#fff0d4"
         castShadow
         shadow-bias={-0.00018}
@@ -576,10 +646,10 @@ function BuilderScene({
       >
         <orthographicCamera attach="shadow-camera" args={[-7, 7, 7, -7, 0.2, 24]} />
       </directionalLight>
-      <directionalLight position={[-5.5, 4.2, -4.5]} intensity={0.46} color="#aeb8b1" />
+      <directionalLight position={[-5.5, 4.2, -4.5]} intensity={0.34} color="#aeb8b1" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y, 0]} receiveShadow>
         <circleGeometry args={[6.3, 128]} />
-        <meshStandardMaterial color="#e8dfcf" roughness={0.94} metalness={0} />
+        <meshStandardMaterial color="#ded4c2" roughness={0.96} metalness={0} />
       </mesh>
       <FloorGrid visible={gridVisible} />
       {floorHover && canDropOnFloor && <FloorPlacementTarget position={floorHover} />}
@@ -611,6 +681,13 @@ function BuilderScene({
               .map((connector) => (
                 <ConnectorTarget key={connector.id} connector={connector} active={hoverConnectorId === connector.id} />
               ))}
+            {rotationTarget && !activeDrag && !placementIntent && (
+              <PentagonalRotationGuide
+                activeIndex={rotationTarget.activeIndex}
+                onRotateToSnap={onRotateToSnap}
+                target={rotationTarget}
+              />
+            )}
           </group>
           <Environment preset={lightingMode === 'gallery' ? 'apartment' : 'studio'} />
           <SceneProjectionSync connectors={connectors} connectorScreensRef={connectorScreensRef} screenToFloorRef={screenToFloorRef} />
@@ -667,11 +744,11 @@ function SolLampGlyph() {
   );
 }
 
-function PriceSummary({ estimate }) {
+function PriceSummary({ buildName, estimate }) {
   return (
     <div className="price-summary">
       <div className="price-summary__heading">
-        <span>Estimated price</span>
+        <span>{buildName || 'Estimated price'}</span>
         <strong>{formatPricingValue(estimate.total, estimate.currency)}</strong>
       </div>
       <p>{estimate.note}</p>
@@ -700,18 +777,87 @@ function PriceSummary({ estimate }) {
   );
 }
 
+function PentagonPointButtons({ activeIndex, onRotateToSnap }) {
+  return (
+    <div className="pentagon-point-buttons" aria-label="Pentagonal rotation snap points">
+      {Array.from({ length: PENTAGON_POINTS }, (_, index) => (
+        <button
+          type="button"
+          key={`point-${index + 1}`}
+          className={activeIndex === index ? 'active' : ''}
+          onClick={() => onRotateToSnap(index)}
+        >
+          {index + 1}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ShopBuildPanel({
+  buildName,
+  estimate,
+  onBuildNameChange,
+  onNavigate,
+  onRefreshPrice,
+  onSaveBuild,
+  onTakeScreenshot,
+}) {
+  return (
+    <div className="builder-glass builder-shop-panel">
+      <div className="builder-panel__header">
+        <span>Shop this build</span>
+        <small>{formatPricingValue(estimate.total, estimate.currency)}</small>
+      </div>
+      <label className="builder-build-name">
+        <span>Build name</span>
+        <input
+          type="text"
+          value={buildName}
+          onChange={(event) => onBuildNameChange(event.target.value)}
+          aria-label="Build name"
+        />
+      </label>
+      <PriceSummary buildName={buildName} estimate={estimate} />
+      <div className="builder-shop-actions">
+        <button type="button" onClick={onRefreshPrice}>
+          <DollarSign size={15} />
+          <span>Estimate price</span>
+        </button>
+        <button type="button" onClick={onSaveBuild}>
+          <Save size={15} />
+          <span>Save build</span>
+        </button>
+        <button type="button" onClick={onTakeScreenshot}>
+          <Download size={15} />
+          <span>Screenshot</span>
+        </button>
+        <AppLink to="/about" onNavigate={onNavigate}>
+          Request this build
+        </AppLink>
+      </div>
+    </div>
+  );
+}
+
 function MobileBuilderDrawer({
   activeTab,
+  activeRotationIndex,
+  buildName,
   estimate,
   feedback,
   mobileDrawerOpen,
+  onBuildNameChange,
   onChoosePart,
   onClearSavedBuild,
   onDeleteSelectedPart,
   onDuplicateSelectedPart,
   onLoadSavedBuild,
+  onNavigate,
+  onNudgeSelectedRoot,
   onResetCamera,
   onResetScene,
+  onRotateToSnap,
   onSaveBuild,
   onSetActiveTab,
   onTakeScreenshot,
@@ -731,7 +877,7 @@ function MobileBuilderDrawer({
       {mobileDrawerOpen && (
         <div className="mobile-builder-drawer__body">
           <div className="mobile-builder-tabs" role="tablist" aria-label="SOL X mobile builder controls">
-            {['parts', 'color', 'build', 'price'].map((tab) => (
+            {['parts', 'edit', 'color', 'price', 'save'].map((tab) => (
               <button
                 type="button"
                 key={tab}
@@ -761,6 +907,38 @@ function MobileBuilderDrawer({
                 ))}
               </div>
               <p className="mobile-builder-help">{feedback}</p>
+            </div>
+          )}
+
+          {activeTab === 'edit' && (
+            <div className="mobile-builder-pane mobile-builder-pane--edit">
+              {selectedPart ? (
+                <>
+                  <p>Selected {selectedPartLabel}</p>
+                  <div className="mobile-action-grid">
+                    <button type="button" onClick={onDeleteSelectedPart}>
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                    <button type="button" onClick={onDuplicateSelectedPart}>
+                      <Copy size={16} />
+                      Duplicate
+                    </button>
+                  </div>
+                  <div className="builder-rotation-card">
+                    <span>Rotate by SOL points</span>
+                    <PentagonPointButtons activeIndex={activeRotationIndex} onRotateToSnap={onRotateToSnap} />
+                  </div>
+                  <div className="mobile-move-pad">
+                    <button type="button" onClick={() => onNudgeSelectedRoot(0, -FLOOR_SNAP)}>Forward</button>
+                    <button type="button" onClick={() => onNudgeSelectedRoot(-FLOOR_SNAP, 0)}>Left</button>
+                    <button type="button" onClick={() => onNudgeSelectedRoot(FLOOR_SNAP, 0)}>Right</button>
+                    <button type="button" onClick={() => onNudgeSelectedRoot(0, FLOOR_SNAP)}>Back</button>
+                  </div>
+                </>
+              ) : (
+                <p>Select a part to move, rotate, duplicate, or delete it.</p>
+              )}
             </div>
           )}
 
@@ -799,7 +977,22 @@ function MobileBuilderDrawer({
             </div>
           )}
 
-          {activeTab === 'build' && (
+          {activeTab === 'price' && (
+            <div className="mobile-builder-pane">
+              <label className="builder-build-name builder-build-name--mobile">
+                <span>Build name</span>
+                <input
+                  type="text"
+                  value={buildName}
+                  onChange={(event) => onBuildNameChange(event.target.value)}
+                  aria-label="Mobile build name"
+                />
+              </label>
+              <PriceSummary buildName={buildName} estimate={estimate} />
+            </div>
+          )}
+
+          {activeTab === 'save' && (
             <div className="mobile-builder-pane">
               <div className="mobile-action-grid mobile-action-grid--build">
                 <button type="button" onClick={onSaveBuild}>
@@ -830,13 +1023,10 @@ function MobileBuilderDrawer({
                   <DollarSign size={16} />
                   Get price
                 </button>
+                <AppLink to="/about" onNavigate={onNavigate} className="mobile-action-grid__wide mobile-request-link">
+                  Request this build
+                </AppLink>
               </div>
-            </div>
-          )}
-
-          {activeTab === 'price' && (
-            <div className="mobile-builder-pane">
-              <PriceSummary estimate={estimate} />
             </div>
           )}
         </div>
@@ -848,6 +1038,7 @@ function MobileBuilderDrawer({
 export default function SolXConfigurator({ onNavigate }) {
   const isMobileBuilder = useMobileBuilderMode();
   const [parts, setParts] = useState(createStarterScene);
+  const [buildName, setBuildName] = useState(DEFAULT_BUILD_NAME);
   const [selectedId, setSelectedId] = useState('base-1');
   const [feedback, setFeedback] = useState('Drop bases onto the floor, then snap modules onto glowing connectors.');
   const [activeDrag, setActiveDrag] = useState(null);
@@ -857,7 +1048,6 @@ export default function SolXConfigurator({ onNavigate }) {
   const [resetCameraToken, setResetCameraToken] = useState(0);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
   const [mobileTab, setMobileTab] = useState('parts');
-  const [pricePanelOpen, setPricePanelOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [showAdvancedDisclaimer, setShowAdvancedDisclaimer] = useState(false);
   const [freePlacement, setFreePlacement] = useState(false);
@@ -876,6 +1066,16 @@ export default function SolXConfigurator({ onNavigate }) {
   const connectors = useMemo(() => buildOutputConnectors(parts, layout), [layout, parts]);
   const selectedPart = parts.find((part) => part.id === selectedId) ?? null;
   const selectedPartLabel = selectedPart ? solxParts[selectedPart.partKey].label : 'None';
+  const selectedRootPart = selectedPart ? getRootPart(parts, selectedPart.id) : null;
+  const selectedRootPlacement = selectedRootPart ? layout.placements.get(selectedRootPart.id) : null;
+  const activeRotationIndex = selectedRootPart ? nearestPentagonIndex(selectedRootPart.rotation?.[1] ?? 0) : 0;
+  const rotationTarget = selectedRootPart && selectedRootPlacement
+    ? {
+      partId: selectedRootPart.id,
+      position: selectedRootPlacement.position,
+      activeIndex: activeRotationIndex,
+    }
+    : null;
   const rootBaseCount = parts.filter((part) => !part.parentId && part.partKey === 'base').length;
   const priceEstimate = useMemo(() => estimateSolXBuild(parts), [parts]);
   const placementIntent = activeDrag ?? (pendingTapPartKey ? { kind: 'new', partKey: pendingTapPartKey } : null);
@@ -889,6 +1089,11 @@ export default function SolXConfigurator({ onNavigate }) {
   }, [activeDrag]);
 
   useEffect(() => () => window.clearTimeout(feedbackTimeout.current), []);
+
+  useEffect(() => {
+    document.body.classList.add('solx-configurator-active');
+    return () => document.body.classList.remove('solx-configurator-active');
+  }, []);
 
   useEffect(() => {
     if (!isMobileBuilder) setPendingTapPartKey(null);
@@ -1097,44 +1302,56 @@ export default function SolXConfigurator({ onNavigate }) {
       return;
     }
 
-    if (selectedPart.partKey !== 'base' && !freePlacement) {
-      showFeedback('Turn on experimental free placement to duplicate loose modules.');
+    const rootPart = getRootPart(parts, selectedPart.id);
+    if (!rootPart) {
+      showFeedback('Select a build first.');
       return;
     }
 
-    const placement = layout.placements.get(selectedPart.id);
-    const position = placement
-      ? normalizeFloorPosition([placement.position.x + 0.16, 0, placement.position.z + 0.12], fineSnap)
+    const branchIds = getBranchIds(parts, rootPart.id);
+    const idMap = new Map();
+    const rootPlacement = layout.placements.get(rootPart.id);
+    const rootPosition = rootPlacement
+      ? normalizeFloorPosition([rootPlacement.position.x + 0.2, 0, rootPlacement.position.z + 0.16], fineSnap)
       : normalizeFloorPosition([0.16, 0, 0.12], fineSnap);
-    const euler = placement ? new THREE.Euler().setFromQuaternion(placement.quaternion, 'XYZ') : rotationFromArray(selectedPart.rotation);
-    const duplicate = createPart(selectedPart.partKey, {
-      color: selectedPart.color,
-      parentId: null,
-      position,
-      rotation: [euler.x, euler.y, euler.z],
+    const branchParts = parts.filter((part) => branchIds.has(part.id));
+    branchParts.forEach((part) => {
+      idMap.set(part.id, `${part.partKey}-${idCounter.current}`);
+      idCounter.current += 1;
     });
-    setParts((current) => [...current, duplicate]);
-    setSelectedId(duplicate.id);
-    showFeedback('Duplicated selected part.');
+
+    const duplicates = branchParts.map((part) => {
+      return {
+        ...part,
+        id: idMap.get(part.id),
+        parentId: part.parentId && branchIds.has(part.parentId) ? idMap.get(part.parentId) : null,
+        position: part.id === rootPart.id ? rootPosition : part.position,
+        rotation: part.id === rootPart.id ? (part.rotation ?? [0, 0, 0]) : part.rotation,
+      };
+    });
+
+    setParts((current) => [...current, ...duplicates]);
+    setSelectedId(idMap.get(rootPart.id));
+    showFeedback('Duplicated selected build.');
   };
 
   const nudgeSelectedRoot = (dx, dz) => {
     if (!selectedPart) {
-      showFeedback('Select a floor part first.');
+      showFeedback('Select a build first.');
       return;
     }
 
-    if (selectedPart.parentId && !freePlacement) {
-      showFeedback('Manual move is for floor roots.');
+    const rootPart = getRootPart(parts, selectedPart.id);
+    if (!rootPart) {
+      showFeedback('Select a build first.');
       return;
     }
 
     setParts((current) => current.map((part) => {
-      if (part.id !== selectedPart.id) return part;
+      if (part.id !== rootPart.id) return part;
       const currentPosition = part.position ?? [0, 0, 0];
       return {
         ...part,
-        parentId: part.parentId && freePlacement ? null : part.parentId,
         position: normalizeFloorPosition([currentPosition[0] + dx, 0, currentPosition[2] + dz], fineSnap),
       };
     }));
@@ -1142,24 +1359,48 @@ export default function SolXConfigurator({ onNavigate }) {
 
   const rotateSelectedRoot = (amount) => {
     if (!selectedPart) {
-      showFeedback('Select a floor part first.');
+      showFeedback('Select a build first.');
       return;
     }
 
-    if (selectedPart.parentId && !freePlacement) {
-      showFeedback('Manual rotate is for floor roots.');
+    const rootPart = getRootPart(parts, selectedPart.id);
+    if (!rootPart) {
+      showFeedback('Select a build first.');
       return;
     }
 
     setParts((current) => current.map((part) => {
-      if (part.id !== selectedPart.id) return part;
+      if (part.id !== rootPart.id) return part;
       const rotation = part.rotation ?? [0, 0, 0];
       return {
         ...part,
-        parentId: part.parentId && freePlacement ? null : part.parentId,
         rotation: [rotation[0], rotation[1] + amount, rotation[2]],
       };
     }));
+  };
+
+  const rotateSelectedToPentagonPoint = (index) => {
+    if (!selectedPart) {
+      showFeedback('Select a build first.');
+      return;
+    }
+
+    const rootPart = getRootPart(parts, selectedPart.id);
+    if (!rootPart) {
+      showFeedback('Select a build first.');
+      return;
+    }
+
+    const angle = index * PENTAGON_STEP;
+    setParts((current) => current.map((part) => {
+      if (part.id !== rootPart.id) return part;
+      const rotation = part.rotation ?? [0, 0, 0];
+      return {
+        ...part,
+        rotation: [rotation[0], angle, rotation[2]],
+      };
+    }));
+    showFeedback(`Rotated to SOL point ${index + 1}.`);
   };
 
   const saveBuild = () => {
@@ -1171,6 +1412,7 @@ export default function SolXConfigurator({ onNavigate }) {
 
     const payload = {
       version: 2,
+      name: buildName.trim() || DEFAULT_BUILD_NAME,
       savedAt: new Date().toISOString(),
       modules: parts.map((part) => {
         const placement = layout.placements.get(part.id);
@@ -1208,6 +1450,7 @@ export default function SolXConfigurator({ onNavigate }) {
     })));
     idCounter.current = nextCounterFromParts(loadedParts);
     setParts(loadedParts);
+    setBuildName(payload.name || DEFAULT_BUILD_NAME);
     setSelectedId(loadedParts[0]?.id ?? null);
     showFeedback('Saved build loaded.');
   };
@@ -1269,10 +1512,12 @@ export default function SolXConfigurator({ onNavigate }) {
             onClearSelection={() => {
               if (!activeDragRef.current && !pendingTapPartKey) setSelectedId(null);
             }}
+            onRotateToSnap={rotateSelectedToPentagonPoint}
             onSelect={setSelectedId}
             parts={parts}
             placementIntent={placementIntent}
             resetCameraToken={resetCameraToken}
+            rotationTarget={rotationTarget}
             screenToFloorRef={screenToFloorRef}
             selectedId={selectedId}
           />
@@ -1346,11 +1591,27 @@ export default function SolXConfigurator({ onNavigate }) {
                       <span>Duplicate</span>
                     </button>
                   </div>
+                  <div className="builder-rotation-card">
+                    <span>Pentagonal rotation</span>
+                    <PentagonPointButtons activeIndex={activeRotationIndex} onRotateToSnap={rotateSelectedToPentagonPoint} />
+                  </div>
                 </>
               ) : (
                 <p className="builder-empty-selection">Select a module to tune its color or remove it.</p>
               )}
             </div>
+
+            {!isMobileBuilder && (
+              <ShopBuildPanel
+                buildName={buildName}
+                estimate={priceEstimate}
+                onBuildNameChange={setBuildName}
+                onNavigate={onNavigate}
+                onRefreshPrice={() => showFeedback('Price estimate updated.')}
+                onSaveBuild={saveBuild}
+                onTakeScreenshot={takeScreenshot}
+              />
+            )}
 
             <div className="builder-glass builder-action-panel">
               <button type="button" onClick={saveBuild}>
@@ -1377,37 +1638,31 @@ export default function SolXConfigurator({ onNavigate }) {
                 <Download size={15} />
                 <span>Screenshot</span>
               </button>
-              <button type="button" onClick={() => setPricePanelOpen((current) => !current)}>
+              <button type="button" onClick={() => showFeedback('Price estimate updated.')}>
                 <DollarSign size={15} />
-                <span>Get price</span>
+                <span>Estimate price</span>
               </button>
             </div>
-
-            {pricePanelOpen && (
-              <div className="builder-glass builder-price-panel">
-                <div className="builder-panel__header">
-                  <span>Price</span>
-                  <button type="button" onClick={() => setPricePanelOpen(false)} aria-label="Close price estimate">
-                    <X size={14} />
-                  </button>
-                </div>
-                <PriceSummary estimate={priceEstimate} />
-              </div>
-            )}
 
             {isMobileBuilder && (
               <MobileBuilderDrawer
                 activeTab={mobileTab}
+                activeRotationIndex={activeRotationIndex}
+                buildName={buildName}
                 estimate={priceEstimate}
                 feedback={feedback}
                 mobileDrawerOpen={mobileDrawerOpen}
+                onBuildNameChange={setBuildName}
                 onChoosePart={chooseMobilePart}
                 onClearSavedBuild={clearSavedBuild}
                 onDeleteSelectedPart={deleteSelectedPart}
                 onDuplicateSelectedPart={duplicateSelectedPart}
                 onLoadSavedBuild={loadSavedBuild}
+                onNavigate={onNavigate}
+                onNudgeSelectedRoot={nudgeSelectedRoot}
                 onResetCamera={() => setResetCameraToken((token) => token + 1)}
                 onResetScene={resetScene}
+                onRotateToSnap={rotateSelectedToPentagonPoint}
                 onSaveBuild={saveBuild}
                 onSetActiveTab={setMobileTab}
                 onTakeScreenshot={takeScreenshot}
