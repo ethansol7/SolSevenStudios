@@ -6,6 +6,8 @@ import {
   Download,
   DollarSign,
   FolderOpen,
+  HelpCircle,
+  Maximize2,
   MousePointer2,
   RotateCcw,
   RotateCw,
@@ -38,6 +40,29 @@ const DEFAULT_CAMERA = {
   target: [0, 0.46, 0],
   fov: 40,
 };
+const TUTORIAL_KEY = 'sol-seven-solx-builder-tutorial-v1';
+const tutorialSteps = [
+  {
+    title: 'Move through the space',
+    body: 'Drag to orbit, pinch or scroll to zoom, and pan when you want to frame a larger build.',
+  },
+  {
+    title: 'Start with a base',
+    body: 'On mobile, tap Base, then tap the highlighted floor target. On desktop, drag bases onto the floor.',
+  },
+  {
+    title: 'Follow the glowing connectors',
+    body: 'Tap or drag shades, dividers, and bases onto the soft connector markers. Invalid connectors stay quiet.',
+  },
+  {
+    title: 'Rotate by SOL points',
+    body: 'Use rotate left and right to step the selected module through five 72 degree magnet positions.',
+  },
+  {
+    title: 'Tune and keep the build',
+    body: 'Select any part to change its translucent color, then save, screenshot, or estimate the build price.',
+  },
+];
 
 function useMobileBuilderMode() {
   const [isMobileBuilder, setIsMobileBuilder] = useState(false);
@@ -61,6 +86,10 @@ const rotationFromArray = (value) => new THREE.Euler(...(value ?? [0, 0, 0]), 'X
 const quaternionFromRotation = (value) => new THREE.Quaternion().setFromEuler(rotationFromArray(value));
 
 const quaternionFromDirection = (direction) => new THREE.Quaternion().setFromUnitVectors(LOCAL_UP, direction.clone().normalize());
+
+const connectorSpinQuaternion = (part) => new THREE.Quaternion().setFromAxisAngle(LOCAL_UP, part?.rotation?.[1] ?? 0);
+
+const quaternionForConnectedPart = (direction, part) => quaternionFromDirection(direction).multiply(connectorSpinQuaternion(part));
 
 const connectorQuaternion = (direction) => new THREE.Quaternion().setFromUnitVectors(TORUS_FORWARD, direction.clone().normalize());
 
@@ -190,7 +219,7 @@ function buildBuilderLayout(parts) {
     children.forEach((childId) => {
       const child = partsById.get(childId);
       if (!child) return;
-      placePart(child, connectorPosition.clone(), quaternionFromDirection(outputDirection));
+      placePart(child, connectorPosition.clone(), quaternionForConnectedPart(outputDirection, child));
     });
   };
 
@@ -420,6 +449,10 @@ function ConnectorTarget({ active, connector }) {
         <sphereGeometry args={[active ? 0.019 : 0.012, 18, 12]} />
         <meshBasicMaterial color={active ? '#d4a35d' : '#95aa9d'} transparent opacity={active ? 0.72 : 0.34} depthWrite={false} />
       </mesh>
+      <mesh position={[0, 0, active ? 0.078 : 0.062]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[active ? 0.022 : 0.017, active ? 0.052 : 0.04, 5]} />
+        <meshBasicMaterial color={active ? '#d4a35d' : '#95aa9d'} transparent opacity={active ? 0.78 : 0.5} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
@@ -566,18 +599,41 @@ function SceneProjectionSync({ connectorScreensRef, connectors, screenToFloorRef
   return null;
 }
 
-function CameraRig({ controlsRef, resetToken }) {
+function CameraRig({ controlsRef, fitToken, layout, resetToken }) {
   const { camera } = useThree();
 
   useEffect(() => {
     camera.position.set(...DEFAULT_CAMERA.position);
     camera.fov = DEFAULT_CAMERA.fov;
+    camera.far = 90;
     camera.updateProjectionMatrix();
     if (controlsRef.current) {
       controlsRef.current.target.set(...DEFAULT_CAMERA.target);
       controlsRef.current.update();
     }
   }, [camera, controlsRef, resetToken]);
+
+  useEffect(() => {
+    if (!fitToken || !layout?.placements?.size) return;
+
+    const points = Array.from(layout.placements.values()).map((placement) => placement.position.clone().multiplyScalar(MODEL_SCALE));
+    const box = new THREE.Box3().setFromPoints(points);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const buildRadius = Math.max(size.length(), 2.8);
+    const distance = Math.min(Math.max(buildRadius * 1.45, 8.2), 30);
+    const cameraOffset = new THREE.Vector3(distance * 0.62, distance * 0.46, distance * 0.78);
+
+    center.y = Math.max(center.y + 0.65, 0.9);
+    camera.position.copy(center.clone().add(cameraOffset));
+    camera.fov = DEFAULT_CAMERA.fov;
+    camera.far = 90;
+    camera.updateProjectionMatrix();
+    if (controlsRef.current) {
+      controlsRef.current.target.copy(center);
+      controlsRef.current.update();
+    }
+  }, [camera, controlsRef, fitToken, layout]);
 
   return null;
 }
@@ -586,6 +642,7 @@ function BuilderScene({
   activeDrag,
   connectorScreensRef,
   connectors,
+  fitCameraToken,
   floorHover,
   freePlacement,
   gridVisible,
@@ -612,10 +669,11 @@ function BuilderScene({
   const expectedPaths = solxPartOrder.map((key) => solxParts[key].expectedPath);
   const resetKey = parts.map((part) => `${part.id}-${part.partKey}`).join('-');
   const canDropOnFloor = canPlaceOnFloor(placementIntent, freePlacement);
+  const floorTarget = floorHover ?? (canDropOnFloor && placementIntent?.kind === 'new' && placementIntent.partKey === 'base' ? [0, 0, 0] : null);
 
   return (
     <Canvas
-      camera={{ position: DEFAULT_CAMERA.position, fov: DEFAULT_CAMERA.fov }}
+      camera={{ position: DEFAULT_CAMERA.position, fov: DEFAULT_CAMERA.fov, far: 90 }}
       dpr={[1, 1.65]}
       shadows
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
@@ -630,13 +688,13 @@ function BuilderScene({
         onClearSelection();
       }}
     >
-      <color attach="background" args={['#e8dfd0']} />
-      <fog attach="fog" args={['#e8dfd0', 12, 30]} />
-      <ambientLight intensity={lightingMode === 'gallery' ? 0.66 : 0.56} />
-      <hemisphereLight args={['#fff1d8', '#87968b', lightingMode === 'gallery' ? 0.5 : 0.42]} />
+      <color attach="background" args={['#ded3c0']} />
+      <fog attach="fog" args={['#ded3c0', 20, 54]} />
+      <ambientLight intensity={lightingMode === 'gallery' ? 0.56 : 0.48} />
+      <hemisphereLight args={['#fff1d8', '#77877c', lightingMode === 'gallery' ? 0.42 : 0.36]} />
       <directionalLight
         position={[4.8, 8, 5.2]}
-        intensity={lightingMode === 'gallery' ? 2.1 : 1.92}
+        intensity={lightingMode === 'gallery' ? 2.25 : 2.02}
         color="#fff0d4"
         castShadow
         shadow-bias={-0.00018}
@@ -646,13 +704,13 @@ function BuilderScene({
       >
         <orthographicCamera attach="shadow-camera" args={[-7, 7, 7, -7, 0.2, 24]} />
       </directionalLight>
-      <directionalLight position={[-5.5, 4.2, -4.5]} intensity={0.34} color="#aeb8b1" />
+      <directionalLight position={[-5.5, 4.2, -4.5]} intensity={0.42} color="#9faf9e" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y, 0]} receiveShadow>
         <circleGeometry args={[6.3, 128]} />
-        <meshStandardMaterial color="#ded4c2" roughness={0.96} metalness={0} />
+        <meshStandardMaterial color="#d4c8b4" roughness={0.96} metalness={0} />
       </mesh>
       <FloorGrid visible={gridVisible} />
-      {floorHover && canDropOnFloor && <FloorPlacementTarget position={floorHover} />}
+      {floorTarget && canDropOnFloor && <FloorPlacementTarget position={floorTarget} />}
       <ConfiguratorErrorBoundary resetKey={resetKey} fallback={<CanvasMessage title="Could not load SOL X GLB files." paths={expectedPaths} />}>
         <Suspense fallback={<CanvasMessage title="Loading SOL X parts..." />}>
           <group scale={MODEL_SCALE}>
@@ -705,11 +763,11 @@ function BuilderScene({
         panSpeed={0.82}
         rotateSpeed={0.58}
         minDistance={3.2}
-        maxDistance={18}
+        maxDistance={34}
         minPolarAngle={Math.PI * 0.1}
         maxPolarAngle={Math.PI * 0.86}
       />
-      <CameraRig controlsRef={controlsRef} resetToken={resetCameraToken} />
+      <CameraRig controlsRef={controlsRef} fitToken={fitCameraToken} layout={layout} resetToken={resetCameraToken} />
     </Canvas>
   );
 }
@@ -794,6 +852,51 @@ function PentagonPointButtons({ activeIndex, onRotateToSnap }) {
   );
 }
 
+function RotateStepControls({ onRotateLeft, onRotateRight }) {
+  return (
+    <div className="rotate-step-controls" aria-label="Rotate selected part by 72 degrees">
+      <button type="button" onClick={onRotateLeft}>
+        <RotateCcw size={15} />
+        <span>Left 72</span>
+      </button>
+      <button type="button" onClick={onRotateRight}>
+        <RotateCw size={15} />
+        <span>Right 72</span>
+      </button>
+    </div>
+  );
+}
+
+function TutorialOverlay({ onClose, onNext, onSkip, stepIndex }) {
+  const step = tutorialSteps[stepIndex];
+  const isLast = stepIndex === tutorialSteps.length - 1;
+
+  return (
+    <div className="builder-modal-backdrop builder-tutorial-backdrop" role="presentation">
+      <div className="builder-glass builder-tutorial-card" role="dialog" aria-modal="true" aria-labelledby="builder-tutorial-title">
+        <p className="section-kicker">Quick guide / {stepIndex + 1} of {tutorialSteps.length}</p>
+        <h2 id="builder-tutorial-title">{step.title}</h2>
+        <p>{step.body}</p>
+        <div className="builder-tutorial-progress" aria-hidden="true">
+          {tutorialSteps.map((item, index) => (
+            <span key={item.title} className={index === stepIndex ? 'active' : ''} />
+          ))}
+        </div>
+        <div className="builder-tool-row">
+          <button type="button" onClick={onSkip}>
+            <X size={15} />
+            <span>Skip</span>
+          </button>
+          <button type="button" onClick={isLast ? onClose : onNext}>
+            <HelpCircle size={15} />
+            <span>{isLast ? 'Done' : 'Next'}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ShopBuildPanel({
   buildName,
   estimate,
@@ -844,22 +947,27 @@ function MobileBuilderDrawer({
   activeTab,
   activeRotationIndex,
   buildName,
+  drawerState,
   estimate,
   feedback,
-  mobileDrawerOpen,
   onBuildNameChange,
   onChoosePart,
   onClearSavedBuild,
   onDeleteSelectedPart,
   onDuplicateSelectedPart,
+  onFitBuildToView,
   onLoadSavedBuild,
   onNavigate,
   onNudgeSelectedRoot,
   onResetCamera,
   onResetScene,
+  onRotateStepLeft,
+  onRotateStepRight,
   onRotateToSnap,
   onSaveBuild,
   onSetActiveTab,
+  onSetDrawerState,
+  onStartTutorial,
   onTakeScreenshot,
   onToggleDrawer,
   onUpdateSelectedColor,
@@ -867,15 +975,25 @@ function MobileBuilderDrawer({
   selectedPart,
   selectedPartLabel,
 }) {
+  const drawerOpen = drawerState !== 'collapsed';
+
   return (
-    <div className={`builder-glass mobile-builder-drawer${mobileDrawerOpen ? ' is-open' : ' is-collapsed'}`}>
-      <button type="button" className="mobile-builder-drawer__summary" onClick={onToggleDrawer} aria-expanded={mobileDrawerOpen}>
+    <div className={`builder-glass mobile-builder-drawer is-${drawerState}`}>
+      <button type="button" className="mobile-builder-drawer__summary" onClick={onToggleDrawer} aria-expanded={drawerOpen}>
         <span>Build controls</span>
         <small>{pendingPartKey ? `Placing ${solxParts[pendingPartKey].shortLabel}` : selectedPartLabel}</small>
-        <b>{mobileDrawerOpen ? 'Close' : 'Open'}</b>
+        <b>{drawerOpen ? 'Min' : 'Open'}</b>
       </button>
-      {mobileDrawerOpen && (
+      {drawerOpen && (
         <div className="mobile-builder-drawer__body">
+          <div className="mobile-drawer-state-buttons" aria-label="Drawer size">
+            <button type="button" className={drawerState === 'half' ? 'active' : ''} onClick={() => onSetDrawerState('half')}>
+              Half
+            </button>
+            <button type="button" className={drawerState === 'full' ? 'active' : ''} onClick={() => onSetDrawerState('full')}>
+              Full
+            </button>
+          </div>
           <div className="mobile-builder-tabs" role="tablist" aria-label="SOL X mobile builder controls">
             {['parts', 'edit', 'color', 'price', 'save'].map((tab) => (
               <button
@@ -927,6 +1045,7 @@ function MobileBuilderDrawer({
                   </div>
                   <div className="builder-rotation-card">
                     <span>Rotate by SOL points</span>
+                    <RotateStepControls onRotateLeft={onRotateStepLeft} onRotateRight={onRotateStepRight} />
                     <PentagonPointButtons activeIndex={activeRotationIndex} onRotateToSnap={onRotateToSnap} />
                   </div>
                   <div className="mobile-move-pad">
@@ -1015,9 +1134,17 @@ function MobileBuilderDrawer({
                   <Camera size={16} />
                   Reset camera
                 </button>
+                <button type="button" onClick={onFitBuildToView}>
+                  <Maximize2 size={16} />
+                  Fit view
+                </button>
                 <button type="button" onClick={onTakeScreenshot}>
                   <Download size={16} />
                   Screenshot
+                </button>
+                <button type="button" onClick={onStartTutorial}>
+                  <HelpCircle size={16} />
+                  Tutorial
                 </button>
                 <button type="button" className="mobile-action-grid__wide" onClick={() => onSetActiveTab('price')}>
                   <DollarSign size={16} />
@@ -1046,8 +1173,14 @@ export default function SolXConfigurator({ onNavigate }) {
   const [hoverConnectorId, setHoverConnectorId] = useState(null);
   const [floorHover, setFloorHover] = useState(null);
   const [resetCameraToken, setResetCameraToken] = useState(0);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
+  const [fitCameraToken, setFitCameraToken] = useState(0);
+  const [mobileDrawerState, setMobileDrawerState] = useState('half');
   const [mobileTab, setMobileTab] = useState('parts');
+  const [tutorialOpen, setTutorialOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(TUTORIAL_KEY) !== 'true';
+  });
+  const [tutorialStep, setTutorialStep] = useState(0);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [showAdvancedDisclaimer, setShowAdvancedDisclaimer] = useState(false);
   const [freePlacement, setFreePlacement] = useState(false);
@@ -1061,18 +1194,19 @@ export default function SolXConfigurator({ onNavigate }) {
   const screenToFloorRef = useRef(null);
   const partsRef = useRef(parts);
   const activeDragRef = useRef(activeDrag);
+  const lastPlacementTimeRef = useRef(0);
 
   const layout = useMemo(() => buildBuilderLayout(parts), [parts]);
   const connectors = useMemo(() => buildOutputConnectors(parts, layout), [layout, parts]);
   const selectedPart = parts.find((part) => part.id === selectedId) ?? null;
   const selectedPartLabel = selectedPart ? solxParts[selectedPart.partKey].label : 'None';
   const selectedRootPart = selectedPart ? getRootPart(parts, selectedPart.id) : null;
-  const selectedRootPlacement = selectedRootPart ? layout.placements.get(selectedRootPart.id) : null;
-  const activeRotationIndex = selectedRootPart ? nearestPentagonIndex(selectedRootPart.rotation?.[1] ?? 0) : 0;
-  const rotationTarget = selectedRootPart && selectedRootPlacement
+  const selectedPartPlacement = selectedPart ? layout.placements.get(selectedPart.id) : null;
+  const activeRotationIndex = selectedPart ? nearestPentagonIndex(selectedPart.rotation?.[1] ?? 0) : 0;
+  const rotationTarget = selectedPart && selectedPartPlacement
     ? {
-      partId: selectedRootPart.id,
-      position: selectedRootPlacement.position,
+      partId: selectedPart.id,
+      position: selectedPartPlacement.position,
       activeIndex: activeRotationIndex,
     }
     : null;
@@ -1107,6 +1241,16 @@ export default function SolXConfigurator({ onNavigate }) {
         setFeedback('Drop bases onto the floor, then snap modules onto glowing connectors.');
       }, FEEDBACK_TIMEOUT);
     }
+  }, []);
+
+  const startTutorial = useCallback(() => {
+    setTutorialStep(0);
+    setTutorialOpen(true);
+  }, []);
+
+  const closeTutorial = useCallback(() => {
+    window.localStorage.setItem(TUTORIAL_KEY, 'true');
+    setTutorialOpen(false);
   }, []);
 
   const createPart = useCallback((partKey, overrides = {}) => {
@@ -1170,6 +1314,7 @@ export default function SolXConfigurator({ onNavigate }) {
         setSelectedId(drag.id);
       }
 
+      lastPlacementTimeRef.current = Date.now();
       showFeedback(solxParts[drag.partKey].type === 'divider' ? 'Add a shade to finish this connector.' : 'Snapped into place.');
       return true;
     } else if (insideViewer && floorPosition && canPlaceOnFloor(drag, freePlacement)) {
@@ -1181,10 +1326,11 @@ export default function SolXConfigurator({ onNavigate }) {
         setParts((current) => current.map((part) => (part.id === drag.id ? { ...part, parentId: null, position: floorPosition } : part)));
         setSelectedId(drag.id);
       }
+      lastPlacementTimeRef.current = Date.now();
       showFeedback(drag.partKey === 'base' ? 'Base placed on the floor.' : 'Placed in experimental free mode.');
       return true;
     } else if (insideViewer && (options.moved || options.showInvalid)) {
-      showFeedback("This part can't connect there.");
+      showFeedback(options.invalidMessage ?? "This part can't connect there.");
     }
 
     return false;
@@ -1228,13 +1374,20 @@ export default function SolXConfigurator({ onNavigate }) {
     setActiveDrag(null);
     setHoverConnectorId(null);
     setFloorHover(null);
+    const eligibleConnectors = eligibleConnectorsForDrag({ kind: 'new', partKey }, connectors, parts);
+    const hasBase = parts.some((part) => part.partKey === 'base');
+    const message = partKey === 'base'
+      ? 'Tap the highlighted floor target to place a base, or tap a glowing shade connector.'
+      : eligibleConnectors.length
+        ? 'Tap a glowing connector to place this part.'
+        : hasBase
+          ? 'No valid connectors available.'
+          : 'Add a base first.';
     showFeedback(
-      partKey === 'base'
-        ? 'Tap the floor to place a base, or tap a glowing shade connector.'
-        : 'Tap a glowing connector to place this part.',
+      message,
       true,
     );
-  }, [showFeedback]);
+  }, [connectors, parts, showFeedback]);
 
   const handleCanvasTapPlacement = useCallback((event) => {
     if (!pendingTapPartKey || activeDragRef.current) return;
@@ -1242,7 +1395,12 @@ export default function SolXConfigurator({ onNavigate }) {
       { kind: 'new', partKey: pendingTapPartKey },
       event.clientX,
       event.clientY,
-      { showInvalid: true },
+      {
+        showInvalid: true,
+        invalidMessage: pendingTapPartKey === 'base'
+          ? 'Tap the highlighted floor target to place this base.'
+          : 'Tap a glowing connector to place this part.',
+      },
     );
     if (placed) setPendingTapPartKey(null);
     setHoverConnectorId(null);
@@ -1379,21 +1537,20 @@ export default function SolXConfigurator({ onNavigate }) {
     }));
   };
 
+  const fitBuildToView = () => {
+    setFitCameraToken((token) => token + 1);
+    showFeedback('Framed the current build.');
+  };
+
   const rotateSelectedToPentagonPoint = (index) => {
     if (!selectedPart) {
-      showFeedback('Select a build first.');
-      return;
-    }
-
-    const rootPart = getRootPart(parts, selectedPart.id);
-    if (!rootPart) {
-      showFeedback('Select a build first.');
+      showFeedback('Select a part first.');
       return;
     }
 
     const angle = index * PENTAGON_STEP;
     setParts((current) => current.map((part) => {
-      if (part.id !== rootPart.id) return part;
+      if (part.id !== selectedPart.id) return part;
       const rotation = part.rotation ?? [0, 0, 0];
       return {
         ...part,
@@ -1401,6 +1558,17 @@ export default function SolXConfigurator({ onNavigate }) {
       };
     }));
     showFeedback(`Rotated to SOL point ${index + 1}.`);
+  };
+
+  const rotateSelectedByStep = (direction) => {
+    if (!selectedPart) {
+      showFeedback('Select a part first.');
+      return;
+    }
+
+    const currentIndex = nearestPentagonIndex(selectedPart.rotation?.[1] ?? 0);
+    const nextIndex = (currentIndex + direction + PENTAGON_POINTS) % PENTAGON_POINTS;
+    rotateSelectedToPentagonPoint(nextIndex);
   };
 
   const saveBuild = () => {
@@ -1427,8 +1595,8 @@ export default function SolXConfigurator({ onNavigate }) {
           parentId: part.parentId,
           position: placement ? [placement.position.x, placement.position.y, placement.position.z] : (part.position ?? [0, 0, 0]),
           rootPosition: part.position ?? null,
-          rotation: [euler.x, euler.y, euler.z],
-          rootRotation: part.rotation ?? null,
+          rotation: part.rotation ?? [0, 0, 0],
+          worldRotation: [euler.x, euler.y, euler.z],
         };
       }),
     };
@@ -1501,6 +1669,7 @@ export default function SolXConfigurator({ onNavigate }) {
             activeDrag={activeDrag}
             connectorScreensRef={connectorScreensRef}
             connectors={connectors}
+            fitCameraToken={fitCameraToken}
             floorHover={floorHover}
             freePlacement={freePlacement}
             gridVisible={gridVisible}
@@ -1510,6 +1679,7 @@ export default function SolXConfigurator({ onNavigate }) {
             onBeginSceneDrag={beginSceneDrag}
             onCanvasTap={handleCanvasTapPlacement}
             onClearSelection={() => {
+              if (Date.now() - lastPlacementTimeRef.current < 350) return;
               if (!activeDragRef.current && !pendingTapPartKey) setSelectedId(null);
             }}
             onRotateToSnap={rotateSelectedToPentagonPoint}
@@ -1593,6 +1763,7 @@ export default function SolXConfigurator({ onNavigate }) {
                   </div>
                   <div className="builder-rotation-card">
                     <span>Pentagonal rotation</span>
+                    <RotateStepControls onRotateLeft={() => rotateSelectedByStep(-1)} onRotateRight={() => rotateSelectedByStep(1)} />
                     <PentagonPointButtons activeIndex={activeRotationIndex} onRotateToSnap={rotateSelectedToPentagonPoint} />
                   </div>
                 </>
@@ -1634,9 +1805,17 @@ export default function SolXConfigurator({ onNavigate }) {
                 <Camera size={15} />
                 <span>Reset camera</span>
               </button>
+              <button type="button" onClick={fitBuildToView}>
+                <Maximize2 size={15} />
+                <span>Fit build</span>
+              </button>
               <button type="button" onClick={takeScreenshot}>
                 <Download size={15} />
                 <span>Screenshot</span>
+              </button>
+              <button type="button" onClick={startTutorial}>
+                <HelpCircle size={15} />
+                <span>Tutorial</span>
               </button>
               <button type="button" onClick={() => showFeedback('Price estimate updated.')}>
                 <DollarSign size={15} />
@@ -1649,24 +1828,29 @@ export default function SolXConfigurator({ onNavigate }) {
                 activeTab={mobileTab}
                 activeRotationIndex={activeRotationIndex}
                 buildName={buildName}
+                drawerState={mobileDrawerState}
                 estimate={priceEstimate}
                 feedback={feedback}
-                mobileDrawerOpen={mobileDrawerOpen}
                 onBuildNameChange={setBuildName}
                 onChoosePart={chooseMobilePart}
                 onClearSavedBuild={clearSavedBuild}
                 onDeleteSelectedPart={deleteSelectedPart}
                 onDuplicateSelectedPart={duplicateSelectedPart}
+                onFitBuildToView={fitBuildToView}
                 onLoadSavedBuild={loadSavedBuild}
                 onNavigate={onNavigate}
                 onNudgeSelectedRoot={nudgeSelectedRoot}
                 onResetCamera={() => setResetCameraToken((token) => token + 1)}
                 onResetScene={resetScene}
+                onRotateStepLeft={() => rotateSelectedByStep(-1)}
+                onRotateStepRight={() => rotateSelectedByStep(1)}
                 onRotateToSnap={rotateSelectedToPentagonPoint}
                 onSaveBuild={saveBuild}
                 onSetActiveTab={setMobileTab}
+                onSetDrawerState={setMobileDrawerState}
+                onStartTutorial={startTutorial}
                 onTakeScreenshot={takeScreenshot}
-                onToggleDrawer={() => setMobileDrawerOpen((current) => !current)}
+                onToggleDrawer={() => setMobileDrawerState((current) => (current === 'collapsed' ? 'half' : 'collapsed'))}
                 onUpdateSelectedColor={updateSelectedColor}
                 pendingPartKey={pendingTapPartKey}
                 selectedPart={selectedPart}
@@ -1748,6 +1932,15 @@ export default function SolXConfigurator({ onNavigate }) {
                 </div>
               </div>
             </div>
+          )}
+
+          {tutorialOpen && (
+            <TutorialOverlay
+              stepIndex={tutorialStep}
+              onNext={() => setTutorialStep((step) => Math.min(step + 1, tutorialSteps.length - 1))}
+              onClose={closeTutorial}
+              onSkip={closeTutorial}
+            />
           )}
         </div>
 

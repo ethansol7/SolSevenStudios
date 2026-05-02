@@ -20,6 +20,14 @@ import { currentRoutePath, useClientNavigation } from './routing.js';
 
 const HeroScene = lazy(() => import('./components/HeroScene.jsx'));
 
+const mobileNavLabels = {
+  'Original SOL': 'Orig',
+  'SOL X': 'SOL',
+  Configurator: 'Build',
+  PlastiVista: 'PV',
+  'About / Contact': 'Info',
+};
+
 const reveal = {
   hidden: { opacity: 0, y: 36 },
   show: {
@@ -48,7 +56,7 @@ function Navigation({ onNavigate }) {
       <nav aria-label="Primary navigation">
         {navItems.map((item) => (
           <AppLink key={item.href} className="nav-link" to={item.href} onNavigate={onNavigate}>
-            <span data-label={item.label}>{item.label}</span>
+            <span data-label={item.label} data-short-label={mobileNavLabels[item.label] ?? item.label}>{item.label}</span>
           </AppLink>
         ))}
       </nav>

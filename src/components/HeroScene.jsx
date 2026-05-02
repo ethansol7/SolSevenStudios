@@ -13,14 +13,14 @@ const heroLayouts = {
     shadow: { position: [0, -2.12, 0], scale: 8 },
   },
   tablet: {
-    camera: { position: [0, 0.18, 7.2], fov: 38 },
-    model: { position: [0.08, -0.24, 0], rotation: [0, -0.32, 0], scale: 2.65 },
-    shadow: { position: [0, -1.62, 0], scale: 6.2 },
+    camera: { position: [0, 0.15, 6.15], fov: 36 },
+    model: { position: [0.04, -0.14, 0], rotation: [0, -0.32, 0], scale: 3.6 },
+    shadow: { position: [0, -1.82, 0], scale: 7.25 },
   },
   mobile: {
-    camera: { position: [0, 0.1, 7.7], fov: 40 },
-    model: { position: [0, -0.62, 0], rotation: [0, -0.3, 0], scale: 2.48 },
-    shadow: { position: [0, -1.78, 0], scale: 5.6 },
+    camera: { position: [0, 0.08, 5.65], fov: 36 },
+    model: { position: [0, -0.08, 0], rotation: [0, -0.3, 0], scale: 4.32 },
+    shadow: { position: [0, -1.62, 0], scale: 7.05 },
   },
 };
 
@@ -80,12 +80,12 @@ function StudioRig({ layout }) {
   return (
     <>
       <color attach="background" args={['#f7f5ef']} />
-      <fog attach="fog" args={['#f7f5ef', 7, 16]} />
-      <ambientLight intensity={1.45} />
-      <directionalLight position={[5, 6, 4]} intensity={2.2} color="#fff8ea" />
-      <directionalLight position={[-4, 2, -3]} intensity={0.75} color="#b9d1c3" />
-      <spotLight position={[0, 5, 5]} angle={0.34} penumbra={0.9} intensity={5} color="#ffe9b7" />
-      <ContactShadows position={layout.shadow.position} opacity={0.22} scale={layout.shadow.scale} blur={2.6} far={4} />
+      <fog attach="fog" args={['#f7f5ef', 9, 24]} />
+      <ambientLight intensity={1.18} />
+      <directionalLight position={[5, 6, 4]} intensity={2.35} color="#fff8ea" />
+      <directionalLight position={[-4, 2, -3]} intensity={0.8} color="#b9d1c3" />
+      <spotLight position={[0, 5, 5]} angle={0.34} penumbra={0.9} intensity={3.7} color="#ffe9b7" />
+      <ContactShadows position={layout.shadow.position} opacity={0.34} scale={layout.shadow.scale} blur={2.2} far={4.6} />
     </>
   );
 }
