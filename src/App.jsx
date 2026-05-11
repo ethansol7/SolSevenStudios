@@ -5,6 +5,7 @@ import AppLink from './components/AppLink.jsx';
 import MusicPlayer from './components/MusicPlayer.jsx';
 import {
   AboutPage,
+  GalleryPage,
   NotFoundPage,
   OriginalSolCollectionPage,
   PlastiVistaPage,
@@ -22,6 +23,7 @@ const HeroScene = lazy(() => import('./components/HeroScene.jsx'));
 
 const mobileNavLabels = {
   'Original SOL': 'Orig',
+  Gallery: 'Gal',
   'SOL X': 'SOL',
   Configurator: 'Build',
   PlastiVista: 'PV',
@@ -291,6 +293,7 @@ function Contact() {
           <span>Open studio channel</span>
           <ExternalLink size={18} />
         </a>
+        <p className="contact-legal">&copy; Sol Seven Studios. Patent Pending.</p>
       </motion.div>
     </footer>
   );
@@ -313,6 +316,7 @@ function HomePage() {
 function RouteSwitch({ onNavigate, routePath }) {
   if (routePath === '/' || routePath === '') return <HomePage />;
   if (routePath === '/shop') return <ShopPage onNavigate={onNavigate} />;
+  if (routePath === '/gallery') return <GalleryPage />;
   if (routePath === '/shop/original-sol') return <OriginalSolCollectionPage onNavigate={onNavigate} />;
   if (routePath === '/sol-x') return <SolXPage onNavigate={onNavigate} />;
   if (routePath === '/solx-configurator') return <SolXConfiguratorPage onNavigate={onNavigate} />;
@@ -324,6 +328,7 @@ function RouteSwitch({ onNavigate, routePath }) {
 
 function musicSectionForRoute(routePath) {
   if (routePath === '/shop' || routePath === '/shop/original-sol') return 'solLamp';
+  if (routePath === '/gallery') return 'solLamp';
   if (routePath === '/sol-x' || routePath === '/solx-configurator') return 'solX';
   if (routePath === '/plastivista') return 'plastivista';
   if (routePath === '/about') return 'contact';

@@ -32,8 +32,8 @@ const getStemManifest = async () => {
   return manifestCache;
 };
 
-export async function generateMusicFromPrompt(promptConfig) {
-  const folder = normalizeFolder(promptConfig.audioStemFolder);
+export async function loadMusicStemsForScene(sceneConfig) {
+  const folder = normalizeFolder(sceneConfig.audioStemFolder);
   const folderKey = folder.replace(/\/$/, '');
   const cacheKey = folder;
 
@@ -59,9 +59,6 @@ export async function generateMusicFromPrompt(promptConfig) {
   for (const role of STEM_ROLES) {
     for (const extension of STEM_EXTENSIONS) {
       const url = assetUrl(`${folder}${role}.${extension}`);
-      // This adapter currently maps prompt settings to local audio stems only.
-      // A future official AI music provider should be called from a backend or
-      // serverless endpoint, never from GitHub Pages, so API keys stay private.
       if (await probeStem(url)) {
         stems.push({ role, url });
         break;
@@ -73,6 +70,6 @@ export async function generateMusicFromPrompt(promptConfig) {
   return stems;
 }
 
-export function clearGeneratedMusicCache() {
+export function clearMusicStemCache() {
   stemCache.clear();
 }

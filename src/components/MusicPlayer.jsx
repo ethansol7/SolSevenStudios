@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Copy, Pause, Play, SlidersHorizontal, Sprout, Volume2, VolumeX, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { sectionMusicPrompts } from '../music/sectionMusicPrompts.js';
 import { MUSIC_PROMPT_STORAGE_KEY, formatPromptsAsConfig, loadPromptOverrides, savePromptOverrides } from '../music/promptStorage.js';
 import { useAmbientMusicEngine } from '../music/useAmbientMusicEngine.js';
@@ -43,11 +43,6 @@ export default function MusicPlayer({ activeSectionKey }) {
       setEditorOpen(false);
     }
   }, [isCollapsed]);
-
-  const promptPreview = useMemo(() => {
-    const text = engine.activePrompt?.prompt ?? '';
-    return text.length > 168 ? `${text.slice(0, 168)}...` : text;
-  }, [engine.activePrompt]);
 
   const updatePrompt = (field, value) => {
     setPrompts((current) => {
@@ -121,7 +116,6 @@ export default function MusicPlayer({ activeSectionKey }) {
                 <span>{engine.loading ? 'Loading stems' : engine.status}</span>
               </div>
               <h2>{engine.activePrompt.label}</h2>
-              <p>{promptPreview}</p>
               <div className="music-meta-row">
                 <span>{engine.activePrompt.texture}</span>
                 <span>{engine.activePrompt.tempo} BPM</span>

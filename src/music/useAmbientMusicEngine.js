@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { generateMusicFromPrompt } from './aiMusicAdapter.js';
+import { loadMusicStemsForScene } from './aiMusicAdapter.js';
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const fadeTime = 2.4;
@@ -82,7 +82,7 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
       if (!context || !masterGain || !prompt) return null;
 
       setLoading(true);
-      const stems = await generateMusicFromPrompt(prompt);
+      const stems = await loadMusicStemsForScene(prompt);
       setLoading(false);
 
       const bankGain = context.createGain();

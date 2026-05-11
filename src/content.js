@@ -4,6 +4,7 @@ export const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Work', href: '/#work' },
   { label: 'Shop', href: '/shop' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'Original SOL', href: '/shop/original-sol' },
   { label: 'SOL X', href: '/sol-x' },
   { label: 'Configurator', href: '/solx-configurator' },

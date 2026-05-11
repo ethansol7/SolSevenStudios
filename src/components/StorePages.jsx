@@ -1,10 +1,11 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import AppLink from './AppLink.jsx';
 import {
   collectionNotes,
   findProductBySlug,
   originalSolProducts,
   productCategories,
+  siteGallerySections,
   solXComponents,
 } from '../data/products.js';
 import { assetUrl } from '../content.js';
@@ -61,6 +62,70 @@ function ProductGrid({ onNavigate, products = originalSolProducts }) {
   );
 }
 
+function normalizeProductGallery(product) {
+  const primary = { src: product.image, caption: `${product.name} primary product render.` };
+  const gallery = Array.isArray(product.gallery) && product.gallery.length ? product.gallery : [primary];
+  const normalized = gallery
+    .filter((item) => item?.src)
+    .map((item) => ({ src: item.src, caption: item.caption || product.name }));
+
+  if (normalized[0]?.src === product.image) return normalized;
+  return [primary, ...normalized.filter((item) => item.src !== product.image)];
+}
+
+function ImageLightbox({ image, label, onClose }) {
+  if (!image) return null;
+
+  return (
+    <div className="image-lightbox" role="dialog" aria-modal="true" aria-label={label} onMouseDown={onClose}>
+      <button className="image-lightbox__close" type="button" onClick={onClose} aria-label="Close image viewer">
+        Close
+      </button>
+      <figure className="image-lightbox__figure" onMouseDown={(event) => event.stopPropagation()}>
+        <img src={image.src} alt={image.caption || label} />
+        {image.caption && <figcaption>{image.caption}</figcaption>}
+      </figure>
+    </div>
+  );
+}
+
+function ProductGallery({ product }) {
+  const images = useMemo(() => normalizeProductGallery(product), [product]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const activeImage = images[activeIndex] ?? images[0];
+
+  return (
+    <div className="product-gallery">
+      <button className="product-gallery__main" type="button" onClick={() => setLightboxImage(activeImage)} aria-label={`Open ${product.name} image larger`}>
+        <img src={activeImage.src} alt={`${product.name} product image`} />
+      </button>
+      {activeImage.caption && <p className="product-gallery__caption">{activeImage.caption}</p>}
+      {images.length > 1 && (
+        <div className="product-gallery__thumbs" aria-label={`${product.name} product images`}>
+          {images.map((image, index) => (
+            <button
+              key={`${image.src}-${index}`}
+              type="button"
+              className={index === activeIndex ? 'active' : ''}
+              onClick={() => setActiveIndex(index)}
+              aria-label={`View image ${index + 1} of ${images.length}`}
+            >
+              <img src={image.src} alt="" loading="lazy" />
+              {image.caption && <span>{image.caption}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+      <ImageLightbox image={lightboxImage} label={`${product.name} gallery image`} onClose={() => setLightboxImage(null)} />
+    </div>
+  );
+}
+
+function PatentLine({ compact = false }) {
+  return <p className={compact ? 'patent-line patent-line--compact' : 'patent-line'}>Patent Pending</p>;
+}
+
 export function ShopPage({ onNavigate }) {
   return (
     <main className="route-page">
@@ -70,6 +135,7 @@ export function ShopPage({ onNavigate }) {
         body="A clean shopping overview for the public Original SOL collection, plus a preview of the next SOL X component system."
         media={assetUrl('assets/shop/s0l-stack.png')}
       >
+        <PatentLine compact />
         <div className="route-actions">
           <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Original SOL Collection</AppLink>
           <AppLink to="/sol-x" onNavigate={onNavigate}>Explore SOL X</AppLink>
@@ -121,6 +187,7 @@ export function OriginalSolCollectionPage({ onNavigate }) {
         body={collectionNotes.originalSol}
         media={assetUrl('assets/shop/s0l-combo.png')}
       >
+        <PatentLine compact />
         <div className="route-actions">
           <AppLink to="/shop" onNavigate={onNavigate}>Shop Overview</AppLink>
           <AppLink to="/sol-x" onNavigate={onNavigate}>SOL X Preview</AppLink>
@@ -154,10 +221,11 @@ export function ProductPage({ onNavigate, slug }) {
     <main className="route-page">
       <section className="product-detail" data-music-section={product.category === 'add-ons' ? 'process' : 'solLamp'}>
         <div className="product-detail__gallery">
-          <img src={product.image} alt={`${product.name} product image`} />
+          <ProductGallery product={product} />
         </div>
         <div className="product-detail__copy">
           <p className="section-kicker">{product.collection}</p>
+          <PatentLine compact />
           <h1>{product.name}</h1>
           <p>{product.shortDescription}</p>
           <div className="product-price">
@@ -203,6 +271,7 @@ export function SolXPage({ onNavigate }) {
       <section className="solx-page" data-music-section="solX">
         <div className="solx-page__copy">
           <p className="section-kicker">SOL X preview</p>
+          <PatentLine compact />
           <h1>Component intelligence for the next modular lamp system.</h1>
           <p>{collectionNotes.solX}</p>
           <div className="route-actions">
@@ -251,7 +320,9 @@ export function PlastiVistaPage() {
         body="A compact process story for material collection, shredding, extrusion, printing, assembly, and product storytelling."
         media={assetUrl('assets/plastivista/system-hero.png')}
         musicSection="plastivista"
-      />
+      >
+        <PatentLine compact />
+      </PageHero>
       <section className="systems-section section-pad" data-music-section="plastivista">
         <div className="systems-copy">
           <p className="section-kicker">Circular workflow</p>
@@ -275,7 +346,9 @@ export function AboutPage() {
         body="Sol Seven Studios develops modular lighting, furniture, additive workflows, and circular manufacturing stories from New York."
         media={assetUrl('assets/process/founder-brand-portrait.png')}
         musicSection="contact"
-      />
+      >
+        <PatentLine compact />
+      </PageHero>
       <section className="contact-section contact-section--route" data-music-section="contact">
         <div>
           <p className="section-kicker">Contact</p>
@@ -285,6 +358,48 @@ export function AboutPage() {
           </a>
         </div>
       </section>
+    </main>
+  );
+}
+
+export function GalleryPage() {
+  const [lightboxImage, setLightboxImage] = useState(null);
+
+  return (
+    <main className="route-page">
+      <PageHero
+        kicker="Gallery"
+        title="SOL lamps across studio, room, and detail views."
+        body="A visual archive for product renders, room settings, and close material studies as the collection expands."
+        media={assetUrl('assets/lamps/sol-page-hero.jpg')}
+      >
+        <PatentLine compact />
+      </PageHero>
+
+      {siteGallerySections.map((section) => (
+        <section className="gallery-section section-pad" key={section.title} data-music-section="solLamp">
+          <div className="section-heading">
+            <p className="section-kicker">{section.title}</p>
+            <h2>{section.title === 'Details' ? 'Material, profile, and modular connection studies.' : 'Product context views for the SOL lighting system.'}</h2>
+          </div>
+          <div className="gallery-grid-page">
+            {section.items.map((image, index) => (
+              <button
+                type="button"
+                className="gallery-tile"
+                key={`${section.title}-${image.src}-${index}`}
+                onClick={() => setLightboxImage(image)}
+                aria-label={`Open ${image.caption}`}
+              >
+                <img src={image.src} alt={image.caption} loading="lazy" />
+                <span>{image.caption}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <ImageLightbox image={lightboxImage} label="Gallery image" onClose={() => setLightboxImage(null)} />
     </main>
   );
 }
