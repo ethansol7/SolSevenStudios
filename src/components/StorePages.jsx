@@ -32,15 +32,17 @@ function PageHero({ kicker, title, body, media, musicSection = 'solLamp', childr
 }
 
 function ProductCard({ onNavigate, product, variant = 'default' }) {
+  const categoryLabel = product.collection || product.category.replace('-', ' ');
+
   return (
     <article className={`store-card store-card--${variant}`}>
       <AppLink to={`/product/${product.slug}`} onNavigate={onNavigate} className="store-card__image" aria-label={`View ${product.name}`}>
         <img src={product.image} alt={`${product.name} product image`} loading="lazy" />
       </AppLink>
       <div className="store-card__body">
-        <p>{product.category.replace('-', ' ')}</p>
+        <p>{categoryLabel}</p>
         <h3>{product.name}</h3>
-        <span>{product.shortDescription}</span>
+        <span>{product.description}</span>
         <div className="store-card__footer">
           <small>{product.compareAt ? `${product.compareAt} / ${product.price}` : product.price}</small>
           <AppLink to={`/product/${product.slug}`} onNavigate={onNavigate}>
@@ -71,6 +73,12 @@ function normalizeProductGallery(product) {
 
   if (normalized[0]?.src === product.image) return normalized;
   return [primary, ...normalized.filter((item) => item.src !== product.image)];
+}
+
+function formatInventoryStatus(inventory) {
+  if (inventory === 'InStock') return 'In stock';
+  if (inventory === 'OutOfStock') return 'Out of stock';
+  return inventory || 'Availability pending';
 }
 
 function ImageLightbox({ image, label, onClose }) {
@@ -128,25 +136,19 @@ function ProductGallery({ product }) {
 
 function ProductPurchasePanel({ product }) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.label ?? '');
-  const [quantity, setQuantity] = useState(1);
   const colors = product.colors ?? [];
 
   useEffect(() => {
     setSelectedColor(product.colors?.[0]?.label ?? '');
-    setQuantity(1);
   }, [product.slug, product.colors]);
-
-  const updateQuantity = (nextValue) => {
-    const parsed = Number(nextValue);
-    if (!Number.isFinite(parsed)) {
-      setQuantity(1);
-      return;
-    }
-    setQuantity(Math.min(Math.max(Math.round(parsed), 1), 99));
-  };
 
   return (
     <div className="product-purchase" aria-label={`${product.name} purchase options`}>
+      <div className="product-stock-row">
+        <span>Stock status</span>
+        <strong>{formatInventoryStatus(product.inventory)}</strong>
+      </div>
+
       {colors.length > 0 && (
         <div className="product-option">
           <p>Color</p>
@@ -168,27 +170,12 @@ function ProductPurchasePanel({ product }) {
         </div>
       )}
 
-      <label className="quantity-control">
-        <span>Quantity</span>
-        <input
-          type="number"
-          min="1"
-          max="99"
-          value={quantity}
-          onChange={(event) => updateQuantity(event.target.value)}
-          aria-label={`${product.name} quantity`}
-        />
-      </label>
-
       <div className="route-actions route-actions--purchase">
-        <a href={product.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Add ${product.name} to cart on SolSevenStudios.com`}>
-          Add to Cart
-        </a>
-        <a href={product.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Buy ${product.name} on SolSevenStudios.com`}>
+        <a href={product.stripePaymentLink} target="_blank" rel="noreferrer" aria-label={`Buy ${product.name} with Stripe checkout`}>
           Buy Now
         </a>
       </div>
-      <p>Checkout opens on the live Sol Seven Studios shop.</p>
+      <p>Secure checkout powered by Stripe.</p>
     </div>
   );
 }
@@ -241,7 +228,7 @@ export function ShopPage({ onNavigate }) {
       <section className="store-section section-pad" data-music-section="solLamp">
         <div className="section-heading">
           <p className="section-kicker">Original SOL</p>
-          <h2>Available products from SolSevenStudios.com.</h2>
+          <h2>Available S0L products and modular components.</h2>
         </div>
         <ProductGrid onNavigate={onNavigate} />
       </section>
@@ -288,6 +275,8 @@ export function ProductPage({ onNavigate, slug }) {
     return <NotFoundPage onNavigate={onNavigate} />;
   }
 
+  const detailSections = product.additionalInfo ?? [];
+
   return (
     <main className="route-page">
       <section className="product-detail" data-music-section={product.category === 'add-ons' ? 'process' : 'solLamp'}>
@@ -298,14 +287,14 @@ export function ProductPage({ onNavigate, slug }) {
           <p className="section-kicker">{product.collection}</p>
           <PatentLine compact />
           <h1>{product.name}</h1>
-          <p>{product.shortDescription}</p>
+          <p>{product.description}</p>
           <div className="product-price">
             {product.compareAt && <span>{product.compareAt}</span>}
             <strong>{product.price}</strong>
           </div>
           <ProductPurchasePanel product={product} />
           <div className="route-actions product-secondary-actions">
-            <a href={product.sourceUrl} target="_blank" rel="noreferrer">View Product Page</a>
+            <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Back to Collection</AppLink>
             <AppLink to="/about" onNavigate={onNavigate}>Inquire</AppLink>
           </div>
         </div>
@@ -313,24 +302,38 @@ export function ProductPage({ onNavigate, slug }) {
 
       <section className="product-story section-pad" data-music-section="studio">
         <div>
-          <p className="section-kicker">Design intent</p>
-          <h2>{product.intent}</h2>
+          <p className="section-kicker">Product description</p>
+          <h2>{product.name}</h2>
         </div>
-        <p>{product.story}</p>
+        <p>{product.description}</p>
       </section>
 
       <section className="product-notes section-pad" data-music-section="process">
         <div className="section-heading">
-          <p className="section-kicker">Material / Process</p>
-          <h2>Material, certification, and modular use details.</h2>
+          <p className="section-kicker">Product details</p>
+          <h2>Category, options, stock, and catalog details.</h2>
         </div>
         <div className="capability-grid product-notes__grid">
-          {product.processNotes.map((note, index) => (
-            <div className="capability-item" key={note}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <p>{note}</p>
+          <div className="capability-item">
+            <span>01</span>
+            <p>Category: {product.collection}</p>
+          </div>
+          <div className="capability-item">
+            <span>02</span>
+            <p>Stock status: {formatInventoryStatus(product.inventory)}</p>
+          </div>
+          {detailSections.map((detail, index) => (
+            <div className="capability-item" key={`${product.slug}-${detail.title}`}>
+              <span>{String(index + 3).padStart(2, '0')}</span>
+              <p><strong>{detail.title}:</strong> {detail.description}</p>
             </div>
           ))}
+          {product.colors?.length > 0 && (
+            <div className="capability-item">
+              <span>{String(detailSections.length + 3).padStart(2, '0')}</span>
+              <p>Available colors: {product.colors.map((color) => color.label).join(', ')}</p>
+            </div>
+          )}
         </div>
       </section>
     </main>

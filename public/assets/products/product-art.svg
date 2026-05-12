@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-label="Product image">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#faf7ef"/>
+      <stop offset="1" stop-color="#e8dfcf"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff8e6" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#d9c8ad" stop-opacity="0.72"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="42%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.86"/>
+      <stop offset="0.52" stop-color="#f6d98f" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#f6d98f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#bg)"/>
+  <circle cx="600" cy="520" r="360" fill="url(#glow)"/>
+  <ellipse cx="600" cy="884" rx="280" ry="44" fill="#2a251d" opacity="0.1"/>
+  <path d="M442 360h316l-52 392H494L442 360Z" fill="url(#glass)" stroke="#2a251d" stroke-opacity="0.16" stroke-width="10"/>
+  <path d="M478 420h244M470 488h260M462 556h276M454 624h292M446 692h308" fill="none" stroke="#2a251d" stroke-linecap="round" stroke-opacity="0.16" stroke-width="10"/>
+  <rect x="508" y="752" width="184" height="92" rx="46" fill="#2a251d" opacity="0.12"/>
+  <rect x="536" y="286" width="128" height="74" rx="37" fill="#2a251d" opacity="0.1"/>
+</svg>
