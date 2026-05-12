@@ -719,23 +719,34 @@ canvas {
   margin-top: 34px;
 }
 
-.route-actions a {
+.route-actions a,
+.route-actions button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 0 18px;
   border: 1px solid rgba(25, 25, 24, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.3);
   color: var(--ink);
+  font: inherit;
   transition: transform 240ms ease, border-color 240ms ease, background 240ms ease;
 }
 
 .route-actions a:hover,
-.route-actions a:focus-visible {
+.route-actions a:focus-visible,
+.route-actions button:not(:disabled):hover,
+.route-actions button:not(:disabled):focus-visible {
   transform: translateY(-2px);
   border-color: rgba(25, 25, 24, 0.36);
   background: rgba(255, 255, 255, 0.68);
+}
+
+.route-actions button:disabled {
+  cursor: not-allowed;
+  color: rgba(25, 25, 24, 0.58);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .store-section {
@@ -1074,10 +1085,17 @@ canvas {
   margin-top: 0;
 }
 
-.route-actions--purchase a {
+.route-actions--purchase a,
+.route-actions--purchase button {
   border-color: rgba(25, 25, 24, 0.74);
   background: var(--ink);
   color: var(--paper);
+}
+
+.route-actions--purchase button:disabled {
+  border-color: rgba(25, 25, 24, 0.18);
+  background: rgba(25, 25, 24, 0.08);
+  color: rgba(25, 25, 24, 0.58);
 }
 
 .product-purchase > p {

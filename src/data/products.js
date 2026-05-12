@@ -8,21 +8,21 @@ const fallbackProductImage = assetUrl('assets/products/product-art.svg');
 
 const galleryImage = (src, caption) => (caption ? { src, caption } : { src });
 
-export const stripePaymentLinks = {
-  s01: 'STRIPE_LINK_S01',
-  s02: 'STRIPE_LINK_S02',
-  s03: 'STRIPE_LINK_S03',
-  s04: 'STRIPE_LINK_S04',
-  s01Shade: 'STRIPE_LINK_S01_SHADE',
-  s02Shade: 'STRIPE_LINK_S02_SHADE',
-  s03Shade: 'STRIPE_LINK_S03_SHADE',
-  s04Shade: 'STRIPE_LINK_S04_SHADE',
-  base: 'STRIPE_LINK_BASE',
-  divider: 'STRIPE_LINK_DIVIDER',
-  planter: 'STRIPE_LINK_PLANTER',
-  accessoryKit: 'STRIPE_LINK_ACCESSORY_KIT',
-  magneticClip: 'STRIPE_LINK_MAGNETIC_CLIP',
-  s0lCombo: 'STRIPE_LINK_S0L_COMBO',
+export const stripeLinks = {
+  s01: '',
+  s02: '',
+  s03: '',
+  s04: '',
+  s01Shade: '',
+  s02Shade: '',
+  s03Shade: '',
+  s04Shade: '',
+  base: '',
+  divider: '',
+  planter: '',
+  accessoryKit: '',
+  magneticClip: '',
+  s0lCombo: '',
 };
 
 const productGalleryFiles = {
@@ -56,8 +56,8 @@ export const solColorOptions = [
 
 export const productCategories = [
   {
-    id: 'table-lights',
-    label: 'Table Lights',
+    id: 'lamps',
+    label: 'Lamps',
     description: 'Complete S0L lamp builds with base, shade, magnetic clips, and smart RGB lighting.',
   },
   {
@@ -66,9 +66,14 @@ export const productCategories = [
     description: 'Stackable S0L shades for changing light diffusion, silhouette, and functional add-on use.',
   },
   {
-    id: 'add-ons',
-    label: 'Combos and Add-Ons',
-    description: 'Planters, bases, dividers, clips, kits, and bundles for extending the modular S0L ecosystem.',
+    id: 'combos',
+    label: 'Combos',
+    description: 'Bundle and planter options for expanding the modular S0L ecosystem.',
+  },
+  {
+    id: 'accessories',
+    label: 'Accessories',
+    description: 'Bases, dividers, clips, kits, and system components for compatible S0L builds.',
   },
 ];
 
@@ -97,7 +102,7 @@ const makeCsvProduct = ({
   collection,
   price,
   description,
-  stripePaymentLink,
+  stripeLink,
   details,
   colors = solColorOptions,
   inventory = 'InStock',
@@ -111,7 +116,7 @@ const makeCsvProduct = ({
   gallery: productGallery(slug),
   colors,
   inventory,
-  stripePaymentLink,
+  stripeLink,
   description,
   shortDescription: description,
   additionalInfo: details,
@@ -119,12 +124,100 @@ const makeCsvProduct = ({
 
 export const originalSolProducts = [
   makeCsvProduct({
+    slug: 's01',
+    name: 'S01',
+    category: 'lamps',
+    collection: 'Lamps',
+    price: '$70.00',
+    stripeLink: stripeLinks.s01,
+    description:
+      'A bold take on contemporary lighting, the S01 Lamp redefines everyday illumination with its sculptural presence and customizable glow. Designed for both ambiance and function, it features a 40W RGB smart bulb, allowing you to shift between crisp white light and dynamic colors to match your mood.',
+    details: lampDetails,
+  }),
+  makeCsvProduct({
+    slug: 's02',
+    name: 'S02',
+    category: 'lamps',
+    collection: 'Lamps',
+    price: '$70.00',
+    stripeLink: stripeLinks.s02,
+    description:
+      'Bridging minimalism and versatility, the S02 Lamp is designed to illuminate entire spaces without overwhelming them. Its sculptural form integrates seamlessly into any setting, while the 40W RGB bulb allows you to customize lighting with millions of colors and adjustable brightness. Whether casting a bold hue for creative inspiration or a soft glow for evening relaxation, S02 adapts to your lifestyle.',
+    details: lampDetails,
+  }),
+  makeCsvProduct({
+    slug: 's03',
+    name: 'S03',
+    category: 'lamps',
+    collection: 'Lamps',
+    price: '$70.00',
+    stripeLink: stripeLinks.s03,
+    description:
+      "A refined blend of modern aesthetics and functional warmth, the S03 Lamp is designed for those who seek an elegant yet inviting lighting experience. Its organic silhouette and plant-based polymer construction make it a sustainable statement piece for any space. Equipped with a 40W RGB bulb, S03 lets you switch between vibrant colors and warm white tones, perfect for setting the mood, whether you're working, relaxing, or creating.",
+    details: lampDetails,
+  }),
+  makeCsvProduct({
+    slug: 's04',
+    name: 'S04',
+    category: 'lamps',
+    collection: 'Lamps',
+    price: '$70.00',
+    stripeLink: stripeLinks.s04,
+    description:
+      'A striking evolution in the S0 series, the S04 Lamp embraces clean geometry and layered depth to create a powerful sculptural presence. With its sharp yet balanced proportions, S04 brings visual rhythm to any space whether standing solo or stacked. Paired with a 40W RGB smart bulb, the lamp allows you to transition from focused white light to ambient color, making it an adaptable centerpiece for creative or calming environments.',
+    details: lampDetails,
+  }),
+  makeCsvProduct({
+    slug: 's01-shade',
+    name: 'S01 Shade',
+    category: 'shades',
+    collection: 'Shades',
+    price: '$15.00',
+    stripeLink: stripeLinks.s01Shade,
+    description:
+      'Minimal yet unmistakable, the S01 Shade serves as the foundation of the S0 system. Its simple geometry makes it perfect for stacking, while its open base allows it to double as a desktop planter. Designed for use with any S0 base or clip, the S01 Shade is where modular lighting begins.',
+    details: shadeDetails,
+  }),
+  makeCsvProduct({
+    slug: 's02-shade',
+    name: 'S02 Shade',
+    category: 'shades',
+    collection: 'Shades',
+    price: '$15.00',
+    stripeLink: stripeLinks.s02Shade,
+    description:
+      'With soft curvature and a clean profile, the S02 Shade offers a modern alternative for diffuse, ambient lighting. Whether placed on a base or layered between other modules, it adds calm visual weight to your setup. Like all S0 components, it is made from durable, recyclable PETG and built to evolve with your space.',
+    details: shadeDetails,
+  }),
+  makeCsvProduct({
+    slug: 's03-shade',
+    name: 'S03 Shade',
+    category: 'shades',
+    collection: 'Shades',
+    price: '$15.00',
+    stripeLink: stripeLinks.s03Shade,
+    description:
+      'Defined by its wide dome and gentle form, the S03 Shade creates warm, even lighting while bringing sculptural volume to your lamp. On its own, it is ideal for low-profile bases. When stacked, it anchors taller builds with balance and depth. It also doubles as a standalone container, proving beauty can be functional too.',
+    details: shadeDetails,
+  }),
+  makeCsvProduct({
+    slug: 's04-shade',
+    name: 'S04 Shade',
+    category: 'shades',
+    collection: 'Shades',
+    price: '$15.00',
+    stripeLink: stripeLinks.s04Shade,
+    description:
+      'A bold geometric profile meets functional modularity in the S04 Shade. Designed to make a visual statement whether used solo or stacked, it introduces a fresh silhouette to the S0 family. Its interlocking form supports upward expansion and pairs seamlessly with all S0 magnetic clips.',
+    details: shadeDetails,
+  }),
+  makeCsvProduct({
     slug: 's0l-planter',
     name: 'S0L Planter',
-    category: 'add-ons',
+    category: 'combos',
     collection: 'Combos',
     price: '$25.00',
-    stripePaymentLink: stripePaymentLinks.planter,
+    stripeLink: stripeLinks.planter,
     description:
       "A playful extension of the S0L ecosystem, the S0L Planter transforms any shade into functional decor. Designed to fit perfectly with S01, S02, S03, and S04 components, it lets you repurpose your unused lamp parts into vibrant homes for small plants, succulents, or desktop greenery. Whether you're stacking it onto a base or displaying it solo, the S0L Planter adds life and versatility to your space.",
     details: [
@@ -138,129 +231,41 @@ export const originalSolProducts = [
     ],
   }),
   makeCsvProduct({
-    slug: 's04-shade',
-    name: 'S04 Shade',
-    category: 'shades',
-    collection: 'Shades',
-    price: '$15.00',
-    stripePaymentLink: stripePaymentLinks.s04Shade,
-    description:
-      'A bold geometric profile meets functional modularity in the S04 Shade. Designed to make a visual statement whether used solo or stacked, it introduces a fresh silhouette to the S0 family. Its interlocking form supports upward expansion and pairs seamlessly with all S0 magnetic clips.',
-    details: shadeDetails,
-  }),
-  makeCsvProduct({
-    slug: 's04',
-    name: 'S04',
-    category: 'table-lights',
-    collection: 'Table Lights',
-    price: '$70.00',
-    stripePaymentLink: stripePaymentLinks.s04,
-    description:
-      'A striking evolution in the S0 series, the S04 Lamp embraces clean geometry and layered depth to create a powerful sculptural presence. With its sharp yet balanced proportions, S04 brings visual rhythm to any space whether standing solo or stacked. Paired with a 40W RGB smart bulb, the lamp allows you to transition from focused white light to ambient color, making it an adaptable centerpiece for creative or calming environments.',
-    details: lampDetails,
-  }),
-  makeCsvProduct({
-    slug: 's03-shade',
-    name: 'S03 Shade',
-    category: 'shades',
-    collection: 'Shades',
-    price: '$15.00',
-    stripePaymentLink: stripePaymentLinks.s03Shade,
-    description:
-      'Defined by its wide dome and gentle form, the S03 Shade creates warm, even lighting while bringing sculptural volume to your lamp. On its own, it is ideal for low-profile bases. When stacked, it anchors taller builds with balance and depth. It also doubles as a standalone container, proving beauty can be functional too.',
-    details: shadeDetails,
-  }),
-  makeCsvProduct({
-    slug: 's03',
-    name: 'S03',
-    category: 'table-lights',
-    collection: 'Table Lights',
-    price: '$70.00',
-    stripePaymentLink: stripePaymentLinks.s03,
-    description:
-      "A refined blend of modern aesthetics and functional warmth, the S03 Lamp is designed for those who seek an elegant yet inviting lighting experience. Its organic silhouette and plant-based polymer construction make it a sustainable statement piece for any space. Equipped with a 40W RGB bulb, S03 lets you switch between vibrant colors and warm white tones, perfect for setting the mood, whether you're working, relaxing, or creating.",
-    details: lampDetails,
-  }),
-  makeCsvProduct({
-    slug: 's02-shade',
-    name: 'S02 Shade',
-    category: 'shades',
-    collection: 'Shades',
-    price: '$15.00',
-    stripePaymentLink: stripePaymentLinks.s02Shade,
-    description:
-      'With soft curvature and a clean profile, the S02 Shade offers a modern alternative for diffuse, ambient lighting. Whether placed on a base or layered between other modules, it adds calm visual weight to your setup. Like all S0 components, it is made from durable, recyclable PETG and built to evolve with your space.',
-    details: shadeDetails,
-  }),
-  makeCsvProduct({
-    slug: 's02',
-    name: 'S02',
-    category: 'table-lights',
-    collection: 'Table Lights',
-    price: '$70.00',
-    stripePaymentLink: stripePaymentLinks.s02,
-    description:
-      'Bridging minimalism and versatility, the S02 Lamp is designed to illuminate entire spaces without overwhelming them. Its sculptural form integrates seamlessly into any setting, while the 40W RGB bulb allows you to customize lighting with millions of colors and adjustable brightness. Whether casting a bold hue for creative inspiration or a soft glow for evening relaxation, S02 adapts to your lifestyle.',
-    details: lampDetails,
-  }),
-  makeCsvProduct({
-    slug: 's01-shade',
-    name: 'S01 Shade',
-    category: 'shades',
-    collection: 'Shades',
-    price: '$15.00',
-    stripePaymentLink: stripePaymentLinks.s01Shade,
-    description:
-      'Minimal yet unmistakable, the S01 Shade serves as the foundation of the S0 system. Its simple geometry makes it perfect for stacking, while its open base allows it to double as a desktop planter. Designed for use with any S0 base or clip, the S01 Shade is where modular lighting begins.',
-    details: shadeDetails,
-  }),
-  makeCsvProduct({
-    slug: 's01',
-    name: 'S01',
-    category: 'table-lights',
-    collection: 'Table Lights',
-    price: '$70.00',
-    stripePaymentLink: stripePaymentLinks.s01,
-    description:
-      'A bold take on contemporary lighting, the S01 Lamp redefines everyday illumination with its sculptural presence and customizable glow. Designed for both ambiance and function, it features a 40W RGB smart bulb, allowing you to shift between crisp white light and dynamic colors to match your mood.',
-    details: lampDetails,
-  }),
-  makeCsvProduct({
     slug: 's0l-combo',
     name: 'S0L Combo',
-    category: 'add-ons',
+    category: 'combos',
     collection: 'Combos',
     price: '$210.00',
-    stripePaymentLink: stripePaymentLinks.s0lCombo,
+    stripeLink: stripeLinks.s0lCombo,
     description:
       "The ultimate modular lighting collection. The S0 Combo includes the full S01, S02, and S03 lamps, each with its own RGB smart bulb, modular base, and matching shade. With included magnetic clips and two extra shades, this bundle gives you the freedom to stack, swap, and sculpt your lighting across multiple rooms or creative setups. It's the most versatile and expressive way to experience the full S0 system.",
     details: lampDetails,
-  }),
-  // TODO: Add S0L Divider product image/gallery when final product images are available.
-  makeCsvProduct({
-    slug: 's0l-divider',
-    name: 'S0L Divider',
-    category: 'add-ons',
-    collection: 'Accessories',
-    price: '$15.00',
-    stripePaymentLink: stripePaymentLinks.divider,
-    description: 'Divider module for separating compatible S0L shade modules in a stacked lamp build.',
-    details: [
-      { title: 'Use', description: 'Designed for compatible stacked S0L shade assemblies.' },
-      { title: 'Material', description: 'Sustainable plant-based polymers (PETG)' },
-    ],
   }),
   // TODO: Add S0L Base product image/gallery when final product images are available.
   makeCsvProduct({
     slug: 's0l-base',
     name: 'S0L Base',
-    category: 'add-ons',
+    category: 'accessories',
     collection: 'Accessories',
     price: '$55.00',
-    stripePaymentLink: stripePaymentLinks.base,
+    stripeLink: stripeLinks.base,
     description: 'Foundation module for compatible S0L lamp builds.',
     details: [
       { title: 'Use', description: 'Designed as the base component for compatible S0L lamp assemblies.' },
+      { title: 'Material', description: 'Sustainable plant-based polymers (PETG)' },
+    ],
+  }),
+  // TODO: Add S0L Divider product image/gallery when final product images are available.
+  makeCsvProduct({
+    slug: 's0l-divider',
+    name: 'S0L Divider',
+    category: 'accessories',
+    collection: 'Accessories',
+    price: '$15.00',
+    stripeLink: stripeLinks.divider,
+    description: 'Divider module for separating compatible S0L shade modules in a stacked lamp build.',
+    details: [
+      { title: 'Use', description: 'Designed for compatible stacked S0L shade assemblies.' },
       { title: 'Material', description: 'Sustainable plant-based polymers (PETG)' },
     ],
   }),
@@ -268,10 +273,10 @@ export const originalSolProducts = [
   makeCsvProduct({
     slug: 's0l-accessory-kit',
     name: 'S0L Accessory Kit',
-    category: 'add-ons',
+    category: 'accessories',
     collection: 'Accessories',
     price: 'Price pending',
-    stripePaymentLink: stripePaymentLinks.accessoryKit,
+    stripeLink: stripeLinks.accessoryKit,
     description: 'Accessory bundle for compatible S0L lamp components.',
     details: [
       { title: 'Use', description: 'Designed for maintaining and adapting compatible S0L assemblies.' },
@@ -282,10 +287,10 @@ export const originalSolProducts = [
   makeCsvProduct({
     slug: 's0l-magnetic-clip',
     name: 'S0L Magnetic Clip',
-    category: 'add-ons',
+    category: 'accessories',
     collection: 'Accessories',
     price: 'Price pending',
-    stripePaymentLink: stripePaymentLinks.magneticClip,
+    stripeLink: stripeLinks.magneticClip,
     description: 'Magnetic connection hardware for compatible S0L components.',
     details: [
       { title: 'Use', description: 'Designed for attaching and stacking compatible S0L modules.' },
@@ -294,7 +299,7 @@ export const originalSolProducts = [
   }),
 ];
 
-export const featuredOriginalSolProducts = originalSolProducts.filter((product) => product.category === 'table-lights');
+export const featuredOriginalSolProducts = originalSolProducts.filter((product) => product.category === 'lamps');
 
 export const solXComponents = [
   {

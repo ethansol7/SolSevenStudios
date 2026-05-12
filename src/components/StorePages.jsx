@@ -13,6 +13,10 @@ import { assetUrl } from '../content.js';
 const SolXViewer = lazy(() => import('./SolXViewer.jsx'));
 const SolXConfigurator = lazy(() => import('./SolXConfigurator.jsx'));
 
+const stripeLinkPattern = /^https:\/\/buy\.stripe\.com\//;
+const hasLiveStripeLink = (link) => typeof link === 'string' && stripeLinkPattern.test(link);
+const productDetailPath = (product) => (findProductBySlug(product.slug) ? `/product/${product.slug}` : '/shop/original-sol');
+
 function PageHero({ kicker, title, body, media, musicSection = 'solLamp', children }) {
   return (
     <section className="store-hero" data-music-section={musicSection}>
@@ -33,10 +37,11 @@ function PageHero({ kicker, title, body, media, musicSection = 'solLamp', childr
 
 function ProductCard({ onNavigate, product, variant = 'default' }) {
   const categoryLabel = product.collection || product.category.replace('-', ' ');
+  const detailPath = productDetailPath(product);
 
   return (
     <article className={`store-card store-card--${variant}`}>
-      <AppLink to={`/product/${product.slug}`} onNavigate={onNavigate} className="store-card__image" aria-label={`View ${product.name}`}>
+      <AppLink to={detailPath} onNavigate={onNavigate} className="store-card__image" aria-label={`View ${product.name}`}>
         <img src={product.image} alt={`${product.name} product image`} loading="lazy" />
       </AppLink>
       <div className="store-card__body">
@@ -45,7 +50,7 @@ function ProductCard({ onNavigate, product, variant = 'default' }) {
         <span>{product.description}</span>
         <div className="store-card__footer">
           <small>{product.compareAt ? `${product.compareAt} / ${product.price}` : product.price}</small>
-          <AppLink to={`/product/${product.slug}`} onNavigate={onNavigate}>
+          <AppLink to={detailPath} onNavigate={onNavigate}>
             View Product
           </AppLink>
         </div>
@@ -62,6 +67,23 @@ function ProductGrid({ onNavigate, products = originalSolProducts }) {
       ))}
     </div>
   );
+}
+
+function ProductSections({ onNavigate }) {
+  return productCategories.map((category) => {
+    const products = originalSolProducts.filter((product) => product.category === category.id);
+    if (!products.length) return null;
+
+    return (
+      <section className="store-section section-pad" data-music-section={category.id === 'accessories' || category.id === 'combos' ? 'process' : 'solLamp'} key={category.id}>
+        <div className="section-heading">
+          <p className="section-kicker">{category.label}</p>
+          <h2>{category.description}</h2>
+        </div>
+        <ProductGrid onNavigate={onNavigate} products={products} />
+      </section>
+    );
+  });
 }
 
 function normalizeProductGallery(product) {
@@ -137,6 +159,7 @@ function ProductGallery({ product }) {
 function ProductPurchasePanel({ product }) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.label ?? '');
   const colors = product.colors ?? [];
+  const liveStripeLink = hasLiveStripeLink(product.stripeLink) ? product.stripeLink : '';
 
   useEffect(() => {
     setSelectedColor(product.colors?.[0]?.label ?? '');
@@ -171,11 +194,17 @@ function ProductPurchasePanel({ product }) {
       )}
 
       <div className="route-actions route-actions--purchase">
-        <a href={product.stripePaymentLink} target="_blank" rel="noreferrer" aria-label={`Buy ${product.name} with Stripe checkout`}>
-          Buy Now
-        </a>
+        {liveStripeLink ? (
+          <a href={liveStripeLink} target="_blank" rel="noreferrer" aria-label={`Buy ${product.name} with Stripe checkout`}>
+            Buy Now
+          </a>
+        ) : (
+          <button type="button" disabled aria-label={`${product.name} coming soon`}>
+            Coming Soon
+          </button>
+        )}
       </div>
-      <p>Secure checkout powered by Stripe.</p>
+      <p>{liveStripeLink ? 'Secure checkout powered by Stripe.' : 'Online checkout is coming soon for this product.'}</p>
     </div>
   );
 }
@@ -225,13 +254,7 @@ export function ShopPage({ onNavigate }) {
         </div>
       </section>
 
-      <section className="store-section section-pad" data-music-section="solLamp">
-        <div className="section-heading">
-          <p className="section-kicker">Original SOL</p>
-          <h2>Available S0L products and modular components.</h2>
-        </div>
-        <ProductGrid onNavigate={onNavigate} />
-      </section>
+      <ProductSections onNavigate={onNavigate} />
     </main>
   );
 }
@@ -252,18 +275,7 @@ export function OriginalSolCollectionPage({ onNavigate }) {
         </div>
       </PageHero>
 
-      {productCategories.map((category) => {
-        const products = originalSolProducts.filter((product) => product.category === category.id);
-        return (
-          <section className="store-section section-pad" data-music-section={category.id === 'add-ons' ? 'process' : 'solLamp'} key={category.id}>
-            <div className="section-heading">
-              <p className="section-kicker">{category.label}</p>
-              <h2>{category.description}</h2>
-            </div>
-            <ProductGrid onNavigate={onNavigate} products={products} />
-          </section>
-        );
-      })}
+      <ProductSections onNavigate={onNavigate} />
     </main>
   );
 }
@@ -279,7 +291,7 @@ export function ProductPage({ onNavigate, slug }) {
 
   return (
     <main className="route-page">
-      <section className="product-detail" data-music-section={product.category === 'add-ons' ? 'process' : 'solLamp'}>
+      <section className="product-detail" data-music-section={product.category === 'accessories' || product.category === 'combos' ? 'process' : 'solLamp'}>
         <div className="product-detail__gallery">
           <ProductGallery product={product} />
         </div>

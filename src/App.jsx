@@ -334,7 +334,7 @@ function musicSectionForRoute(routePath) {
   if (routePath === '/about') return 'contact';
   if (routePath.startsWith('/product/')) {
     const product = findProductBySlug(routePath.replace('/product/', ''));
-    return product?.category === 'add-ons' ? 'process' : 'solLamp';
+    return product?.category === 'accessories' || product?.category === 'combos' ? 'process' : 'solLamp';
   }
 
   return 'home';
