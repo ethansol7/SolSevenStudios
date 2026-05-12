@@ -627,7 +627,6 @@ canvas {
   color: var(--muted);
   font-size: 0.82rem;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .route-page {
@@ -671,23 +670,6 @@ canvas {
   color: var(--ink-soft);
   font-size: clamp(1.08rem, 1.5vw, 1.35rem);
   line-height: 1.55;
-}
-
-.patent-line {
-  width: fit-content;
-  margin: 22px 0 0;
-  padding: 7px 10px;
-  border: 1px solid rgba(25, 25, 24, 0.13);
-  border-radius: 999px;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.34);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.patent-line--compact {
-  margin-top: 18px;
 }
 
 .store-hero__media,

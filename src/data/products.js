@@ -9,20 +9,20 @@ const fallbackProductImage = assetUrl('assets/products/product-art.svg');
 const galleryImage = (src, caption) => (caption ? { src, caption } : { src });
 
 export const stripeLinks = {
-  s01: '',
-  s02: '',
-  s03: '',
-  s04: '',
-  s01Shade: '',
-  s02Shade: '',
-  s03Shade: '',
-  s04Shade: '',
+  s01: 'https://buy.stripe.com/00wdR84QP2P40tO3NbeUU01',
+  s02: 'https://buy.stripe.com/00wbJ00Az89occwbfDeUU02',
+  s03: 'https://buy.stripe.com/fZu6oGcjhdtIfoI6ZneUU03',
+  s04: 'https://buy.stripe.com/6oUcN45UTdtI0tO1F3eUU04',
+  s01Shade: 'https://buy.stripe.com/28E6oGfvt9dsfoI83reUU05',
+  s02Shade: 'https://buy.stripe.com/28E3cubfdcpE0tO0AZeUU06',
+  s03Shade: 'https://buy.stripe.com/bJefZg1ED75k5O8cjHeUU07',
+  s04Shade: 'https://buy.stripe.com/9B66oG975dtI90k97veUU08',
   base: '',
   divider: '',
-  planter: '',
+  planter: 'https://buy.stripe.com/dRm14mdnl9dsdgA6ZneUU09',
   accessoryKit: '',
   magneticClip: '',
-  s0lCombo: '',
+  s0lCombo: 'https://buy.stripe.com/eVqfZgab989o6ScerPeUU0a',
 };
 
 const productGalleryFiles = {
@@ -247,7 +247,7 @@ export const originalSolProducts = [
     name: 'S0L Base',
     category: 'accessories',
     collection: 'Accessories',
-    price: '$55.00',
+    price: 'Price pending',
     stripeLink: stripeLinks.base,
     description: 'Foundation module for compatible S0L lamp builds.',
     details: [
@@ -261,7 +261,7 @@ export const originalSolProducts = [
     name: 'S0L Divider',
     category: 'accessories',
     collection: 'Accessories',
-    price: '$15.00',
+    price: 'Price pending',
     stripeLink: stripeLinks.divider,
     description: 'Divider module for separating compatible S0L shade modules in a stacked lamp build.',
     details: [

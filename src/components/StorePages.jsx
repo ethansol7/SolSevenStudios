@@ -209,10 +209,6 @@ function ProductPurchasePanel({ product }) {
   );
 }
 
-function PatentLine({ compact = false }) {
-  return <p className={compact ? 'patent-line patent-line--compact' : 'patent-line'}>Patent Pending</p>;
-}
-
 export function ShopPage({ onNavigate }) {
   return (
     <main className="route-page">
@@ -222,7 +218,6 @@ export function ShopPage({ onNavigate }) {
         body="A clean shopping overview for the public Original SOL collection, plus a preview of the next SOL X component system."
         media={assetUrl('assets/shop/s0l-stack.png')}
       >
-        <PatentLine compact />
         <div className="route-actions">
           <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Original SOL Collection</AppLink>
           <AppLink to="/sol-x" onNavigate={onNavigate}>Explore SOL X</AppLink>
@@ -268,7 +263,6 @@ export function OriginalSolCollectionPage({ onNavigate }) {
         body={collectionNotes.originalSol}
         media={assetUrl('assets/shop/s0l-combo.png')}
       >
-        <PatentLine compact />
         <div className="route-actions">
           <AppLink to="/shop" onNavigate={onNavigate}>Shop Overview</AppLink>
           <AppLink to="/sol-x" onNavigate={onNavigate}>SOL X Preview</AppLink>
@@ -297,7 +291,6 @@ export function ProductPage({ onNavigate, slug }) {
         </div>
         <div className="product-detail__copy">
           <p className="section-kicker">{product.collection}</p>
-          <PatentLine compact />
           <h1>{product.name}</h1>
           <p>{product.description}</p>
           <div className="product-price">
@@ -358,7 +351,6 @@ export function SolXPage({ onNavigate }) {
       <section className="solx-page" data-music-section="solX">
         <div className="solx-page__copy">
           <p className="section-kicker">SOL X preview</p>
-          <PatentLine compact />
           <h1>Component intelligence for the next modular lamp system.</h1>
           <p>{collectionNotes.solX}</p>
           <div className="route-actions">
@@ -407,9 +399,7 @@ export function PlastiVistaPage() {
         body="A compact process story for material collection, shredding, extrusion, printing, assembly, and product storytelling."
         media={assetUrl('assets/plastivista/system-hero.png')}
         musicSection="plastivista"
-      >
-        <PatentLine compact />
-      </PageHero>
+      />
       <section className="systems-section section-pad" data-music-section="plastivista">
         <div className="systems-copy">
           <p className="section-kicker">Circular workflow</p>
@@ -433,9 +423,7 @@ export function AboutPage() {
         body="Sol Seven Studios develops modular lighting, furniture, additive workflows, and circular manufacturing stories from New York."
         media={assetUrl('assets/process/founder-brand-portrait.png')}
         musicSection="contact"
-      >
-        <PatentLine compact />
-      </PageHero>
+      />
       <section className="contact-section contact-section--route" data-music-section="contact">
         <div>
           <p className="section-kicker">Contact</p>
@@ -459,9 +447,7 @@ export function GalleryPage() {
         title="SOL lamps across studio, room, and detail views."
         body="A curated visual archive for room settings, system studies, and close material views."
         media={assetUrl('assets/gallery/curated/living-space-sol-system-01.png')}
-      >
-        <PatentLine compact />
-      </PageHero>
+      />
 
       {siteGallerySections.map((section) => (
         <section className="gallery-section section-pad" key={section.title} data-music-section="solLamp">
