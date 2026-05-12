@@ -837,7 +837,7 @@ function PriceSummary({ buildName, estimate }) {
       </ul>
       {estimate.hasTemporaryPricing && (
         <small className="price-summary__temporary">
-          Base and divider estimates live in the pricing config so they can be updated when standalone module pricing is final.
+          Base and divider estimates will be finalized when standalone module pricing is released.
         </small>
       )}
       <small className="price-summary__source">Pricing checked {solxPricing.lastChecked}</small>

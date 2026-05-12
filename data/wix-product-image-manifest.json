@@ -1,0 +1,580 @@
+[
+  {
+    "slug": "s0l-planter",
+    "title": "S0L Planter",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s0l-planter",
+    "count": 3,
+    "files": [
+      {
+        "filename": "s0l-planter-main.webp",
+        "bytes": 355498,
+        "sourceMedia": "d6a958_df932975a6494f7d9bd211a0ebfc8b07~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_df932975a6494f7d9bd211a0ebfc8b07~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_df932975a6494f7d9bd211a0ebfc8b07~mv2.webp"
+      },
+      {
+        "filename": "s0l-planter-gallery-01.webp",
+        "bytes": 745754,
+        "sourceMedia": "d6a958_fc63d3cc31c444d581a882c2a01c0f46~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_fc63d3cc31c444d581a882c2a01c0f46~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_fc63d3cc31c444d581a882c2a01c0f46~mv2.webp"
+      },
+      {
+        "filename": "s0l-planter-gallery-02.webp",
+        "bytes": 375264,
+        "sourceMedia": "d6a958_2a1ca63f287b409daf48b46aefc15b88~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_2a1ca63f287b409daf48b46aefc15b88~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_2a1ca63f287b409daf48b46aefc15b88~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s04-shade",
+    "title": "S04 Shade",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s04-shade",
+    "count": 9,
+    "files": [
+      {
+        "filename": "s04-shade-main.webp",
+        "bytes": 416682,
+        "sourceMedia": "d6a958_f8ca028d53fc4ba08e7c3456a8ff43de~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_f8ca028d53fc4ba08e7c3456a8ff43de~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_f8ca028d53fc4ba08e7c3456a8ff43de~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-01.webp",
+        "bytes": 411516,
+        "sourceMedia": "d6a958_1376a39f3b12403ca34dd14051b390cd~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_1376a39f3b12403ca34dd14051b390cd~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_1376a39f3b12403ca34dd14051b390cd~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-02.webp",
+        "bytes": 288702,
+        "sourceMedia": "d6a958_2436d10d4a2f4ea08d49a365f3591829~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_2436d10d4a2f4ea08d49a365f3591829~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_2436d10d4a2f4ea08d49a365f3591829~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-03.webp",
+        "bytes": 415220,
+        "sourceMedia": "d6a958_7f992a58d2ad427c9ac10d155c3a5a33~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_7f992a58d2ad427c9ac10d155c3a5a33~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_7f992a58d2ad427c9ac10d155c3a5a33~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-04.webp",
+        "bytes": 395984,
+        "sourceMedia": "d6a958_5ecd6e88fc044ce29043861a20eb78f1~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_5ecd6e88fc044ce29043861a20eb78f1~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_5ecd6e88fc044ce29043861a20eb78f1~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-05.webp",
+        "bytes": 322072,
+        "sourceMedia": "d6a958_8bedde5d3a7d4da9acda4b0b3db8e54d~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_8bedde5d3a7d4da9acda4b0b3db8e54d~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_8bedde5d3a7d4da9acda4b0b3db8e54d~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-06.webp",
+        "bytes": 335696,
+        "sourceMedia": "d6a958_69e4bb8fb2314c7a82e470c23562037f~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_69e4bb8fb2314c7a82e470c23562037f~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_69e4bb8fb2314c7a82e470c23562037f~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-07.webp",
+        "bytes": 363124,
+        "sourceMedia": "d6a958_cbce03cababf43cea677d3b13a837891~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_cbce03cababf43cea677d3b13a837891~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_cbce03cababf43cea677d3b13a837891~mv2.webp"
+      },
+      {
+        "filename": "s04-shade-gallery-08.webp",
+        "bytes": 246044,
+        "sourceMedia": "d6a958_44d9545aa6524f4fb4c53da7171876fb~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_44d9545aa6524f4fb4c53da7171876fb~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_44d9545aa6524f4fb4c53da7171876fb~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s04",
+    "title": "S04",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s04",
+    "count": 7,
+    "files": [
+      {
+        "filename": "s04-main.webp",
+        "bytes": 98538,
+        "sourceMedia": "d6a958_6513892d4b7647bea429b6e81eae7df8~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_6513892d4b7647bea429b6e81eae7df8~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_6513892d4b7647bea429b6e81eae7df8~mv2.webp"
+      },
+      {
+        "filename": "s04-gallery-01.webp",
+        "bytes": 41724,
+        "sourceMedia": "d6a958_0994209156b8480ca1123c71c67b2c3b~mv2.jpg",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_0994209156b8480ca1123c71c67b2c3b~mv2.jpg/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_0994209156b8480ca1123c71c67b2c3b~mv2.webp"
+      },
+      {
+        "filename": "s04-gallery-02.webp",
+        "bytes": 140604,
+        "sourceMedia": "d6a958_23da15658cc24a59ac9387cd46b95a61~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_23da15658cc24a59ac9387cd46b95a61~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_23da15658cc24a59ac9387cd46b95a61~mv2.webp"
+      },
+      {
+        "filename": "s04-gallery-03.webp",
+        "bytes": 169680,
+        "sourceMedia": "d6a958_abafa54b64a84d83b85c1382725fde5b~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_abafa54b64a84d83b85c1382725fde5b~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_abafa54b64a84d83b85c1382725fde5b~mv2.webp"
+      },
+      {
+        "filename": "s04-gallery-04.webp",
+        "bytes": 133086,
+        "sourceMedia": "d6a958_cb5eecd8f0604fcc86a1671f21cc7890~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_cb5eecd8f0604fcc86a1671f21cc7890~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_cb5eecd8f0604fcc86a1671f21cc7890~mv2.webp"
+      },
+      {
+        "filename": "s04-gallery-05.webp",
+        "bytes": 158830,
+        "sourceMedia": "d6a958_c809ea89369447b39d46148859311279~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_c809ea89369447b39d46148859311279~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_c809ea89369447b39d46148859311279~mv2.webp"
+      },
+      {
+        "filename": "s04-gallery-06.webp",
+        "bytes": 126238,
+        "sourceMedia": "d6a958_b7358f6bb5294c688c5ad1f1fa4fa445~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_b7358f6bb5294c688c5ad1f1fa4fa445~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_b7358f6bb5294c688c5ad1f1fa4fa445~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s01",
+    "title": "S01 Modular Lamp With Shades",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s01",
+    "count": 7,
+    "files": [
+      {
+        "filename": "s01-main.webp",
+        "bytes": 68374,
+        "sourceMedia": "d6a958_6ceba23a723249ffac2c7c8046340d05~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_6ceba23a723249ffac2c7c8046340d05~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_6ceba23a723249ffac2c7c8046340d05~mv2.webp"
+      },
+      {
+        "filename": "s01-gallery-01.webp",
+        "bytes": 767116,
+        "sourceMedia": "d6a958_866bab67189146b9a7d68a6ab8605d1f~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_866bab67189146b9a7d68a6ab8605d1f~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_866bab67189146b9a7d68a6ab8605d1f~mv2.webp"
+      },
+      {
+        "filename": "s01-gallery-02.webp",
+        "bytes": 109162,
+        "sourceMedia": "d6a958_714d1e13a4874e67848dbab794755bfa~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_714d1e13a4874e67848dbab794755bfa~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_714d1e13a4874e67848dbab794755bfa~mv2.webp"
+      },
+      {
+        "filename": "s01-gallery-03.webp",
+        "bytes": 151878,
+        "sourceMedia": "d6a958_c58d971811cc41019cf30ddc773fbde6~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_c58d971811cc41019cf30ddc773fbde6~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_c58d971811cc41019cf30ddc773fbde6~mv2.webp"
+      },
+      {
+        "filename": "s01-gallery-04.webp",
+        "bytes": 126770,
+        "sourceMedia": "d6a958_16a5aaa348dd4cd1837e3c219a02c088~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_16a5aaa348dd4cd1837e3c219a02c088~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_16a5aaa348dd4cd1837e3c219a02c088~mv2.webp"
+      },
+      {
+        "filename": "s01-gallery-05.webp",
+        "bytes": 141728,
+        "sourceMedia": "d6a958_1aa2f98addf743d6a640c8fd1efd0218~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_1aa2f98addf743d6a640c8fd1efd0218~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_1aa2f98addf743d6a640c8fd1efd0218~mv2.webp"
+      },
+      {
+        "filename": "s01-gallery-06.webp",
+        "bytes": 112870,
+        "sourceMedia": "d6a958_0372ce6b069d43cd9059097f26ba7450~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_0372ce6b069d43cd9059097f26ba7450~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_0372ce6b069d43cd9059097f26ba7450~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s02",
+    "title": "S02",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s02",
+    "count": 8,
+    "files": [
+      {
+        "filename": "s02-main.webp",
+        "bytes": 90460,
+        "sourceMedia": "d6a958_dd09eca591c54905ac66bc64264e3aa4~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_dd09eca591c54905ac66bc64264e3aa4~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_dd09eca591c54905ac66bc64264e3aa4~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-01.webp",
+        "bytes": 812286,
+        "sourceMedia": "d6a958_b70a3497522749df97481ee2eb65a579~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_b70a3497522749df97481ee2eb65a579~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_b70a3497522749df97481ee2eb65a579~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-02.webp",
+        "bytes": 651690,
+        "sourceMedia": "d6a958_066d9b4281bb418c8555d995120f3b2f~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_066d9b4281bb418c8555d995120f3b2f~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_066d9b4281bb418c8555d995120f3b2f~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-03.webp",
+        "bytes": 173928,
+        "sourceMedia": "d6a958_4ff1aed575e1478f9be8705dcd0cbda3~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_4ff1aed575e1478f9be8705dcd0cbda3~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_4ff1aed575e1478f9be8705dcd0cbda3~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-04.webp",
+        "bytes": 188898,
+        "sourceMedia": "d6a958_01380dcd26294836b33dd7d167c4e674~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_01380dcd26294836b33dd7d167c4e674~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_01380dcd26294836b33dd7d167c4e674~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-05.webp",
+        "bytes": 153128,
+        "sourceMedia": "d6a958_c7af095b2cff4448aa4e89558e19f5df~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_c7af095b2cff4448aa4e89558e19f5df~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_c7af095b2cff4448aa4e89558e19f5df~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-06.webp",
+        "bytes": 207932,
+        "sourceMedia": "d6a958_ac4dd44afd4c45c299eb1794337efc92~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_ac4dd44afd4c45c299eb1794337efc92~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_ac4dd44afd4c45c299eb1794337efc92~mv2.webp"
+      },
+      {
+        "filename": "s02-gallery-07.webp",
+        "bytes": 135830,
+        "sourceMedia": "d6a958_edc8f3a931634e1cb770216b9927e73c~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_edc8f3a931634e1cb770216b9927e73c~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_edc8f3a931634e1cb770216b9927e73c~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s03",
+    "title": "S03",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s03",
+    "count": 8,
+    "files": [
+      {
+        "filename": "s03-main.webp",
+        "bytes": 114266,
+        "sourceMedia": "d6a958_e1c2146f8f034789a6261449f1dba309~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_e1c2146f8f034789a6261449f1dba309~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_e1c2146f8f034789a6261449f1dba309~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-01.webp",
+        "bytes": 61324,
+        "sourceMedia": "d6a958_96f918047ce6413abd924627fa10e26c~mv2.jpg",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_96f918047ce6413abd924627fa10e26c~mv2.jpg/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_96f918047ce6413abd924627fa10e26c~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-02.webp",
+        "bytes": 806534,
+        "sourceMedia": "d6a958_45d904facf2c42068f4e7c15a0ebf738~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_45d904facf2c42068f4e7c15a0ebf738~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_45d904facf2c42068f4e7c15a0ebf738~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-03.webp",
+        "bytes": 171114,
+        "sourceMedia": "d6a958_3fa2c8caf67f489a9084a3edb4a8f33b~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_3fa2c8caf67f489a9084a3edb4a8f33b~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_3fa2c8caf67f489a9084a3edb4a8f33b~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-04.webp",
+        "bytes": 199140,
+        "sourceMedia": "d6a958_01b715992e0146058b584094dcb7823a~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_01b715992e0146058b584094dcb7823a~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_01b715992e0146058b584094dcb7823a~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-05.webp",
+        "bytes": 173274,
+        "sourceMedia": "d6a958_d09de905b8ca40b5a9f6085d1d902075~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_d09de905b8ca40b5a9f6085d1d902075~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_d09de905b8ca40b5a9f6085d1d902075~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-06.webp",
+        "bytes": 180004,
+        "sourceMedia": "d6a958_63071c1019454970a260426f7559337a~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_63071c1019454970a260426f7559337a~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_63071c1019454970a260426f7559337a~mv2.webp"
+      },
+      {
+        "filename": "s03-gallery-07.webp",
+        "bytes": 128934,
+        "sourceMedia": "d6a958_eb26718aa131467c9281de29f7023c75~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_eb26718aa131467c9281de29f7023c75~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_eb26718aa131467c9281de29f7023c75~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s0l-combo",
+    "title": "S0L Combo",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s0-combo",
+    "count": 14,
+    "files": [
+      {
+        "filename": "s0l-combo-main.webp",
+        "bytes": 463464,
+        "sourceMedia": "d6a958_4d34ac6535494d4f888b72be6be06516~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_4d34ac6535494d4f888b72be6be06516~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_4d34ac6535494d4f888b72be6be06516~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-01.webp",
+        "bytes": 153598,
+        "sourceMedia": "d6a958_a549ae139b694bbf9e26c234021c2084~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_a549ae139b694bbf9e26c234021c2084~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_a549ae139b694bbf9e26c234021c2084~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-02.webp",
+        "bytes": 126770,
+        "sourceMedia": "d6a958_16a5aaa348dd4cd1837e3c219a02c088~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_16a5aaa348dd4cd1837e3c219a02c088~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_16a5aaa348dd4cd1837e3c219a02c088~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-03.webp",
+        "bytes": 68374,
+        "sourceMedia": "d6a958_6ceba23a723249ffac2c7c8046340d05~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_6ceba23a723249ffac2c7c8046340d05~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_6ceba23a723249ffac2c7c8046340d05~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-04.webp",
+        "bytes": 109162,
+        "sourceMedia": "d6a958_714d1e13a4874e67848dbab794755bfa~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_714d1e13a4874e67848dbab794755bfa~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_714d1e13a4874e67848dbab794755bfa~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-05.webp",
+        "bytes": 173928,
+        "sourceMedia": "d6a958_4ff1aed575e1478f9be8705dcd0cbda3~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_4ff1aed575e1478f9be8705dcd0cbda3~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_4ff1aed575e1478f9be8705dcd0cbda3~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-06.webp",
+        "bytes": 90460,
+        "sourceMedia": "d6a958_dd09eca591c54905ac66bc64264e3aa4~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_dd09eca591c54905ac66bc64264e3aa4~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_dd09eca591c54905ac66bc64264e3aa4~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-07.webp",
+        "bytes": 153128,
+        "sourceMedia": "d6a958_c7af095b2cff4448aa4e89558e19f5df~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_c7af095b2cff4448aa4e89558e19f5df~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_c7af095b2cff4448aa4e89558e19f5df~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-08.webp",
+        "bytes": 173274,
+        "sourceMedia": "d6a958_d09de905b8ca40b5a9f6085d1d902075~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_d09de905b8ca40b5a9f6085d1d902075~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_d09de905b8ca40b5a9f6085d1d902075~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-09.webp",
+        "bytes": 114266,
+        "sourceMedia": "d6a958_e1c2146f8f034789a6261449f1dba309~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_e1c2146f8f034789a6261449f1dba309~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_e1c2146f8f034789a6261449f1dba309~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-10.webp",
+        "bytes": 171114,
+        "sourceMedia": "d6a958_3fa2c8caf67f489a9084a3edb4a8f33b~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_3fa2c8caf67f489a9084a3edb4a8f33b~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_3fa2c8caf67f489a9084a3edb4a8f33b~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-11.webp",
+        "bytes": 133086,
+        "sourceMedia": "d6a958_cb5eecd8f0604fcc86a1671f21cc7890~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_cb5eecd8f0604fcc86a1671f21cc7890~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_cb5eecd8f0604fcc86a1671f21cc7890~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-12.webp",
+        "bytes": 98538,
+        "sourceMedia": "d6a958_6513892d4b7647bea429b6e81eae7df8~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_6513892d4b7647bea429b6e81eae7df8~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_6513892d4b7647bea429b6e81eae7df8~mv2.webp"
+      },
+      {
+        "filename": "s0l-combo-gallery-13.webp",
+        "bytes": 140604,
+        "sourceMedia": "d6a958_23da15658cc24a59ac9387cd46b95a61~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_23da15658cc24a59ac9387cd46b95a61~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_23da15658cc24a59ac9387cd46b95a61~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s03-shade",
+    "title": "S03 Shade",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s03-shade",
+    "count": 9,
+    "files": [
+      {
+        "filename": "s03-shade-main.webp",
+        "bytes": 472668,
+        "sourceMedia": "d6a958_f59498f6428b4f86b6e765818bc122cd~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_f59498f6428b4f86b6e765818bc122cd~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_f59498f6428b4f86b6e765818bc122cd~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-01.webp",
+        "bytes": 348962,
+        "sourceMedia": "d6a958_b99aacac3cb54f3bb0888464281169a2~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_b99aacac3cb54f3bb0888464281169a2~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_b99aacac3cb54f3bb0888464281169a2~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-02.webp",
+        "bytes": 391030,
+        "sourceMedia": "d6a958_c2c1c138e49844e8ac94ab76e1033f3d~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_c2c1c138e49844e8ac94ab76e1033f3d~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_c2c1c138e49844e8ac94ab76e1033f3d~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-03.webp",
+        "bytes": 487590,
+        "sourceMedia": "d6a958_d20e6da8c5044da1913462190e3a5d3a~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_d20e6da8c5044da1913462190e3a5d3a~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_d20e6da8c5044da1913462190e3a5d3a~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-04.webp",
+        "bytes": 371374,
+        "sourceMedia": "d6a958_5f6caf0ef78e4c23bd8c29c1ded1d474~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_5f6caf0ef78e4c23bd8c29c1ded1d474~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_5f6caf0ef78e4c23bd8c29c1ded1d474~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-05.webp",
+        "bytes": 410026,
+        "sourceMedia": "d6a958_27fc2bed92ac4985954a1c68ba88aa1d~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_27fc2bed92ac4985954a1c68ba88aa1d~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_27fc2bed92ac4985954a1c68ba88aa1d~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-06.webp",
+        "bytes": 352388,
+        "sourceMedia": "d6a958_6e0d26e0f6534eebbbc108f271747ba5~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_6e0d26e0f6534eebbbc108f271747ba5~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_6e0d26e0f6534eebbbc108f271747ba5~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-07.webp",
+        "bytes": 288764,
+        "sourceMedia": "d6a958_094aabe74ab0475184b61a3a935072a6~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_094aabe74ab0475184b61a3a935072a6~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_094aabe74ab0475184b61a3a935072a6~mv2.webp"
+      },
+      {
+        "filename": "s03-shade-gallery-08.webp",
+        "bytes": 341676,
+        "sourceMedia": "d6a958_3c57abd0dd47492390751df13d8ec61c~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_3c57abd0dd47492390751df13d8ec61c~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_3c57abd0dd47492390751df13d8ec61c~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s02-shade",
+    "title": "S02 Shade",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s02-shade",
+    "count": 9,
+    "files": [
+      {
+        "filename": "s02-shade-main.webp",
+        "bytes": 495890,
+        "sourceMedia": "d6a958_6c19701fc66e4ef1815d627fd30bba2c~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_6c19701fc66e4ef1815d627fd30bba2c~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_6c19701fc66e4ef1815d627fd30bba2c~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-01.webp",
+        "bytes": 123132,
+        "sourceMedia": "d6a958_790e942292134a4597ee24a459afa484~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_790e942292134a4597ee24a459afa484~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_790e942292134a4597ee24a459afa484~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-02.webp",
+        "bytes": 361926,
+        "sourceMedia": "d6a958_04c4d22d5120448f8d2f012dd3fdd092~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_04c4d22d5120448f8d2f012dd3fdd092~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_04c4d22d5120448f8d2f012dd3fdd092~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-03.webp",
+        "bytes": 461556,
+        "sourceMedia": "d6a958_94ddbda7920e4356858f0f45e64d8136~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_94ddbda7920e4356858f0f45e64d8136~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_94ddbda7920e4356858f0f45e64d8136~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-04.webp",
+        "bytes": 103112,
+        "sourceMedia": "d6a958_5ba5e996355e47d19594f4b130c2e696~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_5ba5e996355e47d19594f4b130c2e696~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_5ba5e996355e47d19594f4b130c2e696~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-05.webp",
+        "bytes": 391288,
+        "sourceMedia": "d6a958_38e9c04c9d084fb1bfdd64268365bddc~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_38e9c04c9d084fb1bfdd64268365bddc~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_38e9c04c9d084fb1bfdd64268365bddc~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-06.webp",
+        "bytes": 367368,
+        "sourceMedia": "d6a958_7cc872f072f744fe98f4f087fa9db0c0~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_7cc872f072f744fe98f4f087fa9db0c0~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_7cc872f072f744fe98f4f087fa9db0c0~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-07.webp",
+        "bytes": 110142,
+        "sourceMedia": "d6a958_a37a40afc1b142f48c8da2231a99e8bc~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_a37a40afc1b142f48c8da2231a99e8bc~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_a37a40afc1b142f48c8da2231a99e8bc~mv2.webp"
+      },
+      {
+        "filename": "s02-shade-gallery-08.webp",
+        "bytes": 337972,
+        "sourceMedia": "d6a958_849c673fffba41639185b36e9d3a099b~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_849c673fffba41639185b36e9d3a099b~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_849c673fffba41639185b36e9d3a099b~mv2.webp"
+      }
+    ]
+  },
+  {
+    "slug": "s01-shade",
+    "title": "S01 Shade",
+    "sourcePage": "https://www.solsevenstudios.com/product-page/s01-shade",
+    "count": 9,
+    "files": [
+      {
+        "filename": "s01-shade-main.webp",
+        "bytes": 382052,
+        "sourceMedia": "d6a958_b05a14e73c864fa5b203e51764d23c99~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_b05a14e73c864fa5b203e51764d23c99~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_b05a14e73c864fa5b203e51764d23c99~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-01.webp",
+        "bytes": 99480,
+        "sourceMedia": "d6a958_a62f078d08874b8c889c2db6c1a5df2a~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_a62f078d08874b8c889c2db6c1a5df2a~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_a62f078d08874b8c889c2db6c1a5df2a~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-02.webp",
+        "bytes": 250238,
+        "sourceMedia": "d6a958_18f70a0baca7482e9abb84b09535b178~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_18f70a0baca7482e9abb84b09535b178~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_18f70a0baca7482e9abb84b09535b178~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-03.webp",
+        "bytes": 356154,
+        "sourceMedia": "d6a958_19052432831f4e49959fd9ee80aab0fa~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_19052432831f4e49959fd9ee80aab0fa~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_19052432831f4e49959fd9ee80aab0fa~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-04.webp",
+        "bytes": 83652,
+        "sourceMedia": "d6a958_8777c268332c4170ae48343aa0bc3373~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_8777c268332c4170ae48343aa0bc3373~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_8777c268332c4170ae48343aa0bc3373~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-05.webp",
+        "bytes": 256156,
+        "sourceMedia": "d6a958_eeba04b22ffe430d8bbb91ee84ca4162~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_eeba04b22ffe430d8bbb91ee84ca4162~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_eeba04b22ffe430d8bbb91ee84ca4162~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-06.webp",
+        "bytes": 294466,
+        "sourceMedia": "d6a958_2faf2518e5f245c1a0d546fde39ab447~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_2faf2518e5f245c1a0d546fde39ab447~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_2faf2518e5f245c1a0d546fde39ab447~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-07.webp",
+        "bytes": 89032,
+        "sourceMedia": "d6a958_61d88bc19d62429dabb23d68342cc544~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_61d88bc19d62429dabb23d68342cc544~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_61d88bc19d62429dabb23d68342cc544~mv2.webp"
+      },
+      {
+        "filename": "s01-shade-gallery-08.webp",
+        "bytes": 233904,
+        "sourceMedia": "d6a958_7470fa46aa7c4f05ac8407b6a86de8ee~mv2.png",
+        "sourceUrl": "https://static.wixstatic.com/media/d6a958_7470fa46aa7c4f05ac8407b6a86de8ee~mv2.png/v1/fit/w_1400,h_1400,q_86,enc_webp/d6a958_7470fa46aa7c4f05ac8407b6a86de8ee~mv2.webp"
+      }
+    ]
+  }
+]

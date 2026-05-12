@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { loadMusicStemsForScene } from './aiMusicAdapter.js';
+import { loadMusicStemsForScene } from './musicStemAdapter.js';
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const fadeTime = 2.4;
@@ -18,7 +18,7 @@ const intensityLayerCount = (intensity) => {
   return 1;
 };
 
-const getPrompt = (prompts, key) => prompts[key] ?? prompts.home ?? Object.values(prompts)[0];
+const getScene = (scenes, key) => scenes[key] ?? scenes.home ?? Object.values(scenes)[0];
 
 const rampGain = (gainNode, target, context, seconds = fadeTime) => {
   const now = context.currentTime;
@@ -28,7 +28,7 @@ const rampGain = (gainNode, target, context, seconds = fadeTime) => {
   gainNode.gain.linearRampToValueAtTime(target, now + seconds);
 };
 
-export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
+export function useAmbientMusicEngine({ scenes, activeSectionKey }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(0.42);
@@ -41,14 +41,14 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
   const sectionBanksRef = useRef(new Map());
   const activeBankKeyRef = useRef(null);
   const isPlayingRef = useRef(false);
-  const promptsRef = useRef(prompts);
+  const scenesRef = useRef(scenes);
   const activeSectionRef = useRef(activeSectionKey);
 
-  const activePrompt = useMemo(() => getPrompt(prompts, activeSectionKey), [activeSectionKey, prompts]);
+  const activeScene = useMemo(() => getScene(scenes, activeSectionKey), [activeSectionKey, scenes]);
 
   useEffect(() => {
-    promptsRef.current = prompts;
-  }, [prompts]);
+    scenesRef.current = scenes;
+  }, [scenes]);
 
   useEffect(() => {
     activeSectionRef.current = activeSectionKey;
@@ -78,11 +78,11 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
 
       const context = ensureContext();
       const masterGain = masterGainRef.current;
-      const prompt = getPrompt(promptsRef.current, sectionKey);
-      if (!context || !masterGain || !prompt) return null;
+      const scene = getScene(scenesRef.current, sectionKey);
+      if (!context || !masterGain || !scene) return null;
 
       setLoading(true);
-      const stems = await loadMusicStemsForScene(prompt);
+      const stems = await loadMusicStemsForScene(scene);
       setLoading(false);
 
       const bankGain = context.createGain();
@@ -91,7 +91,7 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
 
       const bank = {
         sectionKey,
-        prompt,
+        scene,
         bankGain,
         layers: [],
         loaded: 0,
@@ -137,17 +137,17 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
     [ensureContext],
   );
 
-  const shapeBankLayers = useCallback((bank, prompt = bank.prompt) => {
+  const shapeBankLayers = useCallback((bank, scene = bank.scene) => {
     const context = contextRef.current;
     if (!context) return;
 
-    const activeLayerCount = intensityLayerCount(prompt.intensity);
+    const activeLayerCount = intensityLayerCount(scene.intensity);
 
     bank.layers.forEach((layer, index) => {
       const base = layerBaseGain[layer.role] ?? 0.24;
       const randomLift = 0.84 + Math.random() * 0.28;
-      const roleBoost = layer.role === 'rhythm' ? clamp(prompt.tempo / 90, 0.7, 1.12) : 1;
-      const target = index < activeLayerCount ? base * clamp(prompt.intensity + 0.36, 0.38, 0.92) * randomLift * roleBoost : 0;
+      const roleBoost = layer.role === 'rhythm' ? clamp(scene.tempo / 90, 0.7, 1.12) : 1;
+      const target = index < activeLayerCount ? base * clamp(scene.intensity + 0.36, 0.38, 0.92) * randomLift * roleBoost : 0;
       rampGain(layer.gain, target, context, 3.8 + Math.random() * 2.2);
     });
   }, []);
@@ -167,15 +167,15 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
       setLoadedStemCount(bank.loaded);
 
       if (!bank.loaded) {
-        setStatus(`No stems loaded for this section: ${bank.prompt.label}`);
+        setStatus(`Music layers unavailable for ${bank.scene.label}`);
       } else {
-        setStatus(`Playing ${bank.prompt.label}`);
+        setStatus(`Playing ${bank.scene.label}`);
       }
 
       sectionBanksRef.current.forEach((candidate, candidateKey) => {
         if (candidateKey === sectionKey) {
           rampGain(candidate.bankGain, candidate.loaded ? 1 : 0, context, fadeTime);
-          shapeBankLayers(candidate, getPrompt(promptsRef.current, sectionKey));
+          shapeBankLayers(candidate, getScene(scenesRef.current, sectionKey));
         } else {
           rampGain(candidate.bankGain, 0, context, fadeTime);
         }
@@ -233,7 +233,7 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
     const interval = window.setInterval(() => {
       const key = activeBankKeyRef.current;
       const bank = key ? sectionBanksRef.current.get(key) : null;
-      if (bank) shapeBankLayers(bank, getPrompt(promptsRef.current, key));
+      if (bank) shapeBankLayers(bank, getScene(scenesRef.current, key));
     }, 4200);
 
     return () => window.clearInterval(interval);
@@ -255,7 +255,7 @@ export function useAmbientMusicEngine({ prompts, activeSectionKey }) {
   }, []);
 
   return {
-    activePrompt,
+    activeScene,
     isPlaying,
     loading,
     loadedStemCount,

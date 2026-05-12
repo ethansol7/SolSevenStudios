@@ -312,10 +312,11 @@ canvas {
 .cinematic-copy h2,
 .contact-section h2 {
   margin: 0;
-  font-size: clamp(2.3rem, 6vw, 7rem);
+  font-size: clamp(2.2rem, 5.2vw, 6rem);
   font-weight: 460;
-  line-height: 0.96;
+  line-height: 1;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .intro-body {
@@ -649,10 +650,17 @@ canvas {
 .product-detail__copy h1,
 .solx-page__copy h1 {
   margin: 0;
-  font-size: clamp(3.2rem, 8.7vw, 10.8rem);
+  font-size: clamp(3.1rem, 7vw, 8.4rem);
   font-weight: 480;
-  line-height: 0.88;
+  line-height: 0.94;
   letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.store-hero__copy,
+.product-detail__copy,
+.solx-page__copy {
+  min-width: 0;
 }
 
 .store-hero__copy > p:not(.section-kicker),
@@ -910,11 +918,12 @@ canvas {
 }
 
 .product-gallery__thumbs button {
-  flex: 0 0 116px;
+  flex: 0 0 clamp(78px, 7.4vw, 104px);
   display: grid;
-  gap: 8px;
-  min-height: 124px;
-  padding: 8px;
+  place-items: center;
+  gap: 6px;
+  min-height: auto;
+  padding: 6px;
   border: 1px solid rgba(25, 25, 24, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.35);
@@ -931,7 +940,7 @@ canvas {
 
 .product-gallery__thumbs img {
   width: 100%;
-  height: 68px;
+  height: clamp(58px, 6.2vw, 78px);
   object-fit: contain;
 }
 
@@ -959,6 +968,102 @@ canvas {
 .product-price strong {
   font-size: clamp(1.2rem, 2vw, 1.7rem);
   font-weight: 500;
+}
+
+.product-purchase {
+  display: grid;
+  gap: 18px;
+  width: min(520px, 100%);
+  margin-top: 28px;
+}
+
+.product-option,
+.quantity-control {
+  display: grid;
+  gap: 9px;
+}
+
+.product-option p,
+.quantity-control span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.product-color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.product-color-options button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 13px 0 10px;
+  border: 1px solid rgba(25, 25, 24, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.34);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, color 220ms ease;
+}
+
+.product-color-options button span {
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(25, 25, 24, 0.16);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.72), transparent 42%),
+    var(--swatch);
+}
+
+.product-color-options button:hover,
+.product-color-options button:focus-visible,
+.product-color-options button.active {
+  transform: translateY(-1px);
+  border-color: rgba(25, 25, 24, 0.34);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+}
+
+.quantity-control {
+  width: min(150px, 100%);
+}
+
+.quantity-control input {
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid rgba(25, 25, 24, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.42);
+  color: var(--ink);
+  font: inherit;
+}
+
+.route-actions--purchase {
+  margin-top: 0;
+}
+
+.route-actions--purchase a:last-child {
+  border-color: rgba(25, 25, 24, 0.74);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.product-purchase > p {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.product-secondary-actions {
+  margin-top: 16px;
 }
 
 .product-story {
@@ -1028,10 +1133,9 @@ canvas {
 
 .gallery-tile img {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  padding: clamp(14px, 3vw, 32px);
+  aspect-ratio: 16 / 10;
   background: linear-gradient(180deg, #fbfaf6, #ebe6da);
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .gallery-tile span {
@@ -2580,6 +2684,17 @@ canvas {
     grid-template-columns: 1fr;
   }
 
+  .store-hero,
+  .product-detail {
+    align-items: start;
+  }
+
+  .store-hero__media,
+  .product-detail__gallery {
+    width: min(760px, 100%);
+    justify-self: center;
+  }
+
   .intro-media {
     width: min(680px, 100%);
     justify-self: end;
@@ -2834,7 +2949,8 @@ canvas {
   .product-detail__copy h1,
   .solx-page__copy h1,
   .configurator-copy h1 {
-    font-size: clamp(3.1rem, 16vw, 5.4rem);
+    font-size: clamp(2.85rem, 12vw, 4.8rem);
+    line-height: 0.98;
   }
 
   .collection-tile {
@@ -2867,6 +2983,14 @@ canvas {
 
   .shade-color-picker button {
     flex: 1 1 180px;
+  }
+
+  .product-color-options button {
+    flex: 1 1 128px;
+  }
+
+  .quantity-control {
+    width: 100%;
   }
 
   .configurator-stack-card__header,
@@ -3770,6 +3894,12 @@ canvas {
   .hero h1 {
     max-width: 10ch;
     font-size: clamp(2.9rem, 13vw, 4.2rem);
+  }
+
+  .store-hero__copy h1,
+  .product-detail__copy h1,
+  .solx-page__copy h1 {
+    font-size: clamp(2.55rem, 11vw, 3.9rem);
   }
 
   .hero-scene {

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import AppLink from './AppLink.jsx';
 import {
   collectionNotes,
@@ -63,11 +63,11 @@ function ProductGrid({ onNavigate, products = originalSolProducts }) {
 }
 
 function normalizeProductGallery(product) {
-  const primary = { src: product.image, caption: `${product.name} primary product render.` };
+  const primary = { src: product.image, caption: '' };
   const gallery = Array.isArray(product.gallery) && product.gallery.length ? product.gallery : [primary];
   const normalized = gallery
     .filter((item) => item?.src)
-    .map((item) => ({ src: item.src, caption: item.caption || product.name }));
+    .map((item) => ({ src: item.src, caption: item.caption || '' }));
 
   if (normalized[0]?.src === product.image) return normalized;
   return [primary, ...normalized.filter((item) => item.src !== product.image)];
@@ -95,6 +95,10 @@ function ProductGallery({ product }) {
   const [lightboxImage, setLightboxImage] = useState(null);
   const activeImage = images[activeIndex] ?? images[0];
 
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [product.slug]);
+
   return (
     <div className="product-gallery">
       <button className="product-gallery__main" type="button" onClick={() => setLightboxImage(activeImage)} aria-label={`Open ${product.name} image larger`}>
@@ -107,7 +111,7 @@ function ProductGallery({ product }) {
             <button
               key={`${image.src}-${index}`}
               type="button"
-              className={index === activeIndex ? 'active' : ''}
+              className={`product-gallery__thumb${index === activeIndex ? ' active' : ''}`}
               onClick={() => setActiveIndex(index)}
               aria-label={`View image ${index + 1} of ${images.length}`}
             >
@@ -118,6 +122,73 @@ function ProductGallery({ product }) {
         </div>
       )}
       <ImageLightbox image={lightboxImage} label={`${product.name} gallery image`} onClose={() => setLightboxImage(null)} />
+    </div>
+  );
+}
+
+function ProductPurchasePanel({ product }) {
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.label ?? '');
+  const [quantity, setQuantity] = useState(1);
+  const colors = product.colors ?? [];
+
+  useEffect(() => {
+    setSelectedColor(product.colors?.[0]?.label ?? '');
+    setQuantity(1);
+  }, [product.slug, product.colors]);
+
+  const updateQuantity = (nextValue) => {
+    const parsed = Number(nextValue);
+    if (!Number.isFinite(parsed)) {
+      setQuantity(1);
+      return;
+    }
+    setQuantity(Math.min(Math.max(Math.round(parsed), 1), 99));
+  };
+
+  return (
+    <div className="product-purchase" aria-label={`${product.name} purchase options`}>
+      {colors.length > 0 && (
+        <div className="product-option">
+          <p>Color</p>
+          <div className="product-color-options">
+            {colors.map((color) => (
+              <button
+                key={`${product.slug}-${color.label}`}
+                type="button"
+                className={selectedColor === color.label ? 'active' : ''}
+                style={{ '--swatch': color.value }}
+                onClick={() => setSelectedColor(color.label)}
+                aria-pressed={selectedColor === color.label}
+              >
+                <span aria-hidden="true" />
+                {color.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <label className="quantity-control">
+        <span>Quantity</span>
+        <input
+          type="number"
+          min="1"
+          max="99"
+          value={quantity}
+          onChange={(event) => updateQuantity(event.target.value)}
+          aria-label={`${product.name} quantity`}
+        />
+      </label>
+
+      <div className="route-actions route-actions--purchase">
+        <a href={product.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Add ${product.name} to cart on SolSevenStudios.com`}>
+          Add to Cart
+        </a>
+        <a href={product.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Buy ${product.name} on SolSevenStudios.com`}>
+          Buy Now
+        </a>
+      </div>
+      <p>Checkout opens on the live Sol Seven Studios shop.</p>
     </div>
   );
 }
@@ -170,7 +241,7 @@ export function ShopPage({ onNavigate }) {
       <section className="store-section section-pad" data-music-section="solLamp">
         <div className="section-heading">
           <p className="section-kicker">Original SOL</p>
-          <h2>Public products from SolSevenStudios.com.</h2>
+          <h2>Available products from SolSevenStudios.com.</h2>
         </div>
         <ProductGrid onNavigate={onNavigate} />
       </section>
@@ -232,8 +303,9 @@ export function ProductPage({ onNavigate, slug }) {
             {product.compareAt && <span>{product.compareAt}</span>}
             <strong>{product.price}</strong>
           </div>
-          <div className="route-actions">
-            <a href={product.sourceUrl} target="_blank" rel="noreferrer">View on SolSevenStudios.com</a>
+          <ProductPurchasePanel product={product} />
+          <div className="route-actions product-secondary-actions">
+            <a href={product.sourceUrl} target="_blank" rel="noreferrer">View Product Page</a>
             <AppLink to="/about" onNavigate={onNavigate}>Inquire</AppLink>
           </div>
         </div>
@@ -250,7 +322,7 @@ export function ProductPage({ onNavigate, slug }) {
       <section className="product-notes section-pad" data-music-section="process">
         <div className="section-heading">
           <p className="section-kicker">Material / Process</p>
-          <h2>Notes from the public product language.</h2>
+          <h2>Material, certification, and modular use details.</h2>
         </div>
         <div className="capability-grid product-notes__grid">
           {product.processNotes.map((note, index) => (
@@ -370,8 +442,8 @@ export function GalleryPage() {
       <PageHero
         kicker="Gallery"
         title="SOL lamps across studio, room, and detail views."
-        body="A visual archive for product renders, room settings, and close material studies as the collection expands."
-        media={assetUrl('assets/lamps/sol-page-hero.jpg')}
+        body="A curated visual archive for room settings, system studies, and close material views."
+        media={assetUrl('assets/gallery/curated/living-space-sol-system-01.png')}
       >
         <PatentLine compact />
       </PageHero>

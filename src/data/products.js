@@ -1,26 +1,33 @@
 import { assetUrl } from '../content.js';
 
-const shopImage = (name) => assetUrl(`assets/shop/${name}`);
 const lampImage = (name) => assetUrl(`assets/lamps/${name}`);
 const plastivistaImage = (name) => assetUrl(`assets/plastivista/${name}`);
+const productAsset = (slug, name) => assetUrl(`assets/products/${slug}/${name}`);
+const galleryAsset = (name) => assetUrl(`assets/gallery/curated/${name}`);
 
-const galleryImage = (src, caption) => ({ src, caption });
+const galleryImage = (src, caption) => (caption ? { src, caption } : { src });
 
-const collectionContextImages = [
-  galleryImage(shopImage('s0l-stack.png'), 'Original SOL stacked collection view.'),
-  galleryImage(shopImage('s0l-combo.png'), 'Full modular S0L bundle composition.'),
-  galleryImage(lampImage('sol-page-hero.jpg'), 'SOL lighting family in a premium product setting.'),
-];
+// Add future product renders by placing files in public/assets/products/<slug>/ and appending the filename here.
+const productGalleryFiles = {
+  's0l-planter': ['s0l-planter-main.webp', 's0l-planter-gallery-01.webp', 's0l-planter-gallery-02.webp'],
+  's04-shade': ['s04-shade-main.webp', 's04-shade-gallery-01.webp', 's04-shade-gallery-02.webp', 's04-shade-gallery-03.webp', 's04-shade-gallery-04.webp', 's04-shade-gallery-05.webp', 's04-shade-gallery-06.webp', 's04-shade-gallery-07.webp', 's04-shade-gallery-08.webp'],
+  's04': ['s04-main.webp', 's04-gallery-01.webp', 's04-gallery-02.webp', 's04-gallery-03.webp', 's04-gallery-04.webp', 's04-gallery-05.webp', 's04-gallery-06.webp'],
+  's01': ['s01-main.webp', 's01-gallery-01.webp', 's01-gallery-02.webp', 's01-gallery-03.webp', 's01-gallery-04.webp', 's01-gallery-05.webp', 's01-gallery-06.webp'],
+  's02': ['s02-main.webp', 's02-gallery-01.webp', 's02-gallery-02.webp', 's02-gallery-03.webp', 's02-gallery-04.webp', 's02-gallery-05.webp', 's02-gallery-06.webp', 's02-gallery-07.webp'],
+  's03': ['s03-main.webp', 's03-gallery-01.webp', 's03-gallery-02.webp', 's03-gallery-03.webp', 's03-gallery-04.webp', 's03-gallery-05.webp', 's03-gallery-06.webp', 's03-gallery-07.webp'],
+  's0l-combo': ['s0l-combo-main.webp', 's0l-combo-gallery-01.webp', 's0l-combo-gallery-02.webp', 's0l-combo-gallery-03.webp', 's0l-combo-gallery-04.webp', 's0l-combo-gallery-05.webp', 's0l-combo-gallery-06.webp', 's0l-combo-gallery-07.webp', 's0l-combo-gallery-08.webp', 's0l-combo-gallery-09.webp', 's0l-combo-gallery-10.webp', 's0l-combo-gallery-11.webp', 's0l-combo-gallery-12.webp', 's0l-combo-gallery-13.webp'],
+  's03-shade': ['s03-shade-main.webp', 's03-shade-gallery-01.webp', 's03-shade-gallery-02.webp', 's03-shade-gallery-03.webp', 's03-shade-gallery-04.webp', 's03-shade-gallery-05.webp', 's03-shade-gallery-06.webp', 's03-shade-gallery-07.webp', 's03-shade-gallery-08.webp'],
+  's02-shade': ['s02-shade-main.webp', 's02-shade-gallery-01.webp', 's02-shade-gallery-02.webp', 's02-shade-gallery-03.webp', 's02-shade-gallery-04.webp', 's02-shade-gallery-05.webp', 's02-shade-gallery-06.webp', 's02-shade-gallery-07.webp', 's02-shade-gallery-08.webp'],
+  's01-shade': ['s01-shade-main.webp', 's01-shade-gallery-01.webp', 's01-shade-gallery-02.webp', 's01-shade-gallery-03.webp', 's01-shade-gallery-04.webp', 's01-shade-gallery-05.webp', 's01-shade-gallery-06.webp', 's01-shade-gallery-07.webp', 's01-shade-gallery-08.webp'],
+};
 
-const shadeContextImages = [
-  galleryImage(shopImage('s0l-stack.png'), 'Stacked S0 shade system view.'),
-  galleryImage(shopImage('s0l-planter.png'), 'Off-lamp module use as a desktop object.'),
-  galleryImage(lampImage('sol-gallery-c.png'), 'Assembly detail for the modular shade language.'),
-];
+const productImage = (slug) => productAsset(slug, productGalleryFiles[slug][0]);
+const productGallery = (slug) => productGalleryFiles[slug].map((file) => galleryImage(productAsset(slug, file)));
 
-const productGallery = (primaryImage, primaryCaption, contextImages) => [
-  galleryImage(primaryImage, primaryCaption),
-  ...contextImages,
+export const solColorOptions = [
+  { label: 'White', value: '#ffffff' },
+  { label: 'Black', value: '#000000' },
+  { label: 'Orange', value: '#ffa500' },
 ];
 
 export const productCategories = [
@@ -43,13 +50,13 @@ export const productCategories = [
 
 const sharedLampNotes = [
   'Modular Swap & Snap ecosystem with magnetic shades, bases, and clips.',
-  '40W RGB smart bulb for color changing light and warm white settings.',
+  '40W RGB smart bulb for color-changing light and warm white settings.',
   'Sustainable plant-based PETG polymer construction.',
   'SGS certified for UL and CSA on listed lamp builds.',
 ];
 
 const sharedShadeNotes = [
-  'Available in White, Black, and Orange on the public Sol Seven Studios product pages.',
+  'Available in White, Black, and Orange in the current shop.',
   'Sustainable plant-based PETG polymer construction.',
   'Designed to stack, swap, diffuse light, or become a functional desktop object.',
 ];
@@ -61,8 +68,9 @@ export const originalSolProducts = [
     category: 'table-lights',
     collection: 'Original SOL Collection',
     price: '$70.00',
-    image: shopImage('s01.png'),
-    gallery: productGallery(shopImage('s01.png'), 'S01 primary product render.', collectionContextImages),
+    image: productImage('s01'),
+    gallery: productGallery('s01'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s01',
     shortDescription: 'A sculptural modular table lamp with customizable RGB illumination.',
     story:
@@ -77,8 +85,9 @@ export const originalSolProducts = [
     category: 'table-lights',
     collection: 'Original SOL Collection',
     price: '$70.00',
-    image: shopImage('s02.png'),
-    gallery: productGallery(shopImage('s02.png'), 'S02 primary product render.', collectionContextImages),
+    image: productImage('s02'),
+    gallery: productGallery('s02'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s02',
     shortDescription: 'A minimal, versatile lamp for broad ambient lighting and daily color control.',
     story:
@@ -93,8 +102,9 @@ export const originalSolProducts = [
     category: 'table-lights',
     collection: 'Original SOL Collection',
     price: '$70.00',
-    image: shopImage('s03.png'),
-    gallery: productGallery(shopImage('s03.png'), 'S03 primary product render.', collectionContextImages),
+    image: productImage('s03'),
+    gallery: productGallery('s03'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s03',
     shortDescription: 'A warm organic lamp profile with a refined, inviting silhouette.',
     story:
@@ -109,8 +119,9 @@ export const originalSolProducts = [
     category: 'table-lights',
     collection: 'Original SOL Collection',
     price: '$70.00',
-    image: shopImage('s04.png'),
-    gallery: productGallery(shopImage('s04.png'), 'S04 primary product render.', collectionContextImages),
+    image: productImage('s04'),
+    gallery: productGallery('s04'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s04',
     shortDescription: 'A sharper geometric SOL profile with layered visual rhythm.',
     story:
@@ -124,9 +135,10 @@ export const originalSolProducts = [
     name: 'S01 Shade',
     category: 'shades',
     collection: 'Original SOL Collection',
-    price: '$35.00',
-    image: shopImage('s01-shade.png'),
-    gallery: productGallery(shopImage('s01-shade.png'), 'S01 Shade primary product render.', shadeContextImages),
+    price: '$15.00',
+    image: productImage('s01-shade'),
+    gallery: productGallery('s01-shade'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s01-shade',
     shortDescription: 'The foundational stackable shade for the S0 modular system.',
     story:
@@ -140,8 +152,9 @@ export const originalSolProducts = [
     category: 'shades',
     collection: 'Original SOL Collection',
     price: '$15.00',
-    image: shopImage('s02-shade.png'),
-    gallery: productGallery(shopImage('s02-shade.png'), 'S02 Shade primary product render.', shadeContextImages),
+    image: productImage('s02-shade'),
+    gallery: productGallery('s02-shade'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s02-shade',
     shortDescription: 'A soft curved shade for diffuse ambient lighting and calm visual weight.',
     story:
@@ -154,9 +167,10 @@ export const originalSolProducts = [
     name: 'S03 Shade',
     category: 'shades',
     collection: 'Original SOL Collection',
-    price: '$35.00',
-    image: shopImage('s03-shade.png'),
-    gallery: productGallery(shopImage('s03-shade.png'), 'S03 Shade primary product render.', shadeContextImages),
+    price: '$15.00',
+    image: productImage('s03-shade'),
+    gallery: productGallery('s03-shade'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s03-shade',
     shortDescription: 'A wide dome shade that creates warm, even light and sculptural volume.',
     story:
@@ -170,8 +184,9 @@ export const originalSolProducts = [
     category: 'shades',
     collection: 'Original SOL Collection',
     price: '$15.00',
-    image: shopImage('s04-shade.png'),
-    gallery: productGallery(shopImage('s04-shade.png'), 'S04 Shade primary product render.', shadeContextImages),
+    image: productImage('s04-shade'),
+    gallery: productGallery('s04-shade'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s04-shade',
     shortDescription: 'A bold geometric shade for stacked visual depth and interlocking expression.',
     story:
@@ -185,18 +200,15 @@ export const originalSolProducts = [
     category: 'add-ons',
     collection: 'Original SOL Collection',
     price: '$25.00',
-    image: shopImage('s0l-planter.png'),
-    gallery: productGallery(shopImage('s0l-planter.png'), 'S0L Planter primary product render.', [
-      galleryImage(shopImage('s01-shade.png'), 'Shade module before planter conversion.'),
-      galleryImage(shopImage('s0l-stack.png'), 'Modular family context for add-on use.'),
-      galleryImage(lampImage('sol-gallery-c.png'), 'Detail view of the SOL modular system.'),
-    ]),
+    image: productImage('s0l-planter'),
+    gallery: productGallery('s0l-planter'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s0l-planter',
     shortDescription: 'A modular planter add-on that turns unused shades into functional decor.',
     story:
       'The planter extends the SOL system beyond lighting. It keeps unused modules active in the room as desktop objects, storage, or small plant vessels.',
     intent: 'Designed to make modularity useful even when parts are not on a lamp.',
-    processNotes: ['Built for S0 shades and attachments.', 'Uses the same playful modular logic as the lighting system.', 'Listed as an add-on in the public shop.'],
+    processNotes: ['Built for S0 shades and attachments.', 'Uses the same playful modular logic as the lighting system.', 'Listed as an add-on in the current shop.'],
   },
   {
     slug: 's0l-combo',
@@ -205,12 +217,9 @@ export const originalSolProducts = [
     collection: 'Original SOL Collection',
     price: '$195.00 sale',
     compareAt: '$210.00 regular',
-    image: shopImage('s0l-combo.png'),
-    gallery: productGallery(shopImage('s0l-combo.png'), 'S0L Combo primary product render.', [
-      galleryImage(shopImage('s0l-stack.png'), 'Stacked lamp system composition.'),
-      galleryImage(lampImage('sol-page-hero.jpg'), 'SOL lighting family in a premium product setting.'),
-      galleryImage(lampImage('sol-gallery-b.png'), 'Collection context for future in-room renders.'),
-    ]),
+    image: productImage('s0l-combo'),
+    gallery: productGallery('s0l-combo'),
+    colors: solColorOptions,
     sourceUrl: 'https://www.solsevenstudios.com/product-page/s0-combo',
     shortDescription: 'The full modular lighting bundle with S01, S02, S03, bulbs, clips, and extra shades.',
     story:
@@ -266,33 +275,33 @@ export const siteGallerySections = [
   {
     title: 'Studio',
     items: [
-      galleryImage(lampImage('sol-page-hero.jpg'), 'SOL lighting family study.'),
-      galleryImage(lampImage('sol-gallery-c.png'), 'Assembly and detail study.'),
-      galleryImage(plastivistaImage('homepage-process-sequence.png'), 'Circular production workflow.'),
+      galleryImage(galleryAsset('studio-product-family-01.jpg'), 'Original SOL family study.'),
+      galleryImage(galleryAsset('studio-system-wide-01.png'), 'Modular lamp system study.'),
+      galleryImage(galleryAsset('studio-sol-collection-02.png'), 'Studio arrangement with shade, lamp, and add-on forms.'),
     ],
   },
   {
     title: 'Living Spaces',
     items: [
-      galleryImage(lampImage('sol-gallery-b.png'), 'SOL collection in a warm interior setting.'),
-      galleryImage(lampImage('homepage-sol-feature.png'), 'Modular lighting collection view.'),
-      galleryImage(shopImage('s0l-stack.png'), 'Stacked SOL composition.'),
+      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'SOL lamps in a calm interior setting.'),
+      galleryImage(galleryAsset('living-space-sol-collection-01.png'), 'Warm room composition with modular floor and table forms.'),
+      galleryImage(lampImage('sol-gallery-b.png'), 'Sculptural SOL lighting in a residential setting.'),
     ],
   },
   {
     title: 'Bedrooms',
     items: [
-      galleryImage(shopImage('s01.png'), 'S01 bedside-scale product render.'),
-      galleryImage(shopImage('s02.png'), 'S02 ambient table-light render.'),
-      galleryImage(shopImage('s03.png'), 'S03 warm sculptural lamp render.'),
+      galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft bedside-scale SOL arrangement.'),
+      galleryImage(lampImage('homepage-sol-feature.png'), 'Low, warm modular light study.'),
+      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'Quiet room setting with modular silhouettes.'),
     ],
   },
   {
     title: 'Details',
     items: [
-      galleryImage(shopImage('s04.png'), 'S04 geometric lamp profile.'),
-      galleryImage(shopImage('s0l-planter.png'), 'S0L Planter add-on.'),
-      galleryImage(shopImage('s0l-combo.png'), 'S0L Combo bundle.'),
+      galleryImage(galleryAsset('detail-modular-lamp-01.png'), 'Vertical module and shade detail.'),
+      galleryImage(galleryAsset('detail-shade-study-01.png'), 'Shade profile and diffusion study.'),
+      galleryImage(plastivistaImage('homepage-process-sequence.png'), 'Circular production workflow.'),
     ],
   },
 ];
