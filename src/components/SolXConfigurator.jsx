@@ -21,6 +21,7 @@ import {
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import AppLink from './AppLink.jsx';
+import { trackConfiguratorInteraction } from '../analytics.js';
 import { estimateSolXBuild, formatPricingValue, solxPricing } from '../data/pricing.js';
 import { shadeColorOptions, solxBuilderConfig, solxPartOrder, solxParts } from '../data/solxParts.js';
 
@@ -1573,6 +1574,10 @@ export default function SolXConfigurator({ onNavigate }) {
     setHoverConnectorId(null);
     setFloorHover(null);
     showFeedback(drag.partKey === 'base' ? 'Drop it on the floor or snap it to a shade.' : 'Move it near a glowing connector.', true);
+    trackConfiguratorInteraction('drag_start', {
+      part_key: drag.partKey,
+      drag_kind: drag.kind,
+    });
   }, [showFeedback]);
 
   const beginTrayDrag = useCallback((event, partKey) => {
@@ -1600,8 +1605,10 @@ export default function SolXConfigurator({ onNavigate }) {
     const floorPosition = screenToFloorRef.current?.(clientX, clientY, fineSnap) ?? null;
 
     if (target) {
+      let placedPartId = drag.id;
       if (drag.kind === 'new') {
         const nextPart = createPart(drag.partKey, { parentId: target.partId });
+        placedPartId = nextPart.id;
         setParts((current) => [...current, nextPart]);
         setSelectedId(nextPart.id);
       } else {
@@ -1611,10 +1618,19 @@ export default function SolXConfigurator({ onNavigate }) {
 
       lastPlacementTimeRef.current = Date.now();
       showFeedback(solxParts[drag.partKey].type === 'divider' ? 'Add a shade to finish this connector.' : 'Snapped into place.');
+      trackConfiguratorInteraction('place_part', {
+        part_key: drag.partKey,
+        part_id: placedPartId,
+        drag_kind: drag.kind,
+        placement_type: 'connector',
+        parent_part_key: target.partKey,
+      });
       return true;
     } else if (insideViewer && floorPosition && canPlaceOnFloor(drag, freePlacement)) {
+      let placedPartId = drag.id;
       if (drag.kind === 'new') {
         const nextPart = createPart(drag.partKey, { position: floorPosition, parentId: null });
+        placedPartId = nextPart.id;
         setParts((current) => [...current, nextPart]);
         setSelectedId(nextPart.id);
       } else {
@@ -1623,6 +1639,12 @@ export default function SolXConfigurator({ onNavigate }) {
       }
       lastPlacementTimeRef.current = Date.now();
       showFeedback(drag.partKey === 'base' ? 'Base placed on the floor.' : 'Placed in experimental free mode.');
+      trackConfiguratorInteraction('place_part', {
+        part_key: drag.partKey,
+        part_id: placedPartId,
+        drag_kind: drag.kind,
+        placement_type: 'floor',
+      });
       return true;
     } else if (insideViewer && (options.moved || options.showInvalid)) {
       showFeedback(options.invalidMessage ?? "This part can't connect there.");
@@ -1682,6 +1704,11 @@ export default function SolXConfigurator({ onNavigate }) {
       message,
       true,
     );
+    trackConfiguratorInteraction('select_part', {
+      part_key: partKey,
+      input_mode: 'mobile_tap',
+      valid_connectors: eligibleConnectors.length,
+    });
   }, [connectors, parts, showFeedback]);
 
   const handleCanvasTapPlacement = useCallback((event) => {
@@ -1705,6 +1732,10 @@ export default function SolXConfigurator({ onNavigate }) {
   const updateSelectedColor = (color) => {
     if (!selectedPart) return;
     setParts((current) => current.map((part) => (part.id === selectedPart.id ? { ...part, color } : part)));
+    trackConfiguratorInteraction('change_color', {
+      part_key: selectedPart.partKey,
+      color,
+    });
   };
 
   const deleteSelectedPart = () => {
@@ -1730,6 +1761,10 @@ export default function SolXConfigurator({ onNavigate }) {
     setParts(remaining);
     setSelectedId(parent && !deleteIds.has(parent.id) ? parent.id : remaining[0]?.id ?? null);
     showFeedback('Removed selected connection.');
+    trackConfiguratorInteraction('delete_part', {
+      part_key: selectedPart.partKey,
+      removed_count: deleteIds.size,
+    });
   };
 
   const resetScene = () => {
@@ -1742,11 +1777,17 @@ export default function SolXConfigurator({ onNavigate }) {
     setHoverConnectorId(null);
     setFloorHover(null);
     showFeedback('Scene reset to one starter base.');
+    trackConfiguratorInteraction('reset_scene', {
+      module_count: nextScene.length,
+    });
   };
 
   const resetColors = () => {
     setParts((current) => current.map((part) => ({ ...part, color: solxBuilderConfig.defaultColor })));
     showFeedback('Colors reset.');
+    trackConfiguratorInteraction('reset_colors', {
+      module_count: parts.length,
+    });
   };
 
   const duplicateSelectedPart = () => {
@@ -1786,6 +1827,10 @@ export default function SolXConfigurator({ onNavigate }) {
     setParts((current) => [...current, ...duplicates]);
     setSelectedId(idMap.get(rootPart.id));
     showFeedback('Duplicated selected build.');
+    trackConfiguratorInteraction('duplicate_build_branch', {
+      root_part_key: rootPart.partKey,
+      duplicated_count: duplicates.length,
+    });
   };
 
   const nudgeSelectedRoot = (dx, dz) => {
@@ -1808,6 +1853,11 @@ export default function SolXConfigurator({ onNavigate }) {
         position: normalizeFloorPosition([currentPosition[0] + dx, 0, currentPosition[2] + dz], fineSnap),
       };
     }));
+    trackConfiguratorInteraction('nudge_build', {
+      root_part_key: rootPart.partKey,
+      dx,
+      dz,
+    });
   };
 
   const rotateSelectedRoot = (amount) => {
@@ -1830,11 +1880,18 @@ export default function SolXConfigurator({ onNavigate }) {
         rotation: [rotation[0], rotation[1] + amount, rotation[2]],
       };
     }));
+    trackConfiguratorInteraction('rotate_root', {
+      root_part_key: rootPart.partKey,
+      amount,
+    });
   };
 
   const fitBuildToView = () => {
     setFitCameraToken((token) => token + 1);
     showFeedback('Framed the current build.');
+    trackConfiguratorInteraction('fit_build_to_view', {
+      module_count: parts.length,
+    });
   };
 
   const rotateSelectedToPentagonPoint = (index) => {
@@ -1853,6 +1910,10 @@ export default function SolXConfigurator({ onNavigate }) {
       };
     }));
     showFeedback(`Rotated to SOL point ${index + 1}.`);
+    trackConfiguratorInteraction('rotate_to_sol_point', {
+      part_key: selectedPart.partKey,
+      point_index: index + 1,
+    });
   };
 
   const rotateSelectedByStep = (direction) => {
@@ -1898,6 +1959,10 @@ export default function SolXConfigurator({ onNavigate }) {
 
     window.localStorage.setItem(solxBuilderConfig.storageKey, JSON.stringify(payload));
     showFeedback('Build saved to this browser.');
+    trackConfiguratorInteraction('save_build', {
+      module_count: parts.length,
+      estimated_total: priceEstimate.total,
+    });
   };
 
   const loadSavedBuild = () => {
@@ -1916,11 +1981,15 @@ export default function SolXConfigurator({ onNavigate }) {
     setBuildName(payload.name || DEFAULT_BUILD_NAME);
     setSelectedId(loadedParts[0]?.id ?? null);
     showFeedback('Saved build loaded.');
+    trackConfiguratorInteraction('load_build', {
+      module_count: loadedParts.length,
+    });
   };
 
   const clearSavedBuild = () => {
     window.localStorage.removeItem(solxBuilderConfig.storageKey);
     showFeedback('Saved build cleared.');
+    trackConfiguratorInteraction('clear_saved_build');
   };
 
   const takeScreenshot = () => {
@@ -1936,6 +2005,9 @@ export default function SolXConfigurator({ onNavigate }) {
       link.href = canvas.toDataURL('image/png');
       link.click();
       showFeedback('Screenshot saved.');
+      trackConfiguratorInteraction('download_screenshot', {
+        module_count: parts.length,
+      });
     } catch {
       showFeedback('Screenshot could not be saved.');
     }

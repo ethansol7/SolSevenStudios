@@ -10,6 +10,7 @@ import {
   solXComponents,
 } from '../data/products.js';
 import { assetUrl } from '../content.js';
+import { trackProductCardClick, trackStripeCheckoutClick } from '../analytics.js';
 
 const SolXViewer = lazy(() => import('./SolXViewer.jsx'));
 const SolXConfigurator = lazy(() => import('./SolXConfigurator.jsx'));
@@ -42,7 +43,13 @@ function ProductCard({ onNavigate, product, variant = 'default' }) {
 
   return (
     <article className={`store-card store-card--${variant}`}>
-      <AppLink to={detailPath} onNavigate={onNavigate} className="store-card__image" aria-label={`View ${product.name}`}>
+      <AppLink
+        to={detailPath}
+        onNavigate={onNavigate}
+        className="store-card__image"
+        aria-label={`View ${product.name}`}
+        onClick={() => trackProductCardClick(product, 'image')}
+      >
         <img src={product.image} alt={`${product.name} product image`} loading="lazy" />
       </AppLink>
       <div className="store-card__body">
@@ -51,7 +58,11 @@ function ProductCard({ onNavigate, product, variant = 'default' }) {
         <span>{product.description}</span>
         <div className="store-card__footer">
           <small>{product.compareAt ? `${product.compareAt} / ${product.price}` : product.price}</small>
-          <AppLink to={detailPath} onNavigate={onNavigate}>
+          <AppLink
+            to={detailPath}
+            onNavigate={onNavigate}
+            onClick={() => trackProductCardClick(product, 'view_product')}
+          >
             View Product
           </AppLink>
         </div>
@@ -196,7 +207,13 @@ function ProductPurchasePanel({ product }) {
 
       <div className="route-actions route-actions--purchase">
         {liveStripeLink ? (
-          <a href={liveStripeLink} target="_blank" rel="noreferrer" aria-label={`Buy ${product.name} with Stripe checkout`}>
+          <a
+            href={liveStripeLink}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Buy ${product.name} with Stripe checkout`}
+            onClick={() => trackStripeCheckoutClick(product)}
+          >
             Buy Now
           </a>
         ) : (

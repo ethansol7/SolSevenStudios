@@ -1,5 +1,6 @@
 import { AlertCircle, CheckCircle2, ImagePlus, Loader2, Send, X } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { trackContactSubmit } from '../analytics.js';
 
 const CONTACT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzbsyq90MK4_5MCOmCVn_YZ901hioj16a0EepEEnRvd5KqrFD07ATe-XkR81t4FaySE/exec';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -59,6 +60,49 @@ function readImageAsBase64(file) {
     reader.onerror = () => reject(new Error('Image data could not be read.'));
     reader.readAsDataURL(file);
   });
+}
+
+function parseContactResponse(text) {
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { success: false, error: 'The contact service returned an unreadable response.' };
+  }
+}
+
+async function sendContactPayload(payload, { allowUnverifiedFallback = false } = {}) {
+  if (allowUnverifiedFallback) {
+    await fetch(CONTACT_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    return { success: true, unverified: true };
+  }
+
+  const response = await fetch(CONTACT_ENDPOINT, {
+    method: 'POST',
+    mode: 'cors',
+    redirect: 'follow',
+    credentials: 'omit',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = parseContactResponse(await response.text());
+  if (!response.ok || result.success === false || result.ok === false) {
+    throw new Error(result.error || result.message || 'The contact service could not save this message.');
+  }
+
+  return result;
 }
 
 function validateForm(form) {
@@ -148,7 +192,7 @@ export default function ContactForm({ context = 'site-contact' }) {
     }
 
     setStatus('submitting');
-    setNotice('');
+    setNotice(imageFile ? 'Uploading image and sending message...' : 'Sending message...');
 
     try {
       const imageDataBase64 = imageFile ? await readImageAsBase64(imageFile) : '';
@@ -160,9 +204,12 @@ export default function ContactForm({ context = 'site-contact' }) {
             dataBase64: imageDataBase64,
           }
         : null;
+      const trimmedName = form.fullName.trim();
+      const trimmedEmail = form.email.trim();
       const payload = {
-        fullName: form.fullName.trim(),
-        email: form.email.trim(),
+        name: trimmedName,
+        fullName: trimmedName,
+        email: trimmedEmail,
         company: form.company.trim(),
         message: form.message.trim(),
         source: 'Sol Seven Studios website contact form',
@@ -170,27 +217,40 @@ export default function ContactForm({ context = 'site-contact' }) {
         pageUrl: window.location.href,
         submittedAt: new Date().toISOString(),
         attachment,
+        fileName: attachment?.fileName || '',
+        mimeType: attachment?.mimeType || '',
+        imageDataBase64: attachment?.dataBase64 || '',
         imageFileName: attachment?.fileName || '',
         imageMimeType: attachment?.mimeType || '',
         imageSize: attachment?.size || '',
       };
 
-      await fetch(CONTACT_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify(payload),
-      });
+      const result = await sendContactPayload(payload, { allowUnverifiedFallback: !imageFile });
+
+      if (imageFile && result.imageUploadFailed) {
+        throw new Error(result.error || 'Message saved, but the image could not be uploaded. Please try sending the image again.');
+      }
+
+      if (imageFile) {
+        const savedImageLink = result.image?.driveViewUrl || result.image?.directImageUrl || result.image?.thumbnailUrl || result.driveViewUrl || result.imageUrl;
+        if (!savedImageLink) {
+          throw new Error('Message reached the contact service, but no saved image link was returned. Please try again after the upload service is updated.');
+        }
+      }
 
       setStatus('success');
-      setNotice(imageFile ? 'Message sent with the attached image. The studio will follow up soon.' : 'Message sent. The studio will follow up soon.');
+      setNotice(
+        imageFile
+          ? 'Message sent with the attached image. The studio will follow up soon.'
+          : 'Message sent. The studio will follow up soon.'
+      );
+      trackContactSubmit({ context, hasImage: Boolean(imageFile) });
       setForm(initialForm);
       resetImage();
-    } catch {
+    } catch (error) {
       setStatus('error');
-      setNotice('The message or image could not be sent. Please try again in a moment.');
+      setNotice(error.message || 'The message or image could not be sent. Please try again in a moment.');
+      trackContactSubmit({ context, hasImage: Boolean(imageFile), status: 'error' });
     }
   };
 

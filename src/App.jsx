@@ -17,6 +17,7 @@ import {
   SolXPage,
 } from './components/StorePages.jsx';
 import { assetUrl, capabilities, featuredWork, heroLines, navItems, systemTabs } from './content.js';
+import { initAnalytics, trackEvent, trackPageView } from './analytics.js';
 import { findProductBySlug } from './data/products.js';
 import { requestMusicSection, useActiveMusicSection } from './music/useActiveMusicSection.js';
 import { currentRoutePath, useClientNavigation } from './routing.js';
@@ -272,6 +273,11 @@ function Systems() {
               onClick={() => {
                 setActive(tab.id);
                 requestMusicSection(tab.id === 'circular' ? 'plastivista' : tab.id === 'studio' ? 'process' : 'dram');
+                trackEvent('system_tab_click', {
+                  event_category: 'navigation',
+                  tab_id: tab.id,
+                  tab_label: tab.label,
+                });
               }}
             >
               {tab.label}
@@ -501,12 +507,14 @@ export default function App() {
   useEffect(() => {
     const handlePopState = () => setRoutePath(currentRoutePath());
     window.addEventListener('popstate', handlePopState);
+    initAnalytics();
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   useEffect(() => {
     requestMusicSection(musicSectionForRoute(routePath));
     updateDocumentMetadata(routePath);
+    trackPageView(routePath, metadataForRoute(routePath));
   }, [routePath]);
 
   return (
