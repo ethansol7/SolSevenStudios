@@ -3,7 +3,7 @@ import { shadeColorOptions, solxPartOrder, solxParts } from './solxParts.js';
 export const solxPricing = {
   currency: 'USD',
   lastChecked: '2026-04-30',
-  sourceUrl: 'https://www.solsevenstudios.com/category/all-products',
+  sourceUrl: 'https://SolSevenStudios.com/shop/original-sol/',
   note: 'Estimated price is based on the modules in your current build. Final availability and pricing may change.',
   parts: {
     base: {

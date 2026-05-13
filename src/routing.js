@@ -1,3 +1,5 @@
+import { resolveLegacyRoute } from './legacyRoutes.js';
+
 export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 export const normalizeRoutePath = (path = '/') => {
@@ -16,12 +18,12 @@ export const currentRoutePath = () => {
       ? redirectUrl.pathname.slice(basePath.length)
       : redirectUrl.pathname;
     window.history.replaceState({}, '', `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`);
-    return normalizeRoutePath(redirectRoute || '/');
+    return resolveLegacyRoute(normalizeRoutePath(redirectRoute || '/'));
   }
 
   const pathname = window.location.pathname;
   const withoutBase = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname;
-  return normalizeRoutePath(withoutBase || '/');
+  return resolveLegacyRoute(normalizeRoutePath(withoutBase || '/'));
 };
 
 export const useClientNavigation = (setRoutePath) => (event, path) => {

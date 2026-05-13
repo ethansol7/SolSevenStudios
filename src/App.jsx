@@ -22,6 +22,7 @@ import { requestMusicSection, useActiveMusicSection } from './music/useActiveMus
 import { currentRoutePath, useClientNavigation } from './routing.js';
 
 const HeroScene = lazy(() => import('./components/HeroScene.jsx'));
+const canonicalOrigin = 'https://SolSevenStudios.com';
 
 const mobileNavLabels = {
   'Original SOL': 'Orig',
@@ -410,8 +411,9 @@ function setCanonicalLink(href) {
 
 function updateDocumentMetadata(routePath) {
   const metadata = metadataForRoute(routePath);
-  const pageUrl = new URL(`${window.location.pathname}${window.location.search}${window.location.hash}`, window.location.origin).href;
-  const imageUrl = new URL(assetUrl('assets/lamps/homepage-hero.png'), window.location.origin).href;
+  const normalizedRoute = routePath === '/' ? '/' : `${routePath.replace(/\/+$/, '')}/`;
+  const pageUrl = new URL(normalizedRoute, canonicalOrigin).href;
+  const imageUrl = new URL('/assets/lamps/homepage-hero.png', canonicalOrigin).href;
 
   document.title = metadata.title;
   setCanonicalLink(pageUrl);

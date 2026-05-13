@@ -6,14 +6,18 @@
     <title>Sol Seven Studios</title>
     <script>
       (function () {
-        var base = '/SolSevenStudios';
-        var target = window.location.pathname + window.location.search + window.location.hash;
-        if (window.location.pathname.indexOf(base) === 0) {
-          sessionStorage.setItem('solseven.redirect', target);
-          window.location.replace(base + '/');
-        } else {
-          window.location.replace(base + '/');
+        var canonicalOrigin = 'https://SolSevenStudios.com';
+        var githubPrefix = '/SolSevenStudios';
+        var path = window.location.pathname;
+
+        if (window.location.hostname === 'ethansol7.github.io' && path.indexOf(githubPrefix) === 0) {
+          var nextPath = path.slice(githubPrefix.length) || '/';
+          window.location.replace(canonicalOrigin + nextPath + window.location.search + window.location.hash);
+          return;
         }
+
+        sessionStorage.setItem('solseven.redirect', window.location.href);
+        window.location.replace('/');
       })();
     </script>
   </head>

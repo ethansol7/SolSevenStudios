@@ -1,8 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { legacyRouteMap } from '../src/legacyRoutes.js';
 
-const siteBaseUrl = 'https://ethansol7.github.io/SolSevenStudios';
+const siteBaseUrl = 'https://SolSevenStudios.com';
 const defaultImageUrl = `${siteBaseUrl}/assets/lamps/homepage-hero.png`;
 
 const productSlugs = [
@@ -112,7 +113,7 @@ const metadataForRoute = (route) => {
   };
 };
 
-const routeUrl = (route) => `${siteBaseUrl}/${route}/`;
+const routeUrl = (route) => (route ? `${siteBaseUrl}/${route}/` : `${siteBaseUrl}/`);
 
 const upsertMetaTag = (html, selector, replacement) => {
   const patterns = {
@@ -159,4 +160,23 @@ await Promise.all(appRoutes.map(async (route) => {
   await writeFile(path.join(routeDir, 'index.html'), withRouteMetadata(appShellHtml, route));
 }));
 
-console.log(`Created static entry files for ${appRoutes.length} routes.`);
+await Promise.all(Object.entries(legacyRouteMap).map(async ([fromRoute, targetRoute]) => {
+  const normalizedFromRoute = fromRoute.replace(/^\/+/, '');
+  const normalizedTargetRoute = targetRoute.replace(/^\/+/, '');
+  const routeDir = path.join(distRoot, ...normalizedFromRoute.split('/'));
+  await mkdir(routeDir, { recursive: true });
+  await writeFile(path.join(routeDir, 'index.html'), withRouteMetadata(appShellHtml, normalizedTargetRoute));
+}));
+
+const sitemapRoutes = ['', ...appRoutes];
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapRoutes.map((route) => `  <url>
+    <loc>${escapeHtml(routeUrl(route))}</loc>
+  </url>`).join('\n')}
+</urlset>
+`;
+
+await writeFile(path.join(distRoot, 'sitemap.xml'), sitemapXml);
+
+console.log(`Created static entry files for ${appRoutes.length} routes and ${Object.keys(legacyRouteMap).length} compatibility routes.`);
