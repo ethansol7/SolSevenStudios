@@ -397,12 +397,24 @@ function setMetaTag(selector, attributes) {
   });
 }
 
+function setCanonicalLink(href) {
+  let tag = document.head.querySelector('link[rel="canonical"]');
+  if (!tag) {
+    tag = document.createElement('link');
+    tag.setAttribute('rel', 'canonical');
+    document.head.appendChild(tag);
+  }
+
+  tag.setAttribute('href', href);
+}
+
 function updateDocumentMetadata(routePath) {
   const metadata = metadataForRoute(routePath);
   const pageUrl = new URL(`${window.location.pathname}${window.location.search}${window.location.hash}`, window.location.origin).href;
   const imageUrl = new URL(assetUrl('assets/lamps/homepage-hero.png'), window.location.origin).href;
 
   document.title = metadata.title;
+  setCanonicalLink(pageUrl);
   setMetaTag('meta[name="description"]', { name: 'description', content: metadata.description });
   setMetaTag('meta[property="og:title"]', { property: 'og:title', content: metadata.title });
   setMetaTag('meta[property="og:description"]', { property: 'og:description', content: metadata.description });
