@@ -1,4 +1,4 @@
-export const GOOGLE_TAG_ID = 'G-ZYML25KSKD';
+export const GOOGLE_TAG_ID = 'G-QN3TZEVE03';
 
 const CANONICAL_ORIGIN = 'https://SolSevenStudios.com';
 const STRIPE_HOST = 'buy.stripe.com';
