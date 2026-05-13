@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion';
-import { ArrowDown, ExternalLink } from 'lucide-react';
+import { ArrowDown, ExternalLink, Menu, X } from 'lucide-react';
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import AppLink from './components/AppLink.jsx';
 import ContactForm from './components/ContactForm.jsx';
@@ -25,12 +25,7 @@ const HeroScene = lazy(() => import('./components/HeroScene.jsx'));
 const canonicalOrigin = 'https://SolSevenStudios.com';
 
 const mobileNavLabels = {
-  'Original SOL': 'Orig',
-  Gallery: 'Gal',
-  'SOL X': 'SOL',
-  Configurator: 'Build',
-  PlastiVista: 'PV',
-  Contact: 'Talk',
+  Configurator: 'Builder',
 };
 
 const reveal = {
@@ -52,16 +47,62 @@ const cascade = {
   },
 };
 
-function Navigation({ onNavigate }) {
+function Navigation({ onNavigate, routePath }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [routePath]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMenuOpen]);
+
+  const handleNavigate = (event, href) => {
+    setIsMenuOpen(false);
+    onNavigate?.(event, href);
+  };
+
+  const isActive = (href) => {
+    const path = href.split('#')[0] || '/';
+    if (path === '/' && href.includes('#')) return false;
+    return routePath === path;
+  };
+
   return (
-    <header className="site-nav">
+    <header className={`site-nav${isMenuOpen ? ' is-open' : ''}`}>
       <AppLink className="brand-mark" to="/" onNavigate={onNavigate} aria-label="Sol Seven Studios home">
         <span>S7</span>
       </AppLink>
-      <nav aria-label="Primary navigation">
+      <button
+        className="nav-menu-button"
+        type="button"
+        aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-controls="primary-navigation"
+        aria-expanded={isMenuOpen}
+        onClick={() => setIsMenuOpen((current) => !current)}
+      >
+        {isMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
+        <span>{isMenuOpen ? 'Close' : 'Menu'}</span>
+      </button>
+      <nav id="primary-navigation" aria-label="Primary navigation">
         {navItems.map((item) => (
-          <AppLink key={item.href} className="nav-link" to={item.href} onNavigate={onNavigate}>
-            <span data-label={item.label} data-short-label={mobileNavLabels[item.label] ?? item.label}>{item.label}</span>
+          <AppLink
+            key={item.href}
+            className={`nav-link${isActive(item.href) ? ' is-active' : ''}`}
+            to={item.href}
+            onNavigate={(event) => handleNavigate(event, item.href)}
+            aria-label={mobileNavLabels[item.label] ?? item.label}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            <span data-label={item.label} data-mobile-label={mobileNavLabels[item.label] ?? item.label}>{item.label}</span>
           </AppLink>
         ))}
       </nav>
@@ -472,7 +513,7 @@ export default function App() {
     <>
       <ScrollProgress />
       <motion.div className="ambient-wash" style={{ '--scroll-shift': backgroundShift }} aria-hidden="true" />
-      <Navigation onNavigate={onNavigate} />
+      <Navigation onNavigate={onNavigate} routePath={routePath} />
       <RouteSwitch routePath={routePath} onNavigate={onNavigate} />
       <MusicPlayer activeSectionKey={activeMusicSection} />
     </>
