@@ -1,4 +1,4 @@
-export const GOOGLE_TAG_ID = 'GT-WR9QKWS8';
+export const GOOGLE_TAG_ID = 'G-ZYML25KSKD';
 
 const CANONICAL_ORIGIN = 'https://SolSevenStudios.com';
 const STRIPE_HOST = 'buy.stripe.com';
@@ -42,6 +42,13 @@ function ensureGtag() {
   };
 }
 
+function dataLayerHasCommand(command, id) {
+  return window.dataLayer?.some?.((entry) => {
+    const values = Array.from(entry || []);
+    return values[0] === command && values[1] === id;
+  });
+}
+
 function trackExternalLinkFromClick(event) {
   const link = event.target?.closest?.('a[href]');
   if (!link) return;
@@ -69,10 +76,6 @@ export function initAnalytics() {
   if (!hasBrowser() || initialized || !GOOGLE_TAG_ID) return;
 
   ensureGtag();
-  window.gtag('js', new Date());
-  window.gtag('config', GOOGLE_TAG_ID, {
-    send_page_view: false,
-  });
 
   const existingScript = document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}"]`);
   if (!existingScript) {
@@ -80,6 +83,13 @@ export function initAnalytics() {
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GOOGLE_TAG_ID)}`;
     document.head.appendChild(script);
+  }
+
+  if (!dataLayerHasCommand('config', GOOGLE_TAG_ID)) {
+    window.gtag('js', new Date());
+    window.gtag('config', GOOGLE_TAG_ID, {
+      send_page_view: false,
+    });
   }
 
   document.addEventListener('click', trackExternalLinkFromClick, { capture: true });
