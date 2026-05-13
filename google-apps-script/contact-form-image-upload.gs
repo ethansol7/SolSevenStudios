@@ -1,3 +1,4 @@
+var SPREADSHEET_ID = '1AEXtWiPSU0nkIrnAtaXTl61O-g6pVOdcepdxRryCGkA';
 var SHEET_NAME = 'Contact Submissions';
 var IMAGE_FOLDER_NAME = 'Sol Seven Studios Contact Uploads';
 var MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -6,19 +7,20 @@ var REQUIRED_HEADERS = [
   'Timestamp',
   'Name',
   'Email',
-  'Company',
+  'Company or Role',
   'Message',
-  'Page URL',
-  'Context',
-  'Source',
-  'Image File Name',
-  'Image MIME Type',
-  'Image Size Bytes',
+  'Source Page',
+  'Submission ID',
+  'Attachment Filename',
   'Drive View Link',
   'Direct Image URL',
   'Thumbnail URL',
   'Image Preview',
-  'Image Upload Status'
+  'Image Upload Status',
+  'Context',
+  'Source',
+  'Image MIME Type',
+  'Image Size Bytes'
 ];
 
 var ALLOWED_IMAGE_TYPES = {
@@ -262,11 +264,12 @@ function legacyValueForHeader_(header, payload, submissionId) {
 function normalizeSubmission_(payload) {
   return {
     timestamp: new Date(),
+    submissionId: cleanText_(payload.submissionId || payload.submission_id) || Utilities.getUuid(),
     name: cleanText_(payload.name || payload.fullName || payload.full_name),
     email: cleanText_(payload.email).toLowerCase(),
-    company: cleanText_(payload.company || payload.business),
+    companyOrRole: cleanText_(payload.company || payload.business || payload.role || payload.roleTitle || payload.title),
     message: cleanText_(payload.message),
-    pageUrl: cleanText_(payload.pageUrl || payload.page_url),
+    sourcePage: cleanText_(payload.sourcePage || payload.source_page || payload.pageUrl || payload.page_url),
     context: cleanText_(payload.context),
     source: cleanText_(payload.source || 'Sol Seven Studios website contact form')
   };
@@ -343,12 +346,13 @@ function appendSubmission_(submission, imageResult, imageError) {
   rowValues['Timestamp'] = submission.timestamp;
   rowValues['Name'] = submission.name;
   rowValues['Email'] = submission.email;
-  rowValues['Company'] = submission.company;
+  rowValues['Company or Role'] = submission.companyOrRole;
   rowValues['Message'] = submission.message;
-  rowValues['Page URL'] = submission.pageUrl;
+  rowValues['Source Page'] = submission.sourcePage;
+  rowValues['Submission ID'] = submission.submissionId;
   rowValues['Context'] = submission.context;
   rowValues['Source'] = submission.source;
-  rowValues['Image File Name'] = imageResult ? imageResult.fileName : '';
+  rowValues['Attachment Filename'] = imageResult ? imageResult.fileName : '';
   rowValues['Image MIME Type'] = imageResult ? imageResult.mimeType : '';
   rowValues['Image Size Bytes'] = imageResult ? imageResult.sizeBytes : '';
   rowValues['Drive View Link'] = imageResult ? imageResult.driveViewUrl : '';
@@ -402,7 +406,7 @@ function insertImagePreview_(sheet, row, column, imageResult) {
 }
 
 function getSpreadsheet_() {
-  var spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  var spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || SPREADSHEET_ID;
   if (spreadsheetId) {
     return SpreadsheetApp.openById(spreadsheetId);
   }

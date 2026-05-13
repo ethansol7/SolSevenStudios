@@ -2,7 +2,7 @@ import { AlertCircle, CheckCircle2, ImagePlus, Loader2, Send, X } from 'lucide-r
 import { useRef, useState } from 'react';
 import { trackContactSubmit } from '../analytics.js';
 
-const CONTACT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwPCzSCkWUipOpIpInk_AaHxeQwD_0ewoev7CnJMNRq8UhPFgt-y1JCZ5RsSD7F_TVn/exec';
+const CONTACT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwp7vn9E_TSuuvdf19mvOCTBhzWQgDfNvtph-mKdE-0zifIBF4BTVAdSS8lLCKEhtYkkw/exec';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const ACCEPTED_IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp']);
