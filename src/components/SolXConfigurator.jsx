@@ -159,6 +159,10 @@ function clampFloorValue(value) {
   return Math.max(-FLOOR_LIMIT, Math.min(FLOOR_LIMIT, value));
 }
 
+function clampUnit(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
 function snapFloorValue(value, fineSnap) {
   const step = fineSnap ? FLOOR_FINE_SNAP : FLOOR_SNAP;
   return clampFloorValue(Math.round(value / step) * step);
@@ -998,7 +1002,90 @@ function MobileBuilderDrawer({
   const drawerOpen = drawerState !== 'collapsed';
   const activeTabLabel = activeTab === 'price' ? 'Price' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
   const carouselRef = useRef(null);
+  const drawerBodyRef = useRef(null);
+  const drawerRailRef = useRef(null);
+  const drawerRailDragRef = useRef(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [drawerScroll, setDrawerScroll] = useState({
+    progress: 0,
+    thumbHeight: 42,
+    scrollable: false,
+  });
+
+  const syncDrawerScroll = useCallback(() => {
+    const body = drawerBodyRef.current;
+    if (!body) return;
+
+    const maxScroll = Math.max(0, body.scrollHeight - body.clientHeight);
+    const scrollable = activeTab !== 'parts' && maxScroll > 6;
+    const thumbHeight = scrollable
+      ? Math.max(42, Math.min(94, (body.clientHeight / body.scrollHeight) * body.clientHeight))
+      : 42;
+
+    setDrawerScroll({
+      progress: scrollable ? clampUnit(body.scrollTop / maxScroll) : 0,
+      thumbHeight,
+      scrollable,
+    });
+  }, [activeTab]);
+
+  const scrollDrawerFromRail = useCallback((clientY) => {
+    const body = drawerBodyRef.current;
+    const rail = drawerRailRef.current;
+    if (!body || !rail) return;
+
+    const maxScroll = Math.max(0, body.scrollHeight - body.clientHeight);
+    if (!maxScroll) return;
+
+    const rect = rail.getBoundingClientRect();
+    const trackTravel = Math.max(1, rect.height - drawerScroll.thumbHeight);
+    const thumbTop = clampUnit((clientY - rect.top - drawerScroll.thumbHeight / 2) / trackTravel);
+    body.scrollTop = thumbTop * maxScroll;
+  }, [drawerScroll.thumbHeight]);
+
+  const handleDrawerRailPointerDown = useCallback((event) => {
+    event.preventDefault();
+    drawerRailDragRef.current = true;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    scrollDrawerFromRail(event.clientY);
+  }, [scrollDrawerFromRail]);
+
+  const handleDrawerRailPointerMove = useCallback((event) => {
+    if (!drawerRailDragRef.current) return;
+    event.preventDefault();
+    scrollDrawerFromRail(event.clientY);
+  }, [scrollDrawerFromRail]);
+
+  const handleDrawerRailPointerEnd = useCallback((event) => {
+    drawerRailDragRef.current = false;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }, []);
+
+  useEffect(() => {
+    const body = drawerBodyRef.current;
+    if (!body || !drawerOpen) return undefined;
+
+    const sync = () => syncDrawerScroll();
+    const frame = window.requestAnimationFrame(sync);
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(sync);
+
+    body.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    resizeObserver?.observe(body);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      body.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+      resizeObserver?.disconnect();
+    };
+  }, [activeTab, drawerOpen, selectedPart?.id, buildName, estimate.total, syncDrawerScroll]);
+
+  useEffect(() => {
+    if (!drawerBodyRef.current) return;
+    drawerBodyRef.current.scrollTop = 0;
+    window.requestAnimationFrame(syncDrawerScroll);
+  }, [activeTab, syncDrawerScroll]);
 
   const scrollCarouselToIndex = (index) => {
     const nextIndex = Math.max(0, Math.min(solxPartOrder.length - 1, index));
@@ -1032,7 +1119,10 @@ function MobileBuilderDrawer({
         </button>
       </div>
       {drawerOpen && (
-        <div className="mobile-builder-drawer__body">
+        <div
+          ref={drawerBodyRef}
+          className={`mobile-builder-drawer__body mobile-builder-drawer__body--${activeTab}`}
+        >
           <div className="mobile-builder-tabs" role="tablist" aria-label="SOL X mobile builder controls">
             {['parts', 'edit', 'color', 'price', 'save'].map((tab) => (
               <button
@@ -1221,7 +1311,147 @@ function MobileBuilderDrawer({
           )}
         </div>
       )}
+      {drawerOpen && (
+        <button
+          type="button"
+          ref={drawerRailRef}
+          className="mobile-drawer-scroll-rail"
+          style={{
+            '--drawer-scroll-progress': `${drawerScroll.progress}`,
+            '--drawer-scroll-thumb': `${drawerScroll.thumbHeight}px`,
+          }}
+          hidden={!drawerScroll.scrollable}
+          aria-label="Scroll build controls"
+          onPointerDown={handleDrawerRailPointerDown}
+          onPointerMove={handleDrawerRailPointerMove}
+          onPointerUp={handleDrawerRailPointerEnd}
+          onPointerCancel={handleDrawerRailPointerEnd}
+        >
+          <span aria-hidden="true" />
+        </button>
+      )}
     </div>
+  );
+}
+
+function MobilePageScrollRail() {
+  const railRef = useRef(null);
+  const railDragRef = useRef(false);
+  const [pageScroll, setPageScroll] = useState({
+    progress: 0,
+    thumbHeight: 58,
+    scrollable: false,
+  });
+
+  const syncPageScroll = useCallback(() => {
+    const scrollingElement = document.scrollingElement || document.documentElement;
+    const maxScroll = Math.max(0, scrollingElement.scrollHeight - window.innerHeight);
+    const scrollable = maxScroll > 6;
+    const thumbHeight = scrollable
+      ? Math.max(52, Math.min(116, (window.innerHeight / scrollingElement.scrollHeight) * window.innerHeight))
+      : 58;
+
+    setPageScroll({
+      progress: scrollable ? clampUnit(window.scrollY / maxScroll) : 0,
+      thumbHeight,
+      scrollable,
+    });
+  }, []);
+
+  const scrollPageFromRail = useCallback((clientY) => {
+    const rail = railRef.current;
+    const scrollingElement = document.scrollingElement || document.documentElement;
+    if (!rail) return;
+
+    const maxScroll = Math.max(0, scrollingElement.scrollHeight - window.innerHeight);
+    if (!maxScroll) return;
+
+    const rect = rail.getBoundingClientRect();
+    const trackTravel = Math.max(1, rect.height - pageScroll.thumbHeight);
+    const thumbTop = clampUnit((clientY - rect.top - pageScroll.thumbHeight / 2) / trackTravel);
+    window.scrollTo({ top: thumbTop * maxScroll, behavior: 'auto' });
+  }, [pageScroll.thumbHeight]);
+
+  const handleRailPointerDown = useCallback((event) => {
+    event.preventDefault();
+    railDragRef.current = true;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    scrollPageFromRail(event.clientY);
+  }, [scrollPageFromRail]);
+
+  const handleRailPointerMove = useCallback((event) => {
+    if (!railDragRef.current) return;
+    event.preventDefault();
+    scrollPageFromRail(event.clientY);
+  }, [scrollPageFromRail]);
+
+  const handleRailPointerEnd = useCallback((event) => {
+    railDragRef.current = false;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }, []);
+
+  const handleRailKeyDown = useCallback((event) => {
+    const step = Math.round(window.innerHeight * 0.38);
+
+    if (event.key === 'ArrowDown' || event.key === 'PageDown') {
+      event.preventDefault();
+      window.scrollBy({ top: step, behavior: 'smooth' });
+    }
+
+    if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+      event.preventDefault();
+      window.scrollBy({ top: -step, behavior: 'smooth' });
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }
+  }, []);
+
+  useEffect(() => {
+    const sync = () => syncPageScroll();
+    const frame = window.requestAnimationFrame(sync);
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(sync);
+
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    resizeObserver?.observe(document.documentElement);
+    resizeObserver?.observe(document.body);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+      resizeObserver?.disconnect();
+    };
+  }, [syncPageScroll]);
+
+  if (!pageScroll.scrollable) return null;
+
+  return (
+    <button
+      type="button"
+      ref={railRef}
+      className="mobile-page-scroll-rail"
+      style={{
+        '--page-scroll-progress': `${pageScroll.progress}`,
+        '--page-scroll-thumb': `${pageScroll.thumbHeight}px`,
+      }}
+      aria-label="Scroll SOL X page"
+      onPointerDown={handleRailPointerDown}
+      onPointerMove={handleRailPointerMove}
+      onPointerUp={handleRailPointerEnd}
+      onPointerCancel={handleRailPointerEnd}
+      onKeyDown={handleRailKeyDown}
+    >
+      <span aria-hidden="true" />
+    </button>
   );
 }
 
@@ -2070,6 +2300,7 @@ export default function SolXConfigurator({ onNavigate }) {
           </div>
         )}
         {mobileBuilderControls}
+        {isMobileBuilder && <MobilePageScrollRail />}
       </section>
     </main>
   );
