@@ -50,15 +50,16 @@ export default function ContactForm({ context = 'site-contact' }) {
       return;
     }
 
-    const payload = new URLSearchParams();
-    payload.set('fullName', form.fullName.trim());
-    payload.set('email', form.email.trim());
-    payload.set('company', form.company.trim());
-    payload.set('message', form.message.trim());
-    payload.set('source', 'Sol Seven Studios website contact form');
-    payload.set('context', context);
-    payload.set('pageUrl', window.location.href);
-    payload.set('submittedAt', new Date().toISOString());
+    const payload = {
+      fullName: form.fullName.trim(),
+      email: form.email.trim(),
+      company: form.company.trim(),
+      message: form.message.trim(),
+      source: 'Sol Seven Studios website contact form',
+      context,
+      pageUrl: window.location.href,
+      submittedAt: new Date().toISOString(),
+    };
 
     setStatus('submitting');
     setNotice('');
@@ -67,7 +68,10 @@ export default function ContactForm({ context = 'site-contact' }) {
       await fetch(CONTACT_ENDPOINT, {
         method: 'POST',
         mode: 'no-cors',
-        body: payload,
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(payload),
       });
 
       setStatus('success');
