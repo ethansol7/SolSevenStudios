@@ -2,7 +2,7 @@ import { AlertCircle, CheckCircle2, ImagePlus, Loader2, Send, X } from 'lucide-r
 import { useRef, useState } from 'react';
 import { trackContactSubmit } from '../analytics.js';
 
-const CONTACT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzbsyq90MK4_5MCOmCVn_YZ901hioj16a0EepEEnRvd5KqrFD07ATe-XkR81t4FaySE/exec';
+const CONTACT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwPCzSCkWUipOpIpInk_AaHxeQwD_0ewoev7CnJMNRq8UhPFgt-y1JCZ5RsSD7F_TVn/exec';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const ACCEPTED_IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp']);
@@ -72,20 +72,7 @@ function parseContactResponse(text) {
   }
 }
 
-async function sendContactPayload(payload, { allowUnverifiedFallback = false } = {}) {
-  if (allowUnverifiedFallback) {
-    await fetch(CONTACT_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    return { success: true, unverified: true };
-  }
-
+async function sendContactPayload(payload) {
   const response = await fetch(CONTACT_ENDPOINT, {
     method: 'POST',
     mode: 'cors',
@@ -225,17 +212,10 @@ export default function ContactForm({ context = 'site-contact' }) {
         imageSize: attachment?.size || '',
       };
 
-      const result = await sendContactPayload(payload, { allowUnverifiedFallback: !imageFile });
+      const result = await sendContactPayload(payload);
 
       if (imageFile && result.imageUploadFailed) {
         throw new Error(result.error || 'Message saved, but the image could not be uploaded. Please try sending the image again.');
-      }
-
-      if (imageFile) {
-        const savedImageLink = result.image?.driveViewUrl || result.image?.directImageUrl || result.image?.thumbnailUrl || result.driveViewUrl || result.imageUrl;
-        if (!savedImageLink) {
-          throw new Error('Message reached the contact service, but no saved image link was returned. Please try again after the upload service is updated.');
-        }
       }
 
       setStatus('success');
