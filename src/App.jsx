@@ -2,9 +2,11 @@ import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'fra
 import { ArrowDown, ExternalLink } from 'lucide-react';
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import AppLink from './components/AppLink.jsx';
+import ContactForm from './components/ContactForm.jsx';
 import MusicPlayer from './components/MusicPlayer.jsx';
 import {
   AboutPage,
+  ContactPage,
   GalleryPage,
   NotFoundPage,
   OriginalSolCollectionPage,
@@ -27,7 +29,7 @@ const mobileNavLabels = {
   'SOL X': 'SOL',
   Configurator: 'Build',
   PlastiVista: 'PV',
-  'About / Contact': 'Info',
+  Contact: 'Talk',
 };
 
 const reveal = {
@@ -289,10 +291,13 @@ function Contact() {
       >
         <p className="section-kicker">Contact</p>
         <h2>Let's build the next system.</h2>
-        <a href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
-          <span>Open studio channel</span>
-          <ExternalLink size={18} />
-        </a>
+        <div className="contact-layout contact-layout--footer">
+          <ContactForm context="home-footer" />
+          <a className="contact-social-link" href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
+            <span>Open studio channel</span>
+            <ExternalLink size={18} />
+          </a>
+        </div>
         <p className="contact-legal">&copy; Sol Seven Studios. Patent Pending.</p>
       </motion.div>
     </footer>
@@ -321,9 +326,93 @@ function RouteSwitch({ onNavigate, routePath }) {
   if (routePath === '/sol-x') return <SolXPage onNavigate={onNavigate} />;
   if (routePath === '/solx-configurator') return <SolXConfiguratorPage onNavigate={onNavigate} />;
   if (routePath === '/plastivista') return <PlastiVistaPage />;
+  if (routePath === '/contact') return <ContactPage />;
   if (routePath === '/about') return <AboutPage />;
   if (routePath.startsWith('/product/')) return <ProductPage slug={routePath.replace('/product/', '')} onNavigate={onNavigate} />;
   return <NotFoundPage onNavigate={onNavigate} />;
+}
+
+function metadataForRoute(routePath) {
+  if (routePath.startsWith('/product/')) {
+    const product = findProductBySlug(routePath.replace('/product/', ''));
+    if (product) {
+      return {
+        title: `${product.name} | Sol Seven Studios`,
+        description: `${product.name} from Sol Seven Studios. ${product.description}`,
+      };
+    }
+  }
+
+  const routeMetadata = {
+    '/': {
+      title: 'Sol Seven Studios | Modular Lighting and Circular Design',
+      description: 'Sol Seven Studios designs modular lighting systems, furniture, circular manufacturing systems, and future focused production workflows.',
+    },
+    '/shop': {
+      title: 'Shop Modular Lighting | Sol Seven Studios',
+      description: 'Shop the Sol Seven Studios Original SOL collection, modular shades, lamp components, and system add-ons with Stripe checkout.',
+    },
+    '/shop/original-sol': {
+      title: 'Original SOL Collection | Sol Seven Studios',
+      description: 'Explore the Original SOL modular lamp collection from Sol Seven Studios, including lamps, shades, combos, and accessories.',
+    },
+    '/gallery': {
+      title: 'Gallery | Sol Seven Studios',
+      description: 'View Sol Seven Studios product, material, and modular lighting gallery images across studio, room, and detail settings.',
+    },
+    '/sol-x': {
+      title: 'SOL X System | Sol Seven Studios',
+      description: 'Preview the SOL X modular lighting system and component language from Sol Seven Studios.',
+    },
+    '/solx-configurator': {
+      title: 'SOL X Configurator | Sol Seven Studios',
+      description: 'Configure a SOL X modular lighting system with live component previews and pricing context.',
+    },
+    '/plastivista': {
+      title: 'PlastiVista Circular Manufacturing | Sol Seven Studios',
+      description: 'Explore PlastiVista, a Sol Seven Studios circular manufacturing workflow for material processing, additive production, and product storytelling.',
+    },
+    '/about': {
+      title: 'About Sol Seven Studios',
+      description: 'Learn about Sol Seven Studios, a New York product design studio developing modular lighting, furniture, and circular manufacturing systems.',
+    },
+    '/contact': {
+      title: 'Contact Sol Seven Studios',
+      description: 'Contact Sol Seven Studios for product inquiries, collaborations, custom work, and modular lighting questions.',
+    },
+  };
+
+  return routeMetadata[routePath] ?? routeMetadata['/'];
+}
+
+function setMetaTag(selector, attributes) {
+  let tag = document.head.querySelector(selector);
+  if (!tag) {
+    tag = document.createElement('meta');
+    document.head.appendChild(tag);
+  }
+
+  Object.entries(attributes).forEach(([key, value]) => {
+    tag.setAttribute(key, value);
+  });
+}
+
+function updateDocumentMetadata(routePath) {
+  const metadata = metadataForRoute(routePath);
+  const pageUrl = new URL(`${window.location.pathname}${window.location.search}${window.location.hash}`, window.location.origin).href;
+  const imageUrl = new URL(assetUrl('assets/lamps/homepage-hero.png'), window.location.origin).href;
+
+  document.title = metadata.title;
+  setMetaTag('meta[name="description"]', { name: 'description', content: metadata.description });
+  setMetaTag('meta[property="og:title"]', { property: 'og:title', content: metadata.title });
+  setMetaTag('meta[property="og:description"]', { property: 'og:description', content: metadata.description });
+  setMetaTag('meta[property="og:type"]', { property: 'og:type', content: 'website' });
+  setMetaTag('meta[property="og:url"]', { property: 'og:url', content: pageUrl });
+  setMetaTag('meta[property="og:image"]', { property: 'og:image', content: imageUrl });
+  setMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
+  setMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: metadata.title });
+  setMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: metadata.description });
+  setMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: imageUrl });
 }
 
 function musicSectionForRoute(routePath) {
@@ -331,7 +420,7 @@ function musicSectionForRoute(routePath) {
   if (routePath === '/gallery') return 'solLamp';
   if (routePath === '/sol-x' || routePath === '/solx-configurator') return 'solX';
   if (routePath === '/plastivista') return 'plastivista';
-  if (routePath === '/about') return 'contact';
+  if (routePath === '/about' || routePath === '/contact') return 'contact';
   if (routePath.startsWith('/product/')) {
     const product = findProductBySlug(routePath.replace('/product/', ''));
     return product?.category === 'accessories' || product?.category === 'combos' ? 'process' : 'solLamp';
@@ -362,6 +451,7 @@ export default function App() {
 
   useEffect(() => {
     requestMusicSection(musicSectionForRoute(routePath));
+    updateDocumentMetadata(routePath);
   }, [routePath]);
 
   return (

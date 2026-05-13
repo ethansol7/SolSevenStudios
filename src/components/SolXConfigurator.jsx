@@ -48,7 +48,6 @@ const MOBILE_CAMERA = {
   fov: 42,
 };
 const TUTORIAL_KEY = 'sol-seven-solx-builder-tutorial-v1';
-const LANDSCAPE_TIP_KEY = 'sol-seven-solx-landscape-tip-v1';
 const tutorialSteps = [
   {
     title: 'Move through the space',
@@ -953,7 +952,7 @@ function ShopBuildPanel({
   );
 }
 
-function MobileConfiguratorHeader({ onDismissLandscapeTip, partsCount, rootBaseCount, showLandscapeTip }) {
+function MobileConfiguratorHeader({ partsCount, rootBaseCount }) {
   return (
     <div className="mobile-configurator-intro">
       <div className="builder-glass mobile-configurator-heading">
@@ -961,14 +960,6 @@ function MobileConfiguratorHeader({ onDismissLandscapeTip, partsCount, rootBaseC
         <h1>SOL X Builder</h1>
         <span>{partsCount} modules / {rootBaseCount} floor bases</span>
       </div>
-      {showLandscapeTip && (
-        <div className="mobile-landscape-tip" role="note">
-          <span>For the best building experience, rotate your phone sideways.</span>
-          <button type="button" onClick={onDismissLandscapeTip} aria-label="Dismiss landscape tip">
-            <X size={14} />
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -996,7 +987,6 @@ function MobileBuilderDrawer({
   onRotateToSnap,
   onSaveBuild,
   onSetActiveTab,
-  onSetDrawerState,
   onStartTutorial,
   onTakeScreenshot,
   onToggleDrawer,
@@ -1040,16 +1030,6 @@ function MobileBuilderDrawer({
           <small>{pendingPartKey ? `Placing ${solxParts[pendingPartKey].shortLabel}` : selectedPartLabel}</small>
           <b>{drawerOpen ? 'Min' : 'Open'}</b>
         </button>
-        {drawerOpen && (
-          <button
-            type="button"
-            className="mobile-builder-drawer__expand"
-            onClick={() => onSetDrawerState(drawerState === 'full' ? 'half' : 'full')}
-            aria-label={drawerState === 'full' ? 'Show half-height drawer' : 'Show full drawer'}
-          >
-            {drawerState === 'full' ? 'Half' : 'Full'}
-          </button>
-        )}
       </div>
       {drawerOpen && (
         <div className="mobile-builder-drawer__body">
@@ -1072,7 +1052,7 @@ function MobileBuilderDrawer({
             <div className="mobile-builder-pane">
               <div className="mobile-parts-carousel">
                 <div className="mobile-parts-carousel__header">
-                  <span>Swipe for more parts</span>
+                  <span>Parts</span>
                   <div>
                     <button type="button" onClick={() => scrollCarouselToIndex(carouselIndex - 1)} aria-label="Previous part">
                       <ChevronLeft size={16} />
@@ -1233,7 +1213,7 @@ function MobileBuilderDrawer({
                   <DollarSign size={16} />
                   Get price
                 </button>
-                <AppLink to="/about" onNavigate={onNavigate} className="mobile-action-grid__wide mobile-request-link">
+                <AppLink to="/contact" onNavigate={onNavigate} className="mobile-action-grid__wide mobile-request-link">
                   Request this build
                 </AppLink>
               </div>
@@ -1250,7 +1230,7 @@ export default function SolXConfigurator({ onNavigate }) {
   const [parts, setParts] = useState(createStarterScene);
   const [buildName, setBuildName] = useState(DEFAULT_BUILD_NAME);
   const [selectedId, setSelectedId] = useState('base-1');
-  const [feedback, setFeedback] = useState('Drop bases onto the floor, then snap modules onto glowing connectors.');
+  const [feedback, setFeedback] = useState('Build ready.');
   const [activeDrag, setActiveDrag] = useState(null);
   const [pendingTapPartKey, setPendingTapPartKey] = useState(null);
   const [hoverConnectorId, setHoverConnectorId] = useState(null);
@@ -1259,15 +1239,8 @@ export default function SolXConfigurator({ onNavigate }) {
   const [fitCameraToken, setFitCameraToken] = useState(0);
   const [mobileDrawerState, setMobileDrawerState] = useState('half');
   const [mobileTab, setMobileTab] = useState('parts');
-  const [tutorialOpen, setTutorialOpen] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.localStorage.getItem(TUTORIAL_KEY) !== 'true';
-  });
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
-  const [landscapeTipDismissed, setLandscapeTipDismissed] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.localStorage.getItem(LANDSCAPE_TIP_KEY) === 'true';
-  });
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [showAdvancedDisclaimer, setShowAdvancedDisclaimer] = useState(false);
   const [freePlacement, setFreePlacement] = useState(false);
@@ -1282,6 +1255,7 @@ export default function SolXConfigurator({ onNavigate }) {
   const partsRef = useRef(parts);
   const activeDragRef = useRef(activeDrag);
   const lastPlacementTimeRef = useRef(0);
+  const mobileViewerGestureRef = useRef(null);
 
   const layout = useMemo(() => buildBuilderLayout(parts), [parts]);
   const connectors = useMemo(() => buildOutputConnectors(parts, layout), [layout, parts]);
@@ -1325,7 +1299,7 @@ export default function SolXConfigurator({ onNavigate }) {
     window.clearTimeout(feedbackTimeout.current);
     if (!persistent) {
       feedbackTimeout.current = window.setTimeout(() => {
-        setFeedback('Drop bases onto the floor, then snap modules onto glowing connectors.');
+        setFeedback('Build ready.');
       }, FEEDBACK_TIMEOUT);
     }
   }, []);
@@ -1338,11 +1312,6 @@ export default function SolXConfigurator({ onNavigate }) {
   const closeTutorial = useCallback(() => {
     window.localStorage.setItem(TUTORIAL_KEY, 'true');
     setTutorialOpen(false);
-  }, []);
-
-  const dismissLandscapeTip = useCallback(() => {
-    window.localStorage.setItem(LANDSCAPE_TIP_KEY, 'true');
-    setLandscapeTipDismissed(true);
   }, []);
 
   const createPart = useCallback((partKey, overrides = {}) => {
@@ -1359,7 +1328,9 @@ export default function SolXConfigurator({ onNavigate }) {
   }, []);
 
   const startDrag = useCallback((event, drag) => {
-    event.preventDefault();
+    if (event.cancelable && event.pointerType !== 'touch') {
+      event.preventDefault();
+    }
     const nextDrag = {
       ...drag,
       startX: event.clientX,
@@ -1380,10 +1351,12 @@ export default function SolXConfigurator({ onNavigate }) {
   }, [isMobileBuilder, startDrag]);
 
   const beginSceneDrag = useCallback((event, id) => {
+    if (isMobileBuilder && event.pointerType === 'touch') return;
+
     const part = partsRef.current.find((nextPart) => nextPart.id === id);
     if (!part) return;
     startDrag(event, { kind: 'existing', id, partKey: part.partKey });
-  }, [startDrag]);
+  }, [isMobileBuilder, startDrag]);
 
   const placeDragAtPoint = useCallback((drag, clientX, clientY, options = {}) => {
     if (!drag) return;
@@ -1469,9 +1442,9 @@ export default function SolXConfigurator({ onNavigate }) {
     const eligibleConnectors = eligibleConnectorsForDrag({ kind: 'new', partKey }, connectors, parts);
     const hasBase = parts.some((part) => part.partKey === 'base');
     const message = partKey === 'base'
-      ? 'Tap the highlighted floor target to place a base, or tap a glowing shade connector.'
+      ? 'Base selected.'
       : eligibleConnectors.length
-        ? 'Tap a glowing spot to place this part.'
+        ? `${solxParts[partKey].shortLabel ?? solxParts[partKey].label} selected.`
         : hasBase
           ? 'No valid connectors available.'
           : 'Add a base first.';
@@ -1490,8 +1463,8 @@ export default function SolXConfigurator({ onNavigate }) {
       {
         showInvalid: true,
         invalidMessage: pendingTapPartKey === 'base'
-          ? 'Tap the highlighted floor target to place this base.'
-          : 'Tap a glowing spot to place this part.',
+          ? 'Floor target required.'
+          : 'Connector target required.',
       },
     );
     if (placed) setPendingTapPartKey(null);
@@ -1753,6 +1726,81 @@ export default function SolXConfigurator({ onNavigate }) {
     setAdvancedOpen(true);
   };
 
+  const handleViewerTouchStart = useCallback((event) => {
+    if (!isMobileBuilder || event.touches.length !== 1) {
+      mobileViewerGestureRef.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    mobileViewerGestureRef.current = {
+      mode: '',
+      startX: touch.clientX,
+      startY: touch.clientY,
+      lastY: touch.clientY,
+    };
+  }, [isMobileBuilder]);
+
+  const handleViewerTouchMove = useCallback((event) => {
+    const gesture = mobileViewerGestureRef.current;
+    if (!isMobileBuilder || !gesture || event.touches.length !== 1) return;
+
+    const touch = event.touches[0];
+    const dx = touch.clientX - gesture.startX;
+    const dy = touch.clientY - gesture.startY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (!gesture.mode && Math.max(absX, absY) > 10) {
+      gesture.mode = absY > absX * 1.15 ? 'page-scroll' : 'viewer';
+    }
+
+    if (gesture.mode !== 'page-scroll') return;
+
+    event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation?.();
+    window.scrollBy({ top: gesture.lastY - touch.clientY, behavior: 'auto' });
+    gesture.lastY = touch.clientY;
+  }, [isMobileBuilder]);
+
+  const handleViewerTouchEnd = useCallback(() => {
+    mobileViewerGestureRef.current = null;
+  }, []);
+
+  const mobileBuilderControls = isMobileBuilder ? (
+    <MobileBuilderDrawer
+      activeTab={mobileTab}
+      activeRotationIndex={activeRotationIndex}
+      buildName={buildName}
+      drawerState={mobileDrawerState}
+      estimate={priceEstimate}
+      feedback={feedback}
+      onBuildNameChange={setBuildName}
+      onChoosePart={chooseMobilePart}
+      onClearSavedBuild={clearSavedBuild}
+      onDeleteSelectedPart={deleteSelectedPart}
+      onDuplicateSelectedPart={duplicateSelectedPart}
+      onFitBuildToView={fitBuildToView}
+      onLoadSavedBuild={loadSavedBuild}
+      onNavigate={onNavigate}
+      onNudgeSelectedRoot={nudgeSelectedRoot}
+      onResetCamera={() => setResetCameraToken((token) => token + 1)}
+      onResetScene={resetScene}
+      onRotateStepLeft={() => rotateSelectedByStep(-1)}
+      onRotateStepRight={() => rotateSelectedByStep(1)}
+      onRotateToSnap={rotateSelectedToPentagonPoint}
+      onSaveBuild={saveBuild}
+      onSetActiveTab={setMobileTab}
+      onStartTutorial={startTutorial}
+      onTakeScreenshot={takeScreenshot}
+      onToggleDrawer={() => setMobileDrawerState((current) => (current === 'collapsed' ? 'half' : 'collapsed'))}
+      onUpdateSelectedColor={updateSelectedColor}
+      pendingPartKey={pendingTapPartKey}
+      selectedPart={selectedPart}
+      selectedPartLabel={selectedPartLabel}
+    />
+  ) : null;
+
   return (
     <main className="route-page configurator-page configurator-page--immersive" data-music-section="solX">
       <section className="configurator-stage" aria-label="SOL X creative builder">
@@ -1760,11 +1808,17 @@ export default function SolXConfigurator({ onNavigate }) {
           <MobileConfiguratorHeader
             partsCount={parts.length}
             rootBaseCount={rootBaseCount}
-            showLandscapeTip={!landscapeTipDismissed}
-            onDismissLandscapeTip={dismissLandscapeTip}
           />
         )}
-        <div ref={viewerRef} className="configurator-viewer configurator-viewer--immersive" aria-label="Interactive SOL X modular builder">
+        <div
+          ref={viewerRef}
+          className="configurator-viewer configurator-viewer--immersive"
+          aria-label="Interactive SOL X modular builder"
+          onTouchStartCapture={handleViewerTouchStart}
+          onTouchMoveCapture={handleViewerTouchMove}
+          onTouchEndCapture={handleViewerTouchEnd}
+          onTouchCancelCapture={handleViewerTouchEnd}
+        >
           <BuilderScene
             activeDrag={activeDrag}
             connectorScreensRef={connectorScreensRef}
@@ -1924,41 +1978,6 @@ export default function SolXConfigurator({ onNavigate }) {
               </button>
             </div>
 
-            {isMobileBuilder && (
-              <MobileBuilderDrawer
-                activeTab={mobileTab}
-                activeRotationIndex={activeRotationIndex}
-                buildName={buildName}
-                drawerState={mobileDrawerState}
-                estimate={priceEstimate}
-                feedback={feedback}
-                onBuildNameChange={setBuildName}
-                onChoosePart={chooseMobilePart}
-                onClearSavedBuild={clearSavedBuild}
-                onDeleteSelectedPart={deleteSelectedPart}
-                onDuplicateSelectedPart={duplicateSelectedPart}
-                onFitBuildToView={fitBuildToView}
-                onLoadSavedBuild={loadSavedBuild}
-                onNavigate={onNavigate}
-                onNudgeSelectedRoot={nudgeSelectedRoot}
-                onResetCamera={() => setResetCameraToken((token) => token + 1)}
-                onResetScene={resetScene}
-                onRotateStepLeft={() => rotateSelectedByStep(-1)}
-                onRotateStepRight={() => rotateSelectedByStep(1)}
-                onRotateToSnap={rotateSelectedToPentagonPoint}
-                onSaveBuild={saveBuild}
-                onSetActiveTab={setMobileTab}
-                onSetDrawerState={setMobileDrawerState}
-                onStartTutorial={startTutorial}
-                onTakeScreenshot={takeScreenshot}
-                onToggleDrawer={() => setMobileDrawerState((current) => (current === 'collapsed' ? 'half' : 'collapsed'))}
-                onUpdateSelectedColor={updateSelectedColor}
-                pendingPartKey={pendingTapPartKey}
-                selectedPart={selectedPart}
-                selectedPartLabel={selectedPartLabel}
-              />
-            )}
-
             <button type="button" className="advanced-lamp-button" onClick={toggleAdvanced} aria-expanded={advancedOpen}>
               <SolLampGlyph />
               <span className="visually-hidden">Advanced controls</span>
@@ -2050,6 +2069,7 @@ export default function SolXConfigurator({ onNavigate }) {
             {solxParts[activeDrag.partKey].label}
           </div>
         )}
+        {mobileBuilderControls}
       </section>
     </main>
   );

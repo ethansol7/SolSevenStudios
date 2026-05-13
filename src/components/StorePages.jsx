@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import AppLink from './AppLink.jsx';
+import ContactForm from './ContactForm.jsx';
 import {
   collectionNotes,
   findProductBySlug,
@@ -300,7 +301,7 @@ export function ProductPage({ onNavigate, slug }) {
           <ProductPurchasePanel product={product} />
           <div className="route-actions product-secondary-actions">
             <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Back to Collection</AppLink>
-            <AppLink to="/about" onNavigate={onNavigate}>Inquire</AppLink>
+            <AppLink to="/contact" onNavigate={onNavigate}>Inquire</AppLink>
           </div>
         </div>
       </section>
@@ -356,7 +357,7 @@ export function SolXPage({ onNavigate }) {
           <div className="route-actions">
             <AppLink to="/solx-configurator" onNavigate={onNavigate}>Open Configurator</AppLink>
             <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Original SOL Collection</AppLink>
-            <AppLink to="/about" onNavigate={onNavigate}>Join Waitlist</AppLink>
+            <AppLink to="/contact" onNavigate={onNavigate}>Join Waitlist</AppLink>
           </div>
         </div>
         <Suspense fallback={<div className="solx-viewer solx-viewer--loading">Loading SOL X models...</div>}>
@@ -425,10 +426,35 @@ export function AboutPage() {
         musicSection="contact"
       />
       <section className="contact-section contact-section--route" data-music-section="contact">
-        <div>
+        <div className="contact-layout">
           <p className="section-kicker">Contact</p>
           <h2>Let's build the next system.</h2>
-          <a href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
+          <ContactForm context="about-page" />
+          <a className="contact-social-link" href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
+            Open studio channel
+          </a>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export function ContactPage() {
+  return (
+    <main className="route-page">
+      <PageHero
+        kicker="Contact"
+        title="Start a studio conversation."
+        body="Use this form for product questions, custom work, collaborations, press, and business inquiries."
+        media={assetUrl('assets/process/founder-brand-portrait.png')}
+        musicSection="contact"
+      />
+      <section className="contact-section contact-section--route contact-section--page" data-music-section="contact">
+        <div className="contact-layout">
+          <p className="section-kicker">Project inquiries</p>
+          <h2>Tell us what you are building.</h2>
+          <ContactForm context="contact-page" />
+          <a className="contact-social-link" href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
             Open studio channel
           </a>
         </div>

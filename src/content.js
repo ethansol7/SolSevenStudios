@@ -9,7 +9,7 @@ export const navItems = [
   { label: 'SOL X', href: '/sol-x' },
   { label: 'Configurator', href: '/solx-configurator' },
   { label: 'PlastiVista', href: '/plastivista' },
-  { label: 'About / Contact', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export const heroLines = [
