@@ -2,8 +2,14 @@ export const GOOGLE_TAG_ID = 'G-QN3TZEVE03';
 
 const CANONICAL_ORIGIN = 'https://SolSevenStudios.com';
 const STRIPE_HOST = 'buy.stripe.com';
+const GA_COLLECT_URL = 'https://www.google-analytics.com/g/collect';
+const CLIENT_ID_STORAGE_KEY = 'sss_ga_client_id';
+const SESSION_ID_STORAGE_KEY = 'sss_ga_session_id';
+const ENGAGEMENT_INTERVAL_MS = 15000;
 let initialized = false;
 let lastTrackedPath = '';
+let engagementTimer = null;
+let lastEngagementAt = 0;
 
 function hasBrowser() {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
@@ -40,6 +46,131 @@ function ensureGtag() {
   window.gtag = window.gtag || function gtag() {
     window.dataLayer.push(arguments);
   };
+}
+
+function randomAnalyticsId() {
+  const cryptoApi = window.crypto || window.msCrypto;
+  if (cryptoApi?.getRandomValues) {
+    const values = new Uint32Array(2);
+    cryptoApi.getRandomValues(values);
+    return `${values[0].toString(36)}${values[1].toString(36)}`;
+  }
+
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+}
+
+function readStoredValue(storage, key) {
+  try {
+    return storage?.getItem(key);
+  } catch {
+    return undefined;
+  }
+}
+
+function writeStoredValue(storage, key, value) {
+  try {
+    storage?.setItem(key, value);
+  } catch {
+    // Storage can be unavailable in private or locked-down browsers.
+  }
+}
+
+function getClientId() {
+  const existingId = readStoredValue(window.localStorage, CLIENT_ID_STORAGE_KEY);
+  if (existingId) return existingId;
+
+  const nextId = randomAnalyticsId();
+  writeStoredValue(window.localStorage, CLIENT_ID_STORAGE_KEY, nextId);
+  return nextId;
+}
+
+function getSessionId() {
+  const existingSession = readStoredValue(window.sessionStorage, SESSION_ID_STORAGE_KEY);
+  if (existingSession) return existingSession;
+
+  const nextSession = Math.floor(Date.now() / 1000).toString();
+  writeStoredValue(window.sessionStorage, SESSION_ID_STORAGE_KEY, nextSession);
+  return nextSession;
+}
+
+function getScreenResolution() {
+  if (!window.screen?.width || !window.screen?.height) return undefined;
+  return `${window.screen.width}x${window.screen.height}`;
+}
+
+function appendCollectParams(searchParams, params = {}) {
+  Object.entries(sanitizeParams(params)).forEach(([key, value]) => {
+    if (['page_location', 'page_title', 'page_path'].includes(key)) return;
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      searchParams.set(`epn.${key}`, String(value));
+      return;
+    }
+
+    const normalizedValue = typeof value === 'boolean' ? String(value) : String(value);
+    searchParams.set(`ep.${key}`, normalizedValue.slice(0, 100));
+  });
+}
+
+function sendCollectEvent(eventName, params = {}, { engagementTimeMsec } = {}) {
+  if (!hasBrowser() || !eventName) return;
+
+  const collectUrl = new URL(GA_COLLECT_URL);
+  collectUrl.searchParams.set('v', '2');
+  collectUrl.searchParams.set('tid', GOOGLE_TAG_ID);
+  collectUrl.searchParams.set('cid', getClientId());
+  collectUrl.searchParams.set('sid', getSessionId());
+  collectUrl.searchParams.set('sct', '1');
+  collectUrl.searchParams.set('seg', '1');
+  collectUrl.searchParams.set('_p', `${Date.now()}${Math.floor(Math.random() * 1000)}`);
+  collectUrl.searchParams.set('ul', (navigator.language || 'en-us').toLowerCase());
+  collectUrl.searchParams.set('en', eventName);
+  collectUrl.searchParams.set('dl', params.page_location || window.location.href);
+  collectUrl.searchParams.set('dt', params.page_title || document.title);
+
+  const screenResolution = getScreenResolution();
+  if (screenResolution) collectUrl.searchParams.set('sr', screenResolution);
+  if (params.page_path) collectUrl.searchParams.set('dp', params.page_path);
+  if (engagementTimeMsec) collectUrl.searchParams.set('_et', String(Math.max(1, Math.round(engagementTimeMsec))));
+  if (analyticsDebugEnabled()) collectUrl.searchParams.set('ep.debug_mode', '1');
+
+  appendCollectParams(collectUrl.searchParams, params);
+
+  fetch(collectUrl.href, {
+    method: 'GET',
+    mode: 'no-cors',
+    keepalive: true,
+    credentials: 'omit',
+  }).catch(() => {
+    const fallbackPixel = new Image();
+    fallbackPixel.src = collectUrl.href;
+  });
+}
+
+function flushEngagement() {
+  if (!hasBrowser() || document.visibilityState !== 'visible') return;
+
+  const now = Date.now();
+  const elapsed = lastEngagementAt ? now - lastEngagementAt : 1;
+  lastEngagementAt = now;
+
+  sendCollectEvent('user_engagement', {
+    page_location: canonicalUrlForPath(window.location.pathname),
+    page_title: document.title,
+    page_path: cleanPath(window.location.pathname),
+  }, {
+    engagementTimeMsec: elapsed,
+  });
+}
+
+function startEngagementTracking() {
+  if (engagementTimer) return;
+
+  lastEngagementAt = Date.now();
+  engagementTimer = window.setInterval(flushEngagement, ENGAGEMENT_INTERVAL_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushEngagement();
+    if (document.visibilityState === 'visible') lastEngagementAt = Date.now();
+  });
 }
 
 function dataLayerHasCommand(command, id) {
@@ -93,6 +224,7 @@ export function initAnalytics() {
   }
 
   document.addEventListener('click', trackExternalLinkFromClick, { capture: true });
+  startEngagementTracking();
   initialized = true;
 }
 
@@ -111,6 +243,7 @@ export function trackPageView(path, metadata = {}) {
   });
 
   window.gtag?.('event', 'page_view', params);
+  sendCollectEvent('page_view', params, { engagementTimeMsec: 1 });
   if (analyticsDebugEnabled()) console.debug('[analytics] page_view', params);
 }
 
@@ -120,6 +253,7 @@ export function trackEvent(eventName, params = {}) {
   initAnalytics();
   const cleanParams = sanitizeParams(params);
   window.gtag?.('event', eventName, cleanParams);
+  sendCollectEvent(eventName, cleanParams);
   if (analyticsDebugEnabled()) console.debug('[analytics]', eventName, cleanParams);
 }
 
