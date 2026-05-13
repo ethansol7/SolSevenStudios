@@ -77,11 +77,11 @@ export function initAnalytics() {
 
   ensureGtag();
 
-  const existingScript = document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}"]`);
+  const existingScript = document.querySelector('script[src^="https://www.googletagmanager.com/gtag/js"]');
   if (!existingScript) {
     const script = document.createElement('script');
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GOOGLE_TAG_ID)}`;
+    script.src = 'https://www.googletagmanager.com/gtag/js';
     document.head.appendChild(script);
   }
 
