@@ -1,5 +1,10 @@
 export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+export const normalizeRoutePath = (path = '/') => {
+  const routePath = path || '/';
+  return routePath.length > 1 ? routePath.replace(/\/+$/, '') : routePath;
+};
+
 export const buildPath = (path = '/') => `${basePath}${path.startsWith('/') ? path : `/${path}`}`;
 
 export const currentRoutePath = () => {
@@ -11,12 +16,12 @@ export const currentRoutePath = () => {
       ? redirectUrl.pathname.slice(basePath.length)
       : redirectUrl.pathname;
     window.history.replaceState({}, '', `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`);
-    return redirectRoute || '/';
+    return normalizeRoutePath(redirectRoute || '/');
   }
 
   const pathname = window.location.pathname;
   const withoutBase = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname;
-  return withoutBase || '/';
+  return normalizeRoutePath(withoutBase || '/');
 };
 
 export const useClientNavigation = (setRoutePath) => (event, path) => {
@@ -24,7 +29,7 @@ export const useClientNavigation = (setRoutePath) => (event, path) => {
 
   event.preventDefault();
   const nextPath = buildPath(path);
-  const routePath = path.split('#')[0] || '/';
+  const routePath = normalizeRoutePath(path.split('#')[0] || '/');
   const hash = path.includes('#') ? `#${path.split('#')[1]}` : '';
   window.history.pushState({}, '', nextPath);
   setRoutePath(routePath);
