@@ -11,12 +11,13 @@ import {
   NotFoundPage,
   OriginalSolCollectionPage,
   PlastiVistaPage,
+  PressPage,
   ProductPage,
   ShopPage,
   SolXConfiguratorPage,
   SolXPage,
 } from './components/StorePages.jsx';
-import { assetUrl, capabilities, featuredWork, heroLines, navItems, systemTabs } from './content.js';
+import { assetUrl, capabilities, featuredWork, heroLines, navItems, socialLinks, systemTabs } from './content.js';
 import { initAnalytics, trackEvent, trackPageView } from './analytics.js';
 import { findProductBySlug } from './data/products.js';
 import { requestMusicSection, useActiveMusicSection } from './music/useActiveMusicSection.js';
@@ -80,7 +81,7 @@ function Navigation({ onNavigate, routePath }) {
   return (
     <header className={`site-nav${isMenuOpen ? ' is-open' : ''}`}>
       <AppLink className="brand-mark" to="/" onNavigate={onNavigate} aria-label="Sol Seven Studios home">
-        <span>S7</span>
+        <img src={assetUrl('assets/brand/sol-seven-studios-logo.png')} alt="" />
       </AppLink>
       <button
         className="nav-menu-button"
@@ -131,7 +132,7 @@ function Hero() {
           Product systems / circular manufacturing
         </motion.p>
         <motion.h1 variants={reveal}>Sol Seven Studios</motion.h1>
-        <motion.div className="hero-lines" aria-label="Modular products. Circular systems. Future focused manufacturing.">
+        <motion.div className="hero-lines" aria-label="Modular products, circular systems, future focused manufacturing">
           {heroLines.map((line) => (
             <motion.span key={line} variants={reveal}>
               {line}
@@ -167,7 +168,7 @@ function StudioIntro() {
           Studio premise
         </motion.p>
         <motion.h2 variants={reveal}>
-          Objects, systems, and production stories built with the same calm precision.
+          Objects, systems, and production stories built with the same precision
         </motion.h2>
         <motion.p className="intro-body" variants={reveal}>
           Sol Seven Studios develops modular lighting, furniture, and circular manufacturing workflows. The work moves from visualization to prototype to distributed production with a focus on tangible systems that can be repaired, remade, and understood.
@@ -191,7 +192,7 @@ function FeaturedWork() {
     <section className="work-section section-pad" id="work" data-music-section="solLamp">
       <div className="section-heading">
         <p className="section-kicker">Featured work</p>
-        <h2>Product platforms with manufacturing built into the narrative.</h2>
+        <h2>Product platforms with manufacturing built into the narrative</h2>
       </div>
       <div className="work-list">
         {featuredWork.map((item, index) => (
@@ -216,6 +217,14 @@ function FeaturedWork() {
           </motion.article>
         ))}
       </div>
+      <div className="work-context">
+        <p>
+          Original SOL is the current sellable lamp system. Its modular shades, bases, and add-ons are designed to stay useful as the system evolves.
+        </p>
+        <p>
+          SOL X is the future electronic and configurator direction, developed to keep the same core language while expanding digital build logic, component feedback, and future compatibility.
+        </p>
+      </div>
     </section>
   );
 }
@@ -235,7 +244,7 @@ function CinematicSection() {
         transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="section-kicker">Material atmosphere</p>
-        <h2>Manufacturing is not hidden behind the product. It becomes the product language.</h2>
+        <h2>Manufacturing is not hidden behind the product. It becomes the product language</h2>
       </motion.div>
     </section>
   );
@@ -307,7 +316,7 @@ function Capabilities() {
     <section className="capabilities-section section-pad" id="capabilities" data-music-section="capabilities">
       <div className="section-heading">
         <p className="section-kicker">Capabilities</p>
-        <h2>From cinematic product vision to physical systems that can be built.</h2>
+        <h2>From cinematic product vision to physical systems that can be built</h2>
       </div>
       <div className="capability-grid">
         {capabilities.map((capability, index) => (
@@ -328,6 +337,19 @@ function Capabilities() {
   );
 }
 
+function SocialLinks({ className = '' }) {
+  return (
+    <div className={`social-links ${className}`}>
+      {socialLinks.map((link) => (
+        <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+          <span>{link.label}</span>
+          <ExternalLink size={16} aria-hidden="true" />
+        </a>
+      ))}
+    </div>
+  );
+}
+
 function Contact() {
   return (
     <footer className="contact-section" id="contact" data-music-section="contact">
@@ -338,16 +360,26 @@ function Contact() {
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="section-kicker">Contact</p>
-        <h2>Let's build the next system.</h2>
+        <h2>Let's build the next system</h2>
         <div className="contact-layout contact-layout--footer">
           <ContactForm context="home-footer" />
-          <a className="contact-social-link" href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
-            <span>Open studio channel</span>
-            <ExternalLink size={18} />
-          </a>
+          <SocialLinks />
         </div>
         <p className="contact-legal">&copy; Sol Seven Studios. Patent Pending.</p>
       </motion.div>
+    </footer>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <div>
+        <p>Sol Seven Studios</p>
+        <span>Modular lighting, circular systems, and future focused manufacturing</span>
+      </div>
+      <SocialLinks />
+      <p className="contact-legal">&copy; Sol Seven Studios. Patent Pending.</p>
     </footer>
   );
 }
@@ -374,6 +406,7 @@ function RouteSwitch({ onNavigate, routePath }) {
   if (routePath === '/sol-x') return <SolXPage onNavigate={onNavigate} />;
   if (routePath === '/solx-configurator') return <SolXConfiguratorPage onNavigate={onNavigate} />;
   if (routePath === '/plastivista') return <PlastiVistaPage />;
+  if (routePath === '/press') return <PressPage onNavigate={onNavigate} />;
   if (routePath === '/contact') return <ContactPage />;
   if (routePath === '/about') return <AboutPage />;
   if (routePath.startsWith('/product/')) return <ProductPage slug={routePath.replace('/product/', '')} onNavigate={onNavigate} />;
@@ -419,6 +452,10 @@ function metadataForRoute(routePath) {
     '/plastivista': {
       title: 'PlastiVista Circular Manufacturing | Sol Seven Studios',
       description: 'Explore PlastiVista, a Sol Seven Studios circular manufacturing workflow for material processing, additive production, and product storytelling.',
+    },
+    '/press': {
+      title: 'Press | Sol Seven Studios',
+      description: 'Press and exhibition updates for Sol Seven Studios, Original SOL modular lamps, SOL X, ICFF, and WantedDesign Launch Pad.',
     },
     '/about': {
       title: 'About Sol Seven Studios',
@@ -481,6 +518,7 @@ function musicSectionForRoute(routePath) {
   if (routePath === '/gallery') return 'solLamp';
   if (routePath === '/sol-x' || routePath === '/solx-configurator') return 'solX';
   if (routePath === '/plastivista') return 'plastivista';
+  if (routePath === '/press') return 'studio';
   if (routePath === '/about' || routePath === '/contact') return 'contact';
   if (routePath.startsWith('/product/')) {
     const product = findProductBySlug(routePath.replace('/product/', ''));
@@ -523,6 +561,7 @@ export default function App() {
       <motion.div className="ambient-wash" style={{ '--scroll-shift': backgroundShift }} aria-hidden="true" />
       <Navigation onNavigate={onNavigate} routePath={routePath} />
       <RouteSwitch routePath={routePath} onNavigate={onNavigate} />
+      {routePath !== '/' && <SiteFooter />}
       <MusicPlayer activeSectionKey={activeMusicSection} />
     </>
   );

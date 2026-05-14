@@ -110,6 +110,12 @@ canvas {
   transition: transform 280ms ease, border-color 280ms ease, background 280ms ease;
 }
 
+.brand-mark img {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+}
+
 .brand-mark:hover,
 .brand-mark:focus-visible {
   transform: translateY(-2px);
@@ -290,9 +296,9 @@ canvas {
   max-width: 11ch;
   margin: 0;
   color: var(--ink);
-  font-size: clamp(4.85rem, 13vw, 14.8rem);
+  font-size: clamp(3.25rem, 8.7vw, 9.9rem);
   font-weight: 500;
-  line-height: 0.82;
+  line-height: 0.88;
   letter-spacing: 0;
 }
 
@@ -332,7 +338,7 @@ canvas {
 .section-pad {
   width: min(var(--max), 100%);
   margin-inline: auto;
-  padding: clamp(88px, 12vw, 176px) clamp(20px, 5vw, 72px);
+  padding: clamp(68px, 8.5vw, 132px) clamp(20px, 5vw, 72px);
 }
 
 .intro-section {
@@ -348,7 +354,7 @@ canvas {
 .cinematic-copy h2,
 .contact-section h2 {
   margin: 0;
-  font-size: clamp(2.2rem, 5.2vw, 6rem);
+  font-size: clamp(2rem, 4.4vw, 4.8rem);
   font-weight: 460;
   line-height: 1;
   letter-spacing: 0;
@@ -387,7 +393,7 @@ canvas {
   grid-template-columns: minmax(180px, 0.34fr) minmax(0, 1fr);
   gap: clamp(28px, 6vw, 96px);
   align-items: start;
-  margin-bottom: clamp(48px, 7vw, 104px);
+  margin-bottom: clamp(34px, 5vw, 72px);
 }
 
 .work-list {
@@ -441,7 +447,7 @@ canvas {
 
 .work-copy h3 {
   margin: 0;
-  font-size: clamp(2.2rem, 5.7vw, 7.8rem);
+  font-size: clamp(2rem, 4.7vw, 5.8rem);
   font-weight: 430;
   line-height: 0.92;
   letter-spacing: 0;
@@ -454,6 +460,22 @@ canvas {
   color: var(--ink-soft);
   font-size: clamp(1rem, 1.3vw, 1.23rem);
   line-height: 1.52;
+}
+
+.work-context {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 3vw, 42px);
+  margin-top: clamp(28px, 5vw, 66px);
+  padding-top: clamp(22px, 3.5vw, 46px);
+  border-top: 1px solid var(--line);
+}
+
+.work-context p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 1.35vw, 1.22rem);
+  line-height: 1.56;
 }
 
 .cinematic-section {
@@ -641,8 +663,8 @@ canvas {
 }
 
 .contact-section h2 {
-  font-size: clamp(3.6rem, 10vw, 12.5rem);
-  line-height: 0.84;
+  font-size: clamp(3rem, 7.2vw, 9rem);
+  line-height: 0.9;
 }
 
 .contact-section a,
@@ -663,6 +685,39 @@ canvas {
 
 .contact-section a {
   margin-top: clamp(28px, 4vw, 52px);
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: clamp(24px, 3vw, 42px);
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(25, 25, 24, 0.14);
+  border-radius: 999px;
+  background: rgba(247, 245, 239, 0.48);
+  color: var(--ink);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0;
+  transition: transform 260ms ease, border-color 260ms ease, background 260ms ease;
+}
+
+.social-links a:hover,
+.social-links a:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(25, 25, 24, 0.34);
+  background: rgba(247, 245, 239, 0.86);
 }
 
 .contact-section a:hover,
@@ -941,20 +996,20 @@ canvas {
 
 .store-hero {
   width: min(var(--max), 100%);
-  min-height: min(880px, calc(100svh - 24px));
+  min-height: min(760px, calc(100svh - 24px));
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.72fr);
   gap: clamp(34px, 7vw, 108px);
   align-items: center;
   margin-inline: auto;
-  padding: clamp(54px, 8vw, 112px) clamp(20px, 5vw, 72px) clamp(72px, 9vw, 128px);
+  padding: clamp(48px, 7vw, 96px) clamp(20px, 5vw, 72px) clamp(56px, 7vw, 104px);
 }
 
 .store-hero__copy h1,
 .product-detail__copy h1,
 .solx-page__copy h1 {
   margin: 0;
-  font-size: clamp(3.1rem, 7vw, 8.4rem);
+  font-size: clamp(2.85rem, 6vw, 6.8rem);
   font-weight: 480;
   line-height: 0.94;
   letter-spacing: 0;
@@ -1095,6 +1150,89 @@ canvas {
   font-size: 0.72rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
+}
+
+.press-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.6vw, 32px);
+}
+
+.press-card {
+  min-height: 280px;
+  display: grid;
+  align-content: end;
+  padding: clamp(22px, 3vw, 38px);
+  border: 1px solid rgba(25, 25, 24, 0.1);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(239, 235, 224, 0.48)),
+    var(--paper-soft);
+}
+
+.press-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.press-card h3 {
+  margin: 0;
+  font-size: clamp(1.65rem, 3vw, 3.5rem);
+  font-weight: 460;
+  line-height: 0.98;
+}
+
+.press-card span {
+  display: block;
+  margin-top: 18px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.site-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(18px, 4vw, 58px);
+  align-items: center;
+  width: min(var(--max), 100%);
+  margin-inline: auto;
+  padding: clamp(42px, 6vw, 78px) clamp(20px, 5vw, 72px);
+  border-top: 1px solid var(--line);
+}
+
+.site-footer > div:first-child {
+  display: grid;
+  gap: 8px;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer > div:first-child p {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.site-footer > div:first-child span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.site-footer .social-links {
+  margin-top: 0;
+}
+
+.site-footer .contact-legal {
+  justify-self: end;
+  margin: 0;
+  text-align: right;
 }
 
 .collection-tile h3,
@@ -2167,6 +2305,39 @@ canvas {
   text-transform: uppercase;
 }
 
+.builder-instructions-button {
+  position: absolute;
+  top: 22px;
+  left: calc(50% - 176px);
+  transform: none;
+  z-index: 7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid rgba(25, 25, 24, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ink);
+  box-shadow: 0 16px 42px rgba(38, 35, 29, 0.1);
+  backdrop-filter: blur(22px) saturate(1.12);
+  cursor: pointer;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: auto;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+
+.builder-instructions-button:hover,
+.builder-instructions-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(25, 25, 24, 0.3);
+  background: rgba(255, 255, 255, 0.74);
+}
+
 .mobile-configurator-intro {
   display: none;
 }
@@ -3093,11 +3264,15 @@ canvas {
 
   .builder-title-panel,
   .builder-inspector-panel,
-  .builder-tray-panel,
-  .builder-action-panel,
   .builder-shop-panel,
   .builder-advanced-panel {
     width: min(360px, calc(50% - 28px));
+  }
+
+  .builder-tray-panel,
+  .builder-action-panel,
+  .builder-shop-panel {
+    width: min(300px, calc(33.333% - 18px));
   }
 
   .parts-tray--icons {
@@ -3105,9 +3280,9 @@ canvas {
   }
 
   .builder-action-panel {
-    left: 22px;
+    left: 50%;
     right: auto;
-    transform: none;
+    transform: translateX(-50%);
     grid-template-columns: 1fr;
   }
 }
@@ -3218,7 +3393,7 @@ canvas {
 
   .hero h1 {
     max-width: 10ch;
-    font-size: clamp(3.1rem, 12vw, 5.1rem);
+    font-size: clamp(2.75rem, 10vw, 4.25rem);
   }
 
   .hero-lines {
@@ -3244,6 +3419,21 @@ canvas {
   .section-heading,
   .work-item {
     grid-template-columns: 1fr;
+  }
+
+  .work-context,
+  .press-grid,
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer {
+    text-align: center;
+  }
+
+  .site-footer .contact-legal {
+    justify-self: center;
+    text-align: center;
   }
 
   .work-index {
@@ -4336,7 +4526,7 @@ canvas {
 @media (max-width: 460px) {
   .hero h1 {
     max-width: 10ch;
-    font-size: clamp(2.9rem, 13vw, 4.2rem);
+    font-size: clamp(2.45rem, 11vw, 3.7rem);
   }
 
   .store-hero__copy h1,
@@ -4465,6 +4655,13 @@ canvas {
   .configurator-viewer--immersive canvas {
     touch-action: pan-y !important;
     user-select: none;
+  }
+
+  .builder-instructions-button {
+    top: 12px;
+    left: 12px;
+    min-height: 42px;
+    padding: 0 13px;
   }
 
   .builder-feedback--toast {

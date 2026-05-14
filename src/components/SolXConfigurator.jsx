@@ -2150,6 +2150,11 @@ export default function SolXConfigurator({ onNavigate }) {
           />
 
           <div className="builder-hud" aria-label="SOL X builder tools">
+            <button type="button" className="builder-instructions-button" onClick={startTutorial}>
+              <HelpCircle size={16} />
+              <span>Instructions</span>
+            </button>
+
             <div className="builder-glass builder-title-panel">
               <p className="section-kicker">SOL X Configurator</p>
               <h1>SOL X Builder</h1>

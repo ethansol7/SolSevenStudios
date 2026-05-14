@@ -9,7 +9,7 @@ import {
   siteGallerySections,
   solXComponents,
 } from '../data/products.js';
-import { assetUrl } from '../content.js';
+import { assetUrl, socialLinks } from '../content.js';
 import { trackProductCardClick, trackStripeCheckoutClick } from '../analytics.js';
 
 const SolXViewer = lazy(() => import('./SolXViewer.jsx'));
@@ -18,6 +18,9 @@ const SolXConfigurator = lazy(() => import('./SolXConfigurator.jsx'));
 const stripeLinkPattern = /^https:\/\/buy\.stripe\.com\//;
 const hasLiveStripeLink = (link) => typeof link === 'string' && stripeLinkPattern.test(link);
 const productDetailPath = (product) => (findProductBySlug(product.slug) ? `/product/${product.slug}` : '/shop/original-sol');
+const sellableOriginalSolProducts = originalSolProducts.filter((product) => hasLiveStripeLink(product.stripeLink));
+const originalSolLamps = sellableOriginalSolProducts.filter((product) => product.category === 'lamps');
+const originalSolAddOns = sellableOriginalSolProducts.filter((product) => product.category !== 'lamps');
 
 function PageHero({ kicker, title, body, media, musicSection = 'solLamp', children }) {
   return (
@@ -37,7 +40,7 @@ function PageHero({ kicker, title, body, media, musicSection = 'solLamp', childr
   );
 }
 
-function ProductCard({ onNavigate, product, variant = 'default' }) {
+function ProductCard({ onNavigate, product, showDescription = true, variant = 'default' }) {
   const categoryLabel = product.collection || product.category.replace('-', ' ');
   const detailPath = productDetailPath(product);
 
@@ -55,7 +58,7 @@ function ProductCard({ onNavigate, product, variant = 'default' }) {
       <div className="store-card__body">
         <p>{categoryLabel}</p>
         <h3>{product.name}</h3>
-        <span>{product.description}</span>
+        {showDescription && <span>{product.description}</span>}
         <div className="store-card__footer">
           <small>{product.compareAt ? `${product.compareAt} / ${product.price}` : product.price}</small>
           <AppLink
@@ -71,19 +74,19 @@ function ProductCard({ onNavigate, product, variant = 'default' }) {
   );
 }
 
-function ProductGrid({ onNavigate, products = originalSolProducts }) {
+function ProductGrid({ onNavigate, products = originalSolProducts, showDescription = true }) {
   return (
     <div className="store-grid">
       {products.map((product) => (
-        <ProductCard key={product.slug} product={product} onNavigate={onNavigate} />
+        <ProductCard key={product.slug} product={product} onNavigate={onNavigate} showDescription={showDescription} />
       ))}
     </div>
   );
 }
 
-function ProductSections({ onNavigate }) {
+function ProductSections({ onNavigate, products: sourceProducts = originalSolProducts, showDescription = true }) {
   return productCategories.map((category) => {
-    const products = originalSolProducts.filter((product) => product.category === category.id);
+    const products = sourceProducts.filter((product) => product.category === category.id);
     if (!products.length) return null;
 
     return (
@@ -92,10 +95,22 @@ function ProductSections({ onNavigate }) {
           <p className="section-kicker">{category.label}</p>
           <h2>{category.description}</h2>
         </div>
-        <ProductGrid onNavigate={onNavigate} products={products} />
+        <ProductGrid onNavigate={onNavigate} products={products} showDescription={showDescription} />
       </section>
     );
   });
+}
+
+function SocialLinks({ className = '' }) {
+  return (
+    <div className={`social-links ${className}`}>
+      {socialLinks.map((link) => (
+        <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+          {link.label}
+        </a>
+      ))}
+    </div>
+  );
 }
 
 function normalizeProductGallery(product) {
@@ -232,42 +247,31 @@ export function ShopPage({ onNavigate }) {
     <main className="route-page">
       <PageHero
         kicker="Shop"
-        title="Modular lighting, shades, and system add-ons."
-        body="A clean shopping overview for the public Original SOL collection, plus a preview of the next SOL X component system."
+        title="Original SOL lamps, ready to buy"
+        body="Shop the current sellable modular lamp system, then add shades or a complete bundle when you want to extend the build"
         media={assetUrl('assets/shop/s0l-stack.png')}
       >
         <div className="route-actions">
-          <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Original SOL Collection</AppLink>
-          <AppLink to="/sol-x" onNavigate={onNavigate}>Explore SOL X</AppLink>
+          <AppLink to="/shop/original-sol" onNavigate={onNavigate}>View Collection</AppLink>
+          <AppLink to="/contact" onNavigate={onNavigate}>Ask a Question</AppLink>
         </div>
       </PageHero>
 
       <section className="store-section section-pad" data-music-section="solLamp">
         <div className="section-heading">
-          <p className="section-kicker">Collections</p>
-          <h2>Current products and future component technology stay intentionally separate.</h2>
+          <p className="section-kicker">Original SOL Lamps</p>
+          <h2>The current sellable modular lamp system</h2>
         </div>
-        <div className="collection-grid">
-          <AppLink to="/shop/original-sol" onNavigate={onNavigate} className="collection-tile">
-            <img src={assetUrl('assets/shop/s01.png')} alt="" loading="lazy" />
-            <div>
-              <p>Available collection</p>
-              <h3>Original SOL Collection</h3>
-              <span>{collectionNotes.originalSol}</span>
-            </div>
-          </AppLink>
-          <AppLink to="/sol-x" onNavigate={onNavigate} className="collection-tile">
-            <img src={assetUrl('assets/lamps/solx-one-lamp.png')} alt="" loading="lazy" />
-            <div>
-              <p>Technology preview</p>
-              <h3>SOL X System</h3>
-              <span>{collectionNotes.solX}</span>
-            </div>
-          </AppLink>
-        </div>
+        <ProductGrid onNavigate={onNavigate} products={originalSolLamps} showDescription={false} />
       </section>
 
-      <ProductSections onNavigate={onNavigate} />
+      <section className="store-section section-pad" data-music-section="solLamp">
+        <div className="section-heading">
+          <p className="section-kicker">Shades and Bundles</p>
+          <h2>Compatible products for expanding an Original SOL build</h2>
+        </div>
+        <ProductGrid onNavigate={onNavigate} products={originalSolAddOns} showDescription={false} />
+      </section>
     </main>
   );
 }
@@ -277,7 +281,7 @@ export function OriginalSolCollectionPage({ onNavigate }) {
     <main className="route-page">
       <PageHero
         kicker="Original SOL Collection"
-        title="Stack, swap, sculpt, and reuse."
+        title="Stack, swap, sculpt, and reuse"
         body={collectionNotes.originalSol}
         media={assetUrl('assets/shop/s0l-combo.png')}
       >
@@ -287,7 +291,7 @@ export function OriginalSolCollectionPage({ onNavigate }) {
         </div>
       </PageHero>
 
-      <ProductSections onNavigate={onNavigate} />
+      <ProductSections onNavigate={onNavigate} products={sellableOriginalSolProducts} showDescription={false} />
     </main>
   );
 }
@@ -334,7 +338,7 @@ export function ProductPage({ onNavigate, slug }) {
       <section className="product-notes section-pad" data-music-section="process">
         <div className="section-heading">
           <p className="section-kicker">Product details</p>
-          <h2>Category, options, stock, and catalog details.</h2>
+          <h2>Category, options, stock, and catalog details</h2>
         </div>
         <div className="capability-grid product-notes__grid">
           <div className="capability-item">
@@ -369,7 +373,7 @@ export function SolXPage({ onNavigate }) {
       <section className="solx-page" data-music-section="solX">
         <div className="solx-page__copy">
           <p className="section-kicker">SOL X preview</p>
-          <h1>Component intelligence for the next modular lamp system.</h1>
+          <h1>Component intelligence for the next modular lamp system</h1>
           <p>{collectionNotes.solX}</p>
           <div className="route-actions">
             <AppLink to="/solx-configurator" onNavigate={onNavigate}>Open Configurator</AppLink>
@@ -385,7 +389,7 @@ export function SolXPage({ onNavigate }) {
       <section className="store-section section-pad" data-music-section="solX">
         <div className="section-heading">
           <p className="section-kicker">SOL X components</p>
-          <h2>Preview the base, shades, and divider as a modular lighting language.</h2>
+          <h2>Preview the base, shades, and divider as a modular lighting language</h2>
         </div>
         <div className="component-list">
           {solXComponents.map((component) => (
@@ -413,7 +417,7 @@ export function PlastiVistaPage() {
     <main className="route-page">
       <PageHero
         kicker="PlastiVista"
-        title="Circular manufacturing as a visible product system."
+        title="Circular manufacturing as a visible product system"
         body="A compact process story for material collection, shredding, extrusion, printing, assembly, and product storytelling."
         media={assetUrl('assets/plastivista/system-hero.png')}
         musicSection="plastivista"
@@ -421,7 +425,7 @@ export function PlastiVistaPage() {
       <section className="systems-section section-pad" data-music-section="plastivista">
         <div className="systems-copy">
           <p className="section-kicker">Circular workflow</p>
-          <h2>Waste streams become design material.</h2>
+          <h2>Waste streams become design material</h2>
           <p>PlastiVista connects plastic waste, small-scale processing, additive manufacturing, and modular product design into a calmer production loop.</p>
         </div>
         <div className="systems-visual">
@@ -437,7 +441,7 @@ export function AboutPage() {
     <main className="route-page">
       <PageHero
         kicker="About / Contact"
-        title="Let's build the next system."
+        title="Let's build the next system"
         body="Sol Seven Studios develops modular lighting, furniture, additive workflows, and circular manufacturing stories from New York."
         media={assetUrl('assets/process/founder-brand-portrait.png')}
         musicSection="contact"
@@ -445,11 +449,9 @@ export function AboutPage() {
       <section className="contact-section contact-section--route" data-music-section="contact">
         <div className="contact-layout">
           <p className="section-kicker">Contact</p>
-          <h2>Let's build the next system.</h2>
+          <h2>Let's build the next system</h2>
           <ContactForm context="about-page" />
-          <a className="contact-social-link" href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
-            Open studio channel
-          </a>
+          <SocialLinks />
         </div>
       </section>
     </main>
@@ -461,19 +463,15 @@ export function ContactPage() {
     <main className="route-page">
       <PageHero
         kicker="Contact"
-        title="Start a studio conversation."
+        title="Contact"
         body="Use this form for product questions, custom work, collaborations, press, and business inquiries."
-        media={assetUrl('assets/process/founder-brand-portrait.png')}
+        media={assetUrl('assets/gallery/curated/detail-modular-lamp-01.png')}
         musicSection="contact"
       />
       <section className="contact-section contact-section--route contact-section--page" data-music-section="contact">
         <div className="contact-layout">
-          <p className="section-kicker">Project inquiries</p>
-          <h2>Tell us what you are building.</h2>
           <ContactForm context="contact-page" />
-          <a className="contact-social-link" href="https://www.instagram.com/solsevenstudios/" target="_blank" rel="noreferrer">
-            Open studio channel
-          </a>
+          <SocialLinks />
         </div>
       </section>
     </main>
@@ -487,7 +485,7 @@ export function GalleryPage() {
     <main className="route-page">
       <PageHero
         kicker="Gallery"
-        title="SOL lamps across studio, room, and detail views."
+        title="Gallery"
         body="A curated visual archive for room settings, system studies, and close material views."
         media={assetUrl('assets/gallery/curated/living-space-sol-system-01.png')}
       />
@@ -496,7 +494,7 @@ export function GalleryPage() {
         <section className="gallery-section section-pad" key={section.title} data-music-section="solLamp">
           <div className="section-heading">
             <p className="section-kicker">{section.title}</p>
-            <h2>{section.title === 'Details' ? 'Material, profile, and modular connection studies.' : 'Product context views for the SOL lighting system.'}</h2>
+            {section.description && <h2>{section.description}</h2>}
           </div>
           <div className="gallery-grid-page">
             {section.items.map((image, index) => (
@@ -520,13 +518,55 @@ export function GalleryPage() {
   );
 }
 
+export function PressPage({ onNavigate }) {
+  return (
+    <main className="route-page">
+      <PageHero
+        kicker="Press"
+        title="Press and exhibition updates"
+        body="Sol Seven Studios is preparing modular lighting, circular design systems, and SOL X configurator work for ICFF and WantedDesign Launch Pad"
+        media={assetUrl('assets/gallery/curated/studio-product-family-01.jpg')}
+        musicSection="studio"
+      >
+        <div className="route-actions">
+          <AppLink to="/contact" onNavigate={onNavigate}>Press Inquiries</AppLink>
+          <AppLink to="/shop/original-sol" onNavigate={onNavigate}>Original SOL</AppLink>
+        </div>
+      </PageHero>
+
+      <section className="press-section section-pad" data-music-section="studio">
+        <div className="section-heading">
+          <p className="section-kicker">Coverage</p>
+          <h2>Publication links will appear here as features go live</h2>
+        </div>
+        <div className="press-grid">
+          <article className="press-card">
+            <p>ICFF 2026</p>
+            <h3>WantedDesign Launch Pad</h3>
+            <span>
+              Sol Seven Studios will present Original SOL as the current modular lamp collection and SOL X as the future configurator and electronic system direction.
+            </span>
+          </article>
+          <article className="press-card">
+            <p>Press contact</p>
+            <h3>Images, interviews, and product information</h3>
+            <span>
+              For press materials, product details, or exhibition questions, use the contact form and include the publication or project context.
+            </span>
+          </article>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export function NotFoundPage({ onNavigate }) {
   return (
     <main className="route-page">
       <section className="store-hero" data-music-section="home">
         <div className="store-hero__copy">
           <p className="section-kicker">404</p>
-          <h1>That page is not in the system yet.</h1>
+          <h1>That page is not in the system yet</h1>
           <p>Head back to the studio home or browse the Original SOL collection.</p>
           <div className="route-actions">
             <AppLink to="/" onNavigate={onNavigate}>Home</AppLink>

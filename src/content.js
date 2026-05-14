@@ -9,13 +9,14 @@ export const navItems = [
   { label: 'SOL X', href: '/sol-x' },
   { label: 'Configurator', href: '/solx-configurator' },
   { label: 'PlastiVista', href: '/plastivista' },
+  { label: 'Press', href: '/press' },
   { label: 'Contact', href: '/contact' },
 ];
 
 export const heroLines = [
-  'Modular products.',
-  'Circular systems.',
-  'Future focused manufacturing.',
+  'Modular products',
+  'Circular systems',
+  'Future focused manufacturing',
 ];
 
 export const featuredWork = [
@@ -51,14 +52,6 @@ export const featuredWork = [
     description:
       'Furniture development focused on rotational form, digital fabrication, and quiet structural clarity.',
   },
-  {
-    title: 'Sol Wheel',
-    eyebrow: 'Object research',
-    musicSection: 'solWheel',
-    image: assetUrl('assets/process/sol-wheel-render.png'),
-    description:
-      'A product exploration linking playful interaction, fabrication research, and physical prototyping.',
-  },
 ];
 
 export const systemTabs = [
@@ -66,7 +59,7 @@ export const systemTabs = [
     id: 'dram',
     label: 'DRAM',
     image: assetUrl('assets/plastivista/system-hero.png'),
-    title: 'Distributed production that behaves like an ecosystem.',
+    title: 'Distributed production that behaves like an ecosystem',
     body:
       'DRAM frames manufacturing as a network of local cells: material collection, processing, fabrication, assembly, and product storytelling working in one loop.',
   },
@@ -74,7 +67,7 @@ export const systemTabs = [
     id: 'circular',
     label: 'Circular',
     image: assetUrl('assets/plastivista/system-diagram.png'),
-    title: 'Waste streams become visible design material.',
+    title: 'Waste streams become visible design material',
     body:
       'PlastiVista translates discarded plastic into feedstock, parts, furniture, and lighting components with a process that can be seen and understood.',
   },
@@ -82,7 +75,7 @@ export const systemTabs = [
     id: 'studio',
     label: 'Studio',
     image: assetUrl('assets/plastivista/system-environment-a.png'),
-    title: 'A calm production environment for future objects.',
+    title: 'An efficient production environment for future objects',
     body:
       'The studio connects visualization, prototyping, product development, and manufacturing systems inside one integrated presentation language.',
   },
@@ -95,4 +88,19 @@ export const capabilities = [
   'Prototyping',
   'Circular design',
   'Storytelling',
+];
+
+export const socialLinks = [
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/solsevenstudios/',
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/company/sol-seven-studios/',
+  },
+  {
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@SolSevenStudios',
+  },
 ];

@@ -31,7 +31,7 @@ const rampGain = (gainNode, target, context, seconds = fadeTime) => {
 export function useAmbientMusicEngine({ scenes, activeSectionKey }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(0.42);
+  const [volume, setVolume] = useState(0.26);
   const [status, setStatus] = useState('Press play to begin.');
   const [loadedStemCount, setLoadedStemCount] = useState(0);
   const [loading, setLoading] = useState(false);

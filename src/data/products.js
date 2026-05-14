@@ -58,22 +58,22 @@ export const productCategories = [
   {
     id: 'lamps',
     label: 'Lamps',
-    description: 'Complete S0L lamp builds with base, shade, magnetic clips, and smart RGB lighting.',
+    description: 'Complete S0L lamp builds with base, shade, magnetic clips, and smart RGB lighting',
   },
   {
     id: 'shades',
     label: 'Shades',
-    description: 'Stackable S0L shades for changing light diffusion, silhouette, and functional add-on use.',
+    description: 'Stackable S0L shades for changing light diffusion, silhouette, and functional add-on use',
   },
   {
     id: 'combos',
     label: 'Combos',
-    description: 'Bundle and planter options for expanding the modular S0L ecosystem.',
+    description: 'Bundle and planter options for expanding the modular S0L ecosystem',
   },
   {
     id: 'accessories',
     label: 'Accessories',
-    description: 'Bases, dividers, clips, kits, and system components for compatible S0L builds.',
+    description: 'Bases, dividers, clips, kits, and system components for compatible S0L builds',
   },
 ];
 
@@ -344,6 +344,7 @@ export const collectionNotes = {
 export const siteGallerySections = [
   {
     title: 'Studio',
+    description: 'Product family studies, silhouettes, and modular arrangements',
     items: [
       galleryImage(galleryAsset('studio-product-family-01.jpg'), 'Original SOL family study.'),
       galleryImage(galleryAsset('studio-system-wide-01.png'), 'Modular lamp system study.'),
@@ -352,6 +353,7 @@ export const siteGallerySections = [
   },
   {
     title: 'Living Spaces',
+    description: 'Interior compositions for scale, warmth, and everyday placement',
     items: [
       galleryImage(galleryAsset('living-space-sol-system-01.png'), 'SOL lamps in a calm interior setting.'),
       galleryImage(galleryAsset('living-space-sol-collection-01.png'), 'Warm room composition with modular floor and table forms.'),
@@ -360,6 +362,7 @@ export const siteGallerySections = [
   },
   {
     title: 'Bedrooms',
+    description: 'Bedside-scale lighting studies with softer ambient presence',
     items: [
       galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft bedside-scale SOL arrangement.'),
       galleryImage(lampImage('homepage-sol-feature.png'), 'Low, warm modular light study.'),
@@ -368,6 +371,7 @@ export const siteGallerySections = [
   },
   {
     title: 'Details',
+    description: 'Material, profile, and modular connection studies',
     items: [
       galleryImage(galleryAsset('detail-modular-lamp-01.png'), 'Vertical module and shade detail.'),
       galleryImage(galleryAsset('detail-shade-study-01.png'), 'Shade profile and diffusion study.'),
