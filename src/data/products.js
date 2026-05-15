@@ -355,25 +355,26 @@ export const siteGallerySections = [
     title: 'Living Spaces',
     description: 'Modular lighting for everyday rooms',
     items: [
-      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'SOL lamps in a calm interior setting'),
       galleryImage(galleryAsset('living-space-sol-collection-01.png'), 'Warm room composition with modular floor and table forms'),
       galleryImage(lampImage('sol-gallery-b.png'), 'Sculptural SOL lighting in a residential setting'),
+      galleryImage(galleryAsset('detail-modular-lamp-01.png'), 'Warm modular lighting beside a lounge chair'),
     ],
   },
   {
     title: 'Bedrooms',
     description: 'Soft ambient lighting for everyday spaces',
     items: [
-      galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft bedside-scale SOL arrangement'),
-      galleryImage(lampImage('homepage-sol-feature.png'), 'Low, warm modular light for a side table'),
+      galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft modular lighting for bedside spaces'),
+      galleryImage(lampImage('homepage-sol-feature.png'), 'Warm modular lighting for side tables'),
+      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'Layered SOL lighting for quiet interior spaces'),
     ],
   },
   {
     title: 'Details',
     description: 'Material, profile, and modular connections',
     items: [
-      galleryImage(galleryAsset('detail-modular-lamp-01.png'), 'Vertical module and shade detail'),
       galleryImage(galleryAsset('detail-shade-study-01.png'), 'Shade profile and diffusion detail'),
+      galleryImage(lampImage('sol-gallery-a.png'), 'Original SOL lamp heights and modular proportions'),
       galleryImage(plastivistaImage('homepage-process-sequence.png'), 'Circular production workflow'),
     ],
   },

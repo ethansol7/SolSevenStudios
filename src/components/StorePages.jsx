@@ -438,6 +438,24 @@ export function SolXPage({ onNavigate }) {
         </Suspense>
       </section>
 
+      <section className="solx-continuity section-pad" data-music-section="solX">
+        <div className="solx-continuity__copy">
+          <p className="section-kicker">Modular continuity</p>
+          <h2>Built around layered connection and future compatibility</h2>
+          <p>
+            SOL X explores a stackable lighting architecture where each layer can align, connect, and pass power through the build. Magnetic positioning, electrical continuity, and modular shade logic are developed together so future parts can feel simple to place and natural to understand.
+          </p>
+          <div className="solx-continuity__points" aria-label="SOL X modular system principles">
+            <span>Magnetic alignment</span>
+            <span>Electrical continuity</span>
+            <span>Layered stack logic</span>
+          </div>
+        </div>
+        <figure className="solx-continuity__image">
+          <img src={assetUrl('assets/solx/solx-modular-connection.png')} alt="Exploded SOL X module showing shade, connector layer, and vertical stack alignment" loading="lazy" />
+        </figure>
+      </section>
+
       <section className="store-section section-pad" data-music-section="solX">
         <div className="section-heading">
           <p className="section-kicker">SOL X components</p>
