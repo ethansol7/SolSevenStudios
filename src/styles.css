@@ -84,7 +84,7 @@ canvas {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 70;
+  z-index: 1000;
   display: grid;
   grid-template-columns: minmax(74px, 0.45fr) auto minmax(112px, 0.45fr);
   align-items: center;
@@ -211,6 +211,20 @@ canvas {
   align-items: center;
 }
 
+.nav-group::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -12px;
+  right: -12px;
+  height: 18px;
+  display: none;
+}
+
+.nav-group.is-expanded::after {
+  display: block;
+}
+
 .nav-link--button {
   gap: 6px;
   border: 0;
@@ -225,9 +239,7 @@ canvas {
   transition: transform 240ms ease, color 240ms ease;
 }
 
-.nav-group:hover .nav-link--button svg,
-.nav-group.is-expanded .nav-link--button svg,
-.nav-group:focus-within .nav-link--button svg {
+.nav-group.is-expanded .nav-link--button svg {
   color: var(--ink);
   transform: rotate(180deg);
 }
@@ -251,9 +263,7 @@ canvas {
   transition: opacity 180ms ease, transform 220ms ease;
 }
 
-.nav-group:hover .nav-dropdown,
-.nav-group.is-expanded .nav-dropdown,
-.nav-group:focus-within .nav-dropdown {
+.nav-group.is-expanded .nav-dropdown {
   opacity: 1;
   pointer-events: auto;
   transform: translate(-50%, 0);
@@ -305,6 +315,7 @@ canvas {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .hero-image-layer img {
@@ -1127,6 +1138,18 @@ canvas {
   object-fit: contain;
   object-position: center;
   padding: clamp(18px, 4vw, 46px);
+}
+
+.store-hero__media--contact {
+  background: linear-gradient(180deg, #f8f7f3, #e9e3d8);
+}
+
+.store-hero__media--contact img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 50% 62%;
+  padding: 0;
+  display: block;
 }
 
 .route-actions {
@@ -2507,9 +2530,11 @@ canvas {
   margin-top: 14px;
 }
 
-.builder-title-links a {
+.builder-title-links a,
+.builder-instructions-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(25, 25, 24, 0.12);
@@ -2522,36 +2547,24 @@ canvas {
 }
 
 .builder-instructions-button {
-  position: absolute;
-  top: 22px;
-  left: calc(50% - 176px);
-  transform: none;
-  z-index: 7;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 15px;
-  border: 1px solid rgba(25, 25, 24, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
-  color: var(--ink);
-  box-shadow: 0 16px 42px rgba(38, 35, 29, 0.1);
-  backdrop-filter: blur(22px) saturate(1.12);
+  gap: 7px;
+  border-color: rgba(25, 25, 24, 0.14);
+  background: rgba(255, 255, 255, 0.46);
+  color: var(--ink-soft);
+  font-family: inherit;
+  box-shadow: none;
   cursor: pointer;
-  font-size: 0.76rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  pointer-events: auto;
-  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, color 220ms ease;
 }
 
+.builder-title-links a:hover,
+.builder-title-links a:focus-visible,
 .builder-instructions-button:hover,
 .builder-instructions-button:focus-visible {
   transform: translateY(-1px);
   border-color: rgba(25, 25, 24, 0.3);
   background: rgba(255, 255, 255, 0.74);
+  color: var(--ink);
 }
 
 .mobile-configurator-intro {
@@ -3555,6 +3568,10 @@ canvas {
     display: grid;
   }
 
+  .nav-group::after {
+    display: none;
+  }
+
   .nav-link--button {
     width: 100%;
     min-height: 48px;
@@ -3583,8 +3600,7 @@ canvas {
     transition: max-height 260ms ease, padding 220ms ease, margin 220ms ease;
   }
 
-  .nav-group.is-expanded .nav-dropdown,
-  .nav-group:focus-within .nav-dropdown {
+  .nav-group.is-expanded .nav-dropdown {
     max-height: 112px;
     margin-top: 4px;
     padding: 6px 8px;
@@ -3967,6 +3983,25 @@ canvas {
     color: var(--muted);
     font-size: 0.72rem;
     letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .mobile-configurator-instructions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    justify-self: start;
+    min-height: 36px;
+    margin-top: 6px;
+    padding: 0 12px;
+    border: 1px solid rgba(25, 25, 24, 0.13);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.46);
+    color: var(--ink-soft);
+    font: inherit;
+    font-size: 0.7rem;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
   }
 
@@ -4932,9 +4967,7 @@ canvas {
   }
 
   .builder-instructions-button {
-    top: 12px;
-    left: 12px;
-    min-height: 42px;
+    min-height: 36px;
     padding: 0 13px;
   }
 

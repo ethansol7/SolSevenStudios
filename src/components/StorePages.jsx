@@ -48,7 +48,7 @@ const originalSolSystemPoints = [
   },
 ];
 
-function PageHero({ kicker, title, body, media, musicSection = 'solLamp', children }) {
+function PageHero({ kicker, title, body, media, mediaAlt = '', mediaClassName = '', musicSection = 'solLamp', children }) {
   return (
     <section className="store-hero" data-music-section={musicSection}>
       <div className="store-hero__copy">
@@ -58,8 +58,8 @@ function PageHero({ kicker, title, body, media, musicSection = 'solLamp', childr
         {children}
       </div>
       {media && (
-        <div className="store-hero__media">
-          <img src={media} alt="" loading="lazy" />
+        <div className={`store-hero__media${mediaClassName ? ` ${mediaClassName}` : ''}`}>
+          <img src={media} alt={mediaAlt} loading="lazy" />
         </div>
       )}
     </section>
@@ -535,7 +535,9 @@ export function ContactPage() {
         kicker="Contact"
         title="Start a conversation"
         body="Use this form for product questions, custom work, collaborations, press, and business inquiries."
-        media={assetUrl('assets/gallery/curated/detail-modular-lamp-01.png')}
+        media={assetUrl('assets/contact/ethan-sol-exhibition-contact.jpg')}
+        mediaAlt="Ethan Solodukhin standing with SOL lamps and fabrication equipment in an exhibition space"
+        mediaClassName="store-hero__media--contact"
         musicSection="contact"
       />
       <section className="contact-section contact-section--route contact-section--page" data-music-section="contact">

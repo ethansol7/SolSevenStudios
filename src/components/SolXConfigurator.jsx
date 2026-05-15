@@ -957,13 +957,17 @@ function ShopBuildPanel({
   );
 }
 
-function MobileConfiguratorHeader({ partsCount, rootBaseCount }) {
+function MobileConfiguratorHeader({ onStartTutorial, partsCount, rootBaseCount }) {
   return (
     <div className="mobile-configurator-intro">
       <div className="builder-glass mobile-configurator-heading">
         <p className="section-kicker">SOL X Configurator</p>
         <h1>SOL X Builder</h1>
         <span>{partsCount} modules / {rootBaseCount} floor bases</span>
+        <button type="button" className="mobile-configurator-instructions" onClick={onStartTutorial}>
+          <HelpCircle size={15} />
+          <span>Instructions</span>
+        </button>
       </div>
     </div>
   );
@@ -2108,6 +2112,7 @@ export default function SolXConfigurator({ onNavigate }) {
       <section className="configurator-stage" aria-label="SOL X creative builder">
         {isMobileBuilder && (
           <MobileConfiguratorHeader
+            onStartTutorial={startTutorial}
             partsCount={parts.length}
             rootBaseCount={rootBaseCount}
           />
@@ -2150,11 +2155,6 @@ export default function SolXConfigurator({ onNavigate }) {
           />
 
           <div className="builder-hud" aria-label="SOL X builder tools">
-            <button type="button" className="builder-instructions-button" onClick={startTutorial}>
-              <HelpCircle size={16} />
-              <span>Instructions</span>
-            </button>
-
             <div className="builder-glass builder-title-panel">
               <p className="section-kicker">SOL X Configurator</p>
               <h1>SOL X Builder</h1>
@@ -2162,6 +2162,10 @@ export default function SolXConfigurator({ onNavigate }) {
               <div className="builder-title-links">
                 <AppLink to="/shop" onNavigate={onNavigate}>Shop</AppLink>
                 <AppLink to="/sol-x" onNavigate={onNavigate}>SOL X</AppLink>
+                <button type="button" className="builder-instructions-button" onClick={startTutorial}>
+                  <HelpCircle size={15} />
+                  <span>Instructions</span>
+                </button>
               </div>
             </div>
 

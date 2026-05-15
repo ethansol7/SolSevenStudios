@@ -366,7 +366,7 @@ export const siteGallerySections = [
     items: [
       galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft modular lighting for bedside spaces'),
       galleryImage(lampImage('homepage-sol-feature.png'), 'Warm modular lighting for side tables'),
-      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'Layered SOL lighting for quiet interior spaces'),
+      galleryImage(galleryAsset('bedroom-sol-multiple-lamps.png'), 'Warm modular lighting across a bedroom'),
     ],
   },
   {

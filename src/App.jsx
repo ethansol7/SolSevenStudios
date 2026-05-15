@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ArrowDown, ChevronDown, ExternalLink, Menu, X } from 'lucide-react';
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import AppLink from './components/AppLink.jsx';
 import ContactForm from './components/ContactForm.jsx';
 import MusicPlayer from './components/MusicPlayer.jsx';
@@ -50,31 +50,53 @@ const cascade = {
 };
 
 function Navigation({ onNavigate, routePath }) {
+  const navRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openMenuKey, setOpenMenuKey] = useState(null);
+  const [openMenuSource, setOpenMenuSource] = useState(null);
+
+  const isDesktopProductsMenu = () => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 821px)').matches;
+  };
 
   useEffect(() => {
     setIsMenuOpen(false);
     setOpenMenuKey(null);
+    setOpenMenuSource(null);
   }, [routePath]);
 
   useEffect(() => {
-    if (!isMenuOpen) return undefined;
+    if (!isMenuOpen && !openMenuKey) return undefined;
 
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         setIsMenuOpen(false);
         setOpenMenuKey(null);
+        setOpenMenuSource(null);
+      }
+    };
+
+    const handlePointerDown = (event) => {
+      if (!navRef.current?.contains(event.target)) {
+        setIsMenuOpen(false);
+        setOpenMenuKey(null);
+        setOpenMenuSource(null);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMenuOpen]);
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [isMenuOpen, openMenuKey]);
 
   const handleNavigate = (event, href) => {
     setIsMenuOpen(false);
     setOpenMenuKey(null);
+    setOpenMenuSource(null);
     onNavigate?.(event, href);
   };
 
@@ -90,7 +112,7 @@ function Navigation({ onNavigate, routePath }) {
   };
 
   return (
-    <header className={`site-nav${isMenuOpen ? ' is-open' : ''}`}>
+    <header className={`site-nav${isMenuOpen ? ' is-open' : ''}`} ref={navRef}>
       <AppLink className="brand-mark" to="/" onNavigate={onNavigate} aria-label="Sol Seven Studios home">
         <img src={assetUrl('assets/brand/sol-seven-studios-logo.png')} alt="" />
       </AppLink>
@@ -100,7 +122,14 @@ function Navigation({ onNavigate, routePath }) {
         aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-controls="primary-navigation"
         aria-expanded={isMenuOpen}
-        onClick={() => setIsMenuOpen((current) => !current)}
+        onClick={() => {
+          setIsMenuOpen((current) => {
+            const next = !current;
+            if (!next) setOpenMenuKey(null);
+            if (!next) setOpenMenuSource(null);
+            return next;
+          });
+        }}
       >
         {isMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
         <span>{isMenuOpen ? 'Close' : 'Menu'}</span>
@@ -116,13 +145,45 @@ function Navigation({ onNavigate, routePath }) {
               <div
                 className={`nav-group${active ? ' is-active' : ''}${isExpanded ? ' is-expanded' : ''}`}
                 key={item.label}
+                onMouseEnter={() => {
+                  if (isDesktopProductsMenu()) {
+                    setOpenMenuKey(item.label);
+                    setOpenMenuSource((current) => (openMenuKey === item.label && current === 'click' ? current : 'hover'));
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (isDesktopProductsMenu()) {
+                    setOpenMenuKey(null);
+                    setOpenMenuSource(null);
+                  }
+                }}
               >
                 <button
                   type="button"
                   className="nav-link nav-link--button"
                   aria-haspopup="true"
                   aria-expanded={isExpanded}
-                  onClick={() => setOpenMenuKey((current) => (current === item.label ? null : item.label))}
+                  onClick={() => {
+                    setOpenMenuKey((current) => {
+                      if (current === item.label && openMenuSource === 'click') {
+                        setOpenMenuSource(null);
+                        return null;
+                      }
+
+                      setOpenMenuSource('click');
+                      return item.label;
+                    });
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'ArrowDown') {
+                      event.preventDefault();
+                      setOpenMenuSource('click');
+                      setOpenMenuKey(item.label);
+                      window.requestAnimationFrame(() => {
+                        event.currentTarget.closest('.nav-group')?.querySelector('.nav-dropdown-link')?.focus();
+                      });
+                    }
+                  }}
                 >
                   <span data-label={item.label} data-mobile-label={item.label}>{item.label}</span>
                   <ChevronDown size={13} aria-hidden="true" />
