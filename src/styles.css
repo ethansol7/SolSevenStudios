@@ -157,7 +157,7 @@ canvas {
   align-items: center;
   gap: clamp(10px, 1.35vw, 22px);
   max-width: min(1120px, 100%);
-  overflow-x: auto;
+  overflow: visible;
   padding: 13px 18px;
   border: 1px solid rgba(25, 25, 24, 0.1);
   border-radius: 999px;
@@ -205,6 +205,80 @@ canvas {
   color: var(--ink);
 }
 
+.nav-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-link--button {
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-link--button svg {
+  flex: 0 0 auto;
+  color: rgba(25, 25, 24, 0.48);
+  transition: transform 240ms ease, color 240ms ease;
+}
+
+.nav-group:hover .nav-link--button svg,
+.nav-group.is-expanded .nav-link--button svg,
+.nav-group:focus-within .nav-link--button svg {
+  color: var(--ink);
+  transform: rotate(180deg);
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  z-index: 10;
+  display: grid;
+  min-width: 188px;
+  padding: 8px;
+  border: 1px solid rgba(25, 25, 24, 0.12);
+  border-radius: 20px;
+  background: rgba(247, 245, 239, 0.92);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 68px rgba(25, 25, 24, 0.14);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -6px);
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+
+.nav-group:hover .nav-dropdown,
+.nav-group.is-expanded .nav-dropdown,
+.nav-group:focus-within .nav-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.nav-dropdown-link {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 14px;
+  color: rgba(25, 25, 24, 0.74);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  transition: background 220ms ease, color 220ms ease, transform 220ms ease;
+}
+
+.nav-dropdown-link:hover,
+.nav-dropdown-link:focus-visible,
+.nav-dropdown-link.is-active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.62);
+  transform: translateX(2px);
+}
+
 .hero {
   position: relative;
   min-height: 100svh;
@@ -246,15 +320,15 @@ canvas {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(247, 245, 239, 0.98) 0%, rgba(247, 245, 239, 0.8) 31%, rgba(247, 245, 239, 0.22) 65%, rgba(247, 245, 239, 0.5) 100%),
+    linear-gradient(90deg, rgba(247, 245, 239, 0.98) 0%, rgba(247, 245, 239, 0.86) 36%, rgba(247, 245, 239, 0.38) 68%, rgba(247, 245, 239, 0.62) 100%),
     linear-gradient(180deg, rgba(247, 245, 239, 0.48), rgba(247, 245, 239, 0.9));
 }
 
 .hero-scene {
   position: absolute;
-  inset: 0 -8vw -4vh 27vw;
+  inset: clamp(104px, 13vh, 152px) clamp(18px, 5vw, 88px) clamp(64px, 8vh, 112px) 46vw;
   z-index: 2;
-  min-height: 100%;
+  min-height: 0;
   pointer-events: none;
 }
 
@@ -279,7 +353,7 @@ canvas {
 .hero-copy {
   position: relative;
   z-index: 5;
-  width: min(1120px, 100%);
+  width: min(780px, 100%);
   padding-top: 4vh;
 }
 
@@ -296,20 +370,21 @@ canvas {
   max-width: 11ch;
   margin: 0;
   color: var(--ink);
-  font-size: clamp(3.25rem, 8.7vw, 9.9rem);
+  font-size: clamp(3rem, 7.15vw, 8rem);
   font-weight: 500;
-  line-height: 0.88;
+  line-height: 0.9;
   letter-spacing: 0;
 }
 
 .hero-lines {
   display: grid;
-  gap: 8px;
-  margin-top: clamp(32px, 4.8vw, 62px);
+  gap: 10px;
+  max-width: 560px;
+  margin-top: clamp(28px, 4vw, 54px);
   color: var(--ink-soft);
-  font-size: clamp(1.34rem, 3.8vw, 4.6rem);
-  font-weight: 400;
-  line-height: 1.02;
+  font-size: clamp(1.18rem, 1.95vw, 2.12rem);
+  font-weight: 430;
+  line-height: 1.14;
 }
 
 .scroll-cue {
@@ -354,7 +429,7 @@ canvas {
 .cinematic-copy h2,
 .contact-section h2 {
   margin: 0;
-  font-size: clamp(2rem, 4.4vw, 4.8rem);
+  font-size: clamp(1.95rem, 3.75vw, 4.1rem);
   font-weight: 460;
   line-height: 1;
   letter-spacing: 0;
@@ -447,9 +522,9 @@ canvas {
 
 .work-copy h3 {
   margin: 0;
-  font-size: clamp(2rem, 4.7vw, 5.8rem);
+  font-size: clamp(1.95rem, 3.8vw, 4.65rem);
   font-weight: 430;
-  line-height: 0.92;
+  line-height: 0.98;
   letter-spacing: 0;
 }
 
@@ -633,9 +708,9 @@ canvas {
 .capability-item p {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(1.45rem, 3vw, 3rem);
+  font-size: clamp(1.28rem, 2.45vw, 2.45rem);
   font-weight: 430;
-  line-height: 1.02;
+  line-height: 1.08;
 }
 
 .contact-section {
@@ -663,8 +738,8 @@ canvas {
 }
 
 .contact-section h2 {
-  font-size: clamp(3rem, 7.2vw, 9rem);
-  line-height: 0.9;
+  font-size: clamp(2.7rem, 5.8vw, 6.6rem);
+  line-height: 0.96;
 }
 
 .contact-section a,
@@ -1009,9 +1084,9 @@ canvas {
 .product-detail__copy h1,
 .solx-page__copy h1 {
   margin: 0;
-  font-size: clamp(2.85rem, 6vw, 6.8rem);
+  font-size: clamp(2.65rem, 5.1vw, 5.85rem);
   font-weight: 480;
-  line-height: 0.94;
+  line-height: 0.98;
   letter-spacing: 0;
   text-wrap: balance;
 }
@@ -1180,7 +1255,7 @@ canvas {
 
 .press-card h3 {
   margin: 0;
-  font-size: clamp(1.65rem, 3vw, 3.5rem);
+  font-size: clamp(1.55rem, 2.55vw, 3rem);
   font-weight: 460;
   line-height: 0.98;
 }
@@ -1190,6 +1265,19 @@ canvas {
   margin-top: 18px;
   color: var(--ink-soft);
   line-height: 1.5;
+}
+
+.press-card--link {
+  color: inherit;
+}
+
+.press-card--link:hover,
+.press-card--link:focus-visible {
+  transform: translateY(-4px);
+  border-color: rgba(25, 25, 24, 0.26);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(239, 235, 224, 0.58)),
+    var(--paper-soft);
 }
 
 .site-footer {
@@ -1573,6 +1661,73 @@ canvas {
   display: block;
   margin-bottom: 8px;
   font-weight: 560;
+}
+
+.original-sol-explainer,
+.original-sol-compat {
+  border-top: 1px solid var(--line);
+}
+
+.original-sol-explainer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 1.8vw, 24px);
+}
+
+.original-sol-explainer__grid article {
+  min-height: 300px;
+  display: grid;
+  align-content: space-between;
+  gap: 20px;
+  padding: clamp(22px, 2.8vw, 34px);
+  border: 1px solid rgba(25, 25, 24, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.original-sol-explainer__grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.original-sol-explainer__grid h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.28rem, 1.65vw, 1.9rem);
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.original-sol-explainer__grid span {
+  display: block;
+  color: var(--ink-soft);
+  font-size: clamp(0.98rem, 1vw, 1.08rem);
+  line-height: 1.5;
+}
+
+.original-sol-compat {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.46fr) minmax(0, 1fr);
+  gap: clamp(28px, 7vw, 112px);
+  align-items: start;
+}
+
+.original-sol-compat h2 {
+  margin: 0;
+  font-size: clamp(1.95rem, 3.6vw, 4rem);
+  font-weight: 460;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.original-sol-compat > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(1.08rem, 1.45vw, 1.32rem);
+  line-height: 1.58;
 }
 
 .gallery-section {
@@ -3187,7 +3342,7 @@ canvas {
   }
 
   .hero-scene {
-    inset: 26vh -6vw 4vh 8vw;
+    inset: 24vh 3vw 5vh 16vw;
     opacity: 0.78;
   }
 
@@ -3229,6 +3384,7 @@ canvas {
   .store-grid,
   .gallery-grid-page,
   .product-notes__grid,
+  .original-sol-explainer__grid,
   .component-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3331,6 +3487,54 @@ canvas {
     transform: translateY(0);
   }
 
+  .nav-group {
+    width: 100%;
+    display: grid;
+  }
+
+  .nav-link--button {
+    width: 100%;
+    min-height: 48px;
+    justify-content: space-between;
+    padding: 0 14px;
+    border-radius: 17px;
+  }
+
+  .nav-link--button span::after {
+    display: none;
+  }
+
+  .nav-dropdown {
+    position: static;
+    min-width: 0;
+    max-height: 0;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.34);
+    box-shadow: none;
+    opacity: 1;
+    overflow: hidden;
+    pointer-events: none;
+    transform: none;
+    transition: max-height 260ms ease, padding 220ms ease, margin 220ms ease;
+  }
+
+  .nav-group.is-expanded .nav-dropdown,
+  .nav-group:focus-within .nav-dropdown {
+    max-height: 112px;
+    margin-top: 4px;
+    padding: 6px 8px;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .nav-dropdown-link {
+    min-height: 42px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+  }
+
   .nav-link {
     width: 100%;
     min-height: 48px;
@@ -3376,6 +3580,10 @@ canvas {
     content: "›";
   }
 
+  .nav-link--button span::after {
+    display: none;
+  }
+
   .nav-link span {
     font-size: 0;
   }
@@ -3393,16 +3601,16 @@ canvas {
 
   .hero h1 {
     max-width: 10ch;
-    font-size: clamp(2.75rem, 10vw, 4.25rem);
+    font-size: clamp(2.65rem, 9.5vw, 4rem);
   }
 
   .hero-lines {
-    max-width: 14ch;
-    font-size: clamp(1.58rem, 8vw, 2.8rem);
+    max-width: 18ch;
+    font-size: clamp(1.18rem, 5.2vw, 2rem);
   }
 
   .hero-scene {
-    inset: 48vh 0 7vh;
+    inset: 50vh 0 7vh;
     min-height: 0;
     opacity: 0.9;
   }
@@ -3422,6 +3630,7 @@ canvas {
   }
 
   .work-context,
+  .original-sol-compat,
   .press-grid,
   .site-footer {
     grid-template-columns: 1fr;
@@ -3459,6 +3668,7 @@ canvas {
   .store-grid,
   .gallery-grid-page,
   .product-notes__grid,
+  .original-sol-explainer__grid,
   .component-list {
     grid-template-columns: 1fr;
   }
@@ -3474,12 +3684,12 @@ canvas {
   }
 
   .contact-section h2 {
-    font-size: clamp(3.1rem, 15vw, 6rem);
-    line-height: 0.92;
+    font-size: clamp(2.8rem, 11.5vw, 4.8rem);
+    line-height: 0.98;
   }
 
   .contact-section--route h2 {
-    font-size: clamp(2.65rem, 12vw, 4.8rem);
+    font-size: clamp(2.45rem, 9vw, 3.8rem);
   }
 
   .contact-form__grid,
@@ -3582,8 +3792,8 @@ canvas {
   .product-detail__copy h1,
   .solx-page__copy h1,
   .configurator-copy h1 {
-    font-size: clamp(2.85rem, 12vw, 4.8rem);
-    line-height: 0.98;
+    font-size: clamp(2.45rem, 9.5vw, 3.8rem);
+    line-height: 1;
   }
 
   .collection-tile {

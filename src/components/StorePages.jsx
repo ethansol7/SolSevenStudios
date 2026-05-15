@@ -21,6 +21,32 @@ const productDetailPath = (product) => (findProductBySlug(product.slug) ? `/prod
 const sellableOriginalSolProducts = originalSolProducts.filter((product) => hasLiveStripeLink(product.stripeLink));
 const originalSolLamps = sellableOriginalSolProducts.filter((product) => product.category === 'lamps');
 const originalSolAddOns = sellableOriginalSolProducts.filter((product) => product.category !== 'lamps');
+const originalSolSystemPoints = [
+  {
+    label: 'What it is',
+    title: 'A modular lamp system you can buy now',
+    body:
+      'Original SOL is the lighting collection available now. Each lamp uses a base, shade, magnetic connection hardware, and smart bulb so the build can change without replacing the whole object.',
+  },
+  {
+    label: 'Parts',
+    title: 'Lamps, shades, bundles, and add-ons',
+    body:
+      'The collection includes complete S01-S04 lamps, matching shade modules, the S0L Planter combo, and compatible accessories as they become available.',
+  },
+  {
+    label: 'Modularity',
+    title: 'Stack, swap, and reuse pieces over time',
+    body:
+      'Shades and add-ons are designed to move between lamp builds. A piece can become a new silhouette, a storage form, or part of a taller stack instead of becoming obsolete.',
+  },
+  {
+    label: 'Future direction',
+    title: 'Designed to grow toward SOL X',
+    body:
+      'SOL X extends the same design language into an electronic and configurator-driven system. It is a future prototype direction, while Original SOL is the current product line.',
+  },
+];
 
 function PageHero({ kicker, title, body, media, musicSection = 'solLamp', children }) {
   return (
@@ -247,8 +273,8 @@ export function ShopPage({ onNavigate }) {
     <main className="route-page">
       <PageHero
         kicker="Shop"
-        title="Original SOL lamps, ready to buy"
-        body="Shop the current sellable modular lamp system, then add shades or a complete bundle when you want to extend the build"
+        title="Shop Original SOL Lamps"
+        body="Browse the current Original SOL lamp pieces, then choose the lamp, shade, or bundle that fits your space."
         media={assetUrl('assets/shop/s0l-stack.png')}
       >
         <div className="route-actions">
@@ -260,7 +286,7 @@ export function ShopPage({ onNavigate }) {
       <section className="store-section section-pad" data-music-section="solLamp">
         <div className="section-heading">
           <p className="section-kicker">Original SOL Lamps</p>
-          <h2>The current sellable modular lamp system</h2>
+          <h2>Complete modular lamps for quick checkout</h2>
         </div>
         <ProductGrid onNavigate={onNavigate} products={originalSolLamps} showDescription={false} />
       </section>
@@ -268,7 +294,7 @@ export function ShopPage({ onNavigate }) {
       <section className="store-section section-pad" data-music-section="solLamp">
         <div className="section-heading">
           <p className="section-kicker">Shades and Bundles</p>
-          <h2>Compatible products for expanding an Original SOL build</h2>
+          <h2>Compatible pieces for expanding a build</h2>
         </div>
         <ProductGrid onNavigate={onNavigate} products={originalSolAddOns} showDescription={false} />
       </section>
@@ -290,6 +316,32 @@ export function OriginalSolCollectionPage({ onNavigate }) {
           <AppLink to="/sol-x" onNavigate={onNavigate}>SOL X Preview</AppLink>
         </div>
       </PageHero>
+
+      <section className="original-sol-explainer section-pad" data-music-section="studio">
+        <div className="section-heading">
+          <p className="section-kicker">System overview</p>
+          <h2>Original SOL is the lamp collection customers can buy now</h2>
+        </div>
+        <div className="original-sol-explainer__grid">
+          {originalSolSystemPoints.map((item) => (
+            <article key={item.label}>
+              <p>{item.label}</p>
+              <h3>{item.title}</h3>
+              <span>{item.body}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="original-sol-compat section-pad" data-music-section="solX">
+        <div>
+          <p className="section-kicker">Compatibility direction</p>
+          <h2>Built for today, shaped for the next SOL system</h2>
+        </div>
+        <p>
+          Original SOL and SOL X share the same core visual language: ribbed printed forms, swappable silhouettes, and modular build logic. Original SOL is the lamp system available now. SOL X is the future electronic and configurator direction, developed as a prototype path for smarter parts, cleaner build feedback, and long-term compatibility.
+        </p>
+      </section>
 
       <ProductSections onNavigate={onNavigate} products={sellableOriginalSolProducts} showDescription={false} />
     </main>
@@ -441,7 +493,7 @@ export function AboutPage() {
     <main className="route-page">
       <PageHero
         kicker="About / Contact"
-        title="Let's build the next system"
+        title="Start a conversation"
         body="Sol Seven Studios develops modular lighting, furniture, additive workflows, and circular manufacturing stories from New York."
         media={assetUrl('assets/process/founder-brand-portrait.png')}
         musicSection="contact"
@@ -449,7 +501,7 @@ export function AboutPage() {
       <section className="contact-section contact-section--route" data-music-section="contact">
         <div className="contact-layout">
           <p className="section-kicker">Contact</p>
-          <h2>Let's build the next system</h2>
+          <h2>Start a conversation</h2>
           <ContactForm context="about-page" />
           <SocialLinks />
         </div>
@@ -463,7 +515,7 @@ export function ContactPage() {
     <main className="route-page">
       <PageHero
         kicker="Contact"
-        title="Contact"
+        title="Start a conversation"
         body="Use this form for product questions, custom work, collaborations, press, and business inquiries."
         media={assetUrl('assets/gallery/curated/detail-modular-lamp-01.png')}
         musicSection="contact"
@@ -485,8 +537,8 @@ export function GalleryPage() {
     <main className="route-page">
       <PageHero
         kicker="Gallery"
-        title="Gallery"
-        body="A curated visual archive for room settings, system studies, and close material views."
+        title="SOL in rooms, systems, and details"
+        body="A visual archive of modular lighting, interior use, product details, and material views."
         media={assetUrl('assets/gallery/curated/living-space-sol-system-01.png')}
       />
 
@@ -537,9 +589,21 @@ export function PressPage({ onNavigate }) {
       <section className="press-section section-pad" data-music-section="studio">
         <div className="section-heading">
           <p className="section-kicker">Coverage</p>
-          <h2>Publication links will appear here as features go live</h2>
+          <h2>Press, exhibition notes, and circular design coverage</h2>
         </div>
         <div className="press-grid">
+          <a
+            className="press-card press-card--link"
+            href="https://www.yankodesign.com/2024/11/19/3d-printed-chairs-are-made-from-100-recycled-plastic-from-donation-program/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <p>Yanko Design</p>
+            <h3>Revo Chair circular design feature</h3>
+            <span>
+              Coverage of recycled-plastic furniture work that supports the studio's circular material and additive manufacturing direction.
+            </span>
+          </a>
           <article className="press-card">
             <p>ICFF 2026</p>
             <h3>WantedDesign Launch Pad</h3>

@@ -336,46 +336,45 @@ export const solXComponents = [
 
 export const collectionNotes = {
   originalSol:
-    'Discover the modular S0L Lamps, shades, and attachments. Every piece is designed to mix, match, and stack so a lamp can feel personal, playful, and adaptable.',
+    'Original SOL is the current modular lamp system from Sol Seven Studios. Lamps, shades, and attachments are designed to mix, stack, and adapt over time.',
   solX:
-    'SOL X is a preview of the next technology direction: component-based lamp architecture, additive manufacturing workflows, and cleaner digital-to-physical assembly logic.',
+    'SOL X is the future electronic and configurator direction for the same design language. It is shown as a prototype and interactive preview, not as a current product for sale.',
 };
 
 export const siteGallerySections = [
   {
     title: 'Studio',
-    description: 'Product family studies, silhouettes, and modular arrangements',
+    description: 'Product families, silhouettes, and modular combinations',
     items: [
-      galleryImage(galleryAsset('studio-product-family-01.jpg'), 'Original SOL family study.'),
-      galleryImage(galleryAsset('studio-system-wide-01.png'), 'Modular lamp system study.'),
-      galleryImage(galleryAsset('studio-sol-collection-02.png'), 'Studio arrangement with shade, lamp, and add-on forms.'),
+      galleryImage(galleryAsset('studio-product-family-01.jpg'), 'Original SOL family in white, amber, and gray'),
+      galleryImage(galleryAsset('studio-system-wide-01.png'), 'Modular lamp system with PlastiVista seating forms'),
+      galleryImage(galleryAsset('studio-sol-collection-02.png'), 'Studio arrangement with shade, lamp, and add-on forms'),
     ],
   },
   {
     title: 'Living Spaces',
-    description: 'Interior compositions for scale, warmth, and everyday placement',
+    description: 'Modular lighting for everyday rooms',
     items: [
-      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'SOL lamps in a calm interior setting.'),
-      galleryImage(galleryAsset('living-space-sol-collection-01.png'), 'Warm room composition with modular floor and table forms.'),
-      galleryImage(lampImage('sol-gallery-b.png'), 'Sculptural SOL lighting in a residential setting.'),
+      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'SOL lamps in a calm interior setting'),
+      galleryImage(galleryAsset('living-space-sol-collection-01.png'), 'Warm room composition with modular floor and table forms'),
+      galleryImage(lampImage('sol-gallery-b.png'), 'Sculptural SOL lighting in a residential setting'),
     ],
   },
   {
     title: 'Bedrooms',
-    description: 'Bedside-scale lighting studies with softer ambient presence',
+    description: 'Soft ambient lighting for everyday spaces',
     items: [
-      galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft bedside-scale SOL arrangement.'),
-      galleryImage(lampImage('homepage-sol-feature.png'), 'Low, warm modular light study.'),
-      galleryImage(galleryAsset('living-space-sol-system-01.png'), 'Quiet room setting with modular silhouettes.'),
+      galleryImage(galleryAsset('bedroom-sol-collection-01.png'), 'Soft bedside-scale SOL arrangement'),
+      galleryImage(lampImage('homepage-sol-feature.png'), 'Low, warm modular light for a side table'),
     ],
   },
   {
     title: 'Details',
-    description: 'Material, profile, and modular connection studies',
+    description: 'Material, profile, and modular connections',
     items: [
-      galleryImage(galleryAsset('detail-modular-lamp-01.png'), 'Vertical module and shade detail.'),
-      galleryImage(galleryAsset('detail-shade-study-01.png'), 'Shade profile and diffusion study.'),
-      galleryImage(plastivistaImage('homepage-process-sequence.png'), 'Circular production workflow.'),
+      galleryImage(galleryAsset('detail-modular-lamp-01.png'), 'Vertical module and shade detail'),
+      galleryImage(galleryAsset('detail-shade-study-01.png'), 'Shade profile and diffusion detail'),
+      galleryImage(plastivistaImage('homepage-process-sequence.png'), 'Circular production workflow'),
     ],
   },
 ];

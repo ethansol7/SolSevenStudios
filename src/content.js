@@ -2,11 +2,16 @@ export const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\
 
 export const navItems = [
   { label: 'Home', href: '/' },
-  { label: 'Work', href: '/#work' },
+  {
+    label: 'Products',
+    href: '/shop',
+    children: [
+      { label: 'Original SOL', href: '/shop/original-sol' },
+      { label: 'SOL X', href: '/sol-x' },
+    ],
+  },
   { label: 'Shop', href: '/shop' },
   { label: 'Gallery', href: '/gallery' },
-  { label: 'Original SOL', href: '/shop/original-sol' },
-  { label: 'SOL X', href: '/sol-x' },
   { label: 'Configurator', href: '/solx-configurator' },
   { label: 'PlastiVista', href: '/plastivista' },
   { label: 'Press', href: '/press' },
@@ -30,11 +35,11 @@ export const featuredWork = [
   },
   {
     title: 'SOL X Lamp',
-    eyebrow: 'Additive workflow',
+    eyebrow: 'Future system',
     musicSection: 'solX',
     image: assetUrl('assets/lamps/solx-one-lamp.png'),
     description:
-      'A refined lamp study that connects printed parts, connector logic, and premium domestic lighting.',
+      'The future electronic and configurator direction for the SOL language, built around component feedback and digital assembly logic.',
   },
   {
     title: 'PlastiVista',

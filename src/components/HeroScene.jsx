@@ -9,7 +9,7 @@ const heroModelUrl = assetUrl('assets/3d/sol-lamp-exploded.glb');
 const heroLayouts = {
   desktop: {
     camera: { position: [0, 0.2, 6.2], fov: 36 },
-    model: { position: [0.65, -0.48, 0], rotation: [0, -0.35, 0], scale: 3.05 },
+    model: { position: [0.24, -0.38, 0], rotation: [0, -0.35, 0], scale: 3.55 },
     shadow: { position: [0, -2.12, 0], scale: 8 },
   },
   tablet: {
@@ -79,7 +79,6 @@ function LampModel({ layout }) {
 function StudioRig({ layout }) {
   return (
     <>
-      <color attach="background" args={['#f7f5ef']} />
       <fog attach="fog" args={['#f7f5ef', 9, 24]} />
       <ambientLight intensity={1.18} />
       <directionalLight position={[5, 6, 4]} intensity={2.35} color="#fff8ea" />

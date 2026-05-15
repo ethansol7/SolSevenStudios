@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion';
-import { ArrowDown, ExternalLink, Menu, X } from 'lucide-react';
+import { ArrowDown, ChevronDown, ExternalLink, Menu, X } from 'lucide-react';
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import AppLink from './components/AppLink.jsx';
 import ContactForm from './components/ContactForm.jsx';
@@ -51,16 +51,21 @@ const cascade = {
 
 function Navigation({ onNavigate, routePath }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openMenuKey, setOpenMenuKey] = useState(null);
 
   useEffect(() => {
     setIsMenuOpen(false);
+    setOpenMenuKey(null);
   }, [routePath]);
 
   useEffect(() => {
     if (!isMenuOpen) return undefined;
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') setIsMenuOpen(false);
+      if (event.key === 'Escape') {
+        setIsMenuOpen(false);
+        setOpenMenuKey(null);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -69,6 +74,7 @@ function Navigation({ onNavigate, routePath }) {
 
   const handleNavigate = (event, href) => {
     setIsMenuOpen(false);
+    setOpenMenuKey(null);
     onNavigate?.(event, href);
   };
 
@@ -76,6 +82,11 @@ function Navigation({ onNavigate, routePath }) {
     const path = href.split('#')[0] || '/';
     if (path === '/' && href.includes('#')) return false;
     return routePath === path;
+  };
+
+  const isItemActive = (item) => {
+    if (item.children?.length) return item.children.some((child) => isActive(child.href));
+    return isActive(item.href);
   };
 
   return (
@@ -95,18 +106,57 @@ function Navigation({ onNavigate, routePath }) {
         <span>{isMenuOpen ? 'Close' : 'Menu'}</span>
       </button>
       <nav id="primary-navigation" aria-label="Primary navigation">
-        {navItems.map((item) => (
-          <AppLink
-            key={item.href}
-            className={`nav-link${isActive(item.href) ? ' is-active' : ''}`}
-            to={item.href}
-            onNavigate={(event) => handleNavigate(event, item.href)}
-            aria-label={mobileNavLabels[item.label] ?? item.label}
-            aria-current={isActive(item.href) ? 'page' : undefined}
-          >
-            <span data-label={item.label} data-mobile-label={mobileNavLabels[item.label] ?? item.label}>{item.label}</span>
-          </AppLink>
-        ))}
+        {navItems.map((item) => {
+          const active = isItemActive(item);
+
+          if (item.children?.length) {
+            const isExpanded = openMenuKey === item.label;
+
+            return (
+              <div
+                className={`nav-group${active ? ' is-active' : ''}${isExpanded ? ' is-expanded' : ''}`}
+                key={item.label}
+              >
+                <button
+                  type="button"
+                  className="nav-link nav-link--button"
+                  aria-haspopup="true"
+                  aria-expanded={isExpanded}
+                  onClick={() => setOpenMenuKey((current) => (current === item.label ? null : item.label))}
+                >
+                  <span data-label={item.label} data-mobile-label={item.label}>{item.label}</span>
+                  <ChevronDown size={13} aria-hidden="true" />
+                </button>
+                <div className="nav-dropdown" role="menu" aria-label={`${item.label} pages`}>
+                  {item.children.map((child) => (
+                    <AppLink
+                      key={child.href}
+                      className={`nav-dropdown-link${isActive(child.href) ? ' is-active' : ''}`}
+                      to={child.href}
+                      onNavigate={(event) => handleNavigate(event, child.href)}
+                      role="menuitem"
+                    >
+                      {child.label}
+                    </AppLink>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <AppLink
+              key={item.href}
+              className={`nav-link${active ? ' is-active' : ''}`}
+              to={item.href}
+              onNavigate={(event) => handleNavigate(event, item.href)}
+              aria-label={mobileNavLabels[item.label] ?? item.label}
+              aria-current={active ? 'page' : undefined}
+            >
+              <span data-label={item.label} data-mobile-label={mobileNavLabels[item.label] ?? item.label}>{item.label}</span>
+            </AppLink>
+          );
+        })}
       </nav>
     </header>
   );
@@ -216,14 +266,6 @@ function FeaturedWork() {
             </div>
           </motion.article>
         ))}
-      </div>
-      <div className="work-context">
-        <p>
-          Original SOL is the current sellable lamp system. Its modular shades, bases, and add-ons are designed to stay useful as the system evolves.
-        </p>
-        <p>
-          SOL X is the future electronic and configurator direction, developed to keep the same core language while expanding digital build logic, component feedback, and future compatibility.
-        </p>
       </div>
     </section>
   );
@@ -360,7 +402,7 @@ function Contact() {
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="section-kicker">Contact</p>
-        <h2>Let's build the next system</h2>
+        <h2>Start a conversation</h2>
         <div className="contact-layout contact-layout--footer">
           <ContactForm context="home-footer" />
           <SocialLinks />
